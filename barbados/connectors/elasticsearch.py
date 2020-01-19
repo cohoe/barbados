@@ -1,5 +1,6 @@
 import requests
 
+
 class ElasticsearchConnector:
     def __init__(self, protocol='http', host='localhost', port=9200):
         self.protocol = protocol

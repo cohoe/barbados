@@ -1,5 +1,13 @@
 from pynamodb.models import Model
+from pynamodb.indexes import GlobalSecondaryIndex, IncludeProjection
 from pynamodb.attributes import UnicodeAttribute, UnicodeSetAttribute, JSONAttribute, NumberAttribute
+
+
+class CocktailNameIndex(GlobalSecondaryIndex):
+    class Meta:
+        projection = IncludeProjection(['display_name'])
+
+    slug = UnicodeAttribute(hash_key=True)
 
 
 class CocktailModel(Model):
@@ -17,3 +25,5 @@ class CocktailModel(Model):
     notes = UnicodeSetAttribute(null=True)
     origin = JSONAttribute(null=True)
     spec_count = NumberAttribute(null=False)
+
+    name_index = CocktailNameIndex()
