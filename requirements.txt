@@ -1,0 +1,6 @@
+MarkupSafe
+python-editor
+jinja2
+pdfkit
+wkhtmltopdf
+PyYAML
