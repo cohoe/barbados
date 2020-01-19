@@ -23,6 +23,8 @@ setup(
         'python-editor',
         'pdfkit',
         'wkhtmltopdf',
-        'PyYAML'
+        'PyYAML',
+        'pynamodb',
+        'requests'
     ]
 )
