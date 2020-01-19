@@ -2,8 +2,8 @@ from .status import Status
 
 
 class Cocktail:
-    def __init__(self, name, status, origin, specs, citations, notes, tags, slug):
-        self.name = name
+    def __init__(self, display_name, status, origin, specs, citations, notes, tags, slug):
+        self.display_name = display_name
         self.status = status
         self.origin = origin
         self.specs = specs
@@ -29,11 +29,11 @@ class Cocktail:
         :return:
         """
         ser = {
-            'name': self.name,
+            'display_name': self.display_name,
             'slug': self.slug,
             'status': self.status.color,
             'origin': self.origin.serialize(),
-            'spec': [spec.serialize() for spec in self.specs],
+            'specs': [spec.serialize() for spec in self.specs],
             'spec_count': self.spec_count,
             'citations': [citation.serialize() for citation in self.citations],
             'notes': [note.serialize() for note in self.notes],

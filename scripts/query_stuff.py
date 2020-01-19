@@ -9,7 +9,7 @@ log = logging.getLogger("pynamodb")
 log.setLevel(logging.DEBUG)
 log.propagate = True
 
-results = CocktailModel.query(hash_key="flor-de-jerez", attributes_to_get=['display_name', 'status'])
+results = CocktailModel.query(hash_key="flor-de-jerez", attributes_to_get=['display_name', 'status', 'notes'])
 
 for result in results:
-    print(result.__dict__)
+    print(result.notes)

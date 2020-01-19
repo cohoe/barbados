@@ -5,3 +5,4 @@ pdfkit
 wkhtmltopdf
 PyYAML
 pynamodb
+requests

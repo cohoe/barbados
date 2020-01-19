@@ -11,7 +11,7 @@ class CocktailModel(Model):
 
     slug = UnicodeAttribute(hash_key=True)
     display_name = UnicodeAttribute(null=False)
-    spec = JSONAttribute(null=False)
+    specs = JSONAttribute(null=False)
     status = UnicodeAttribute(null=False)
     citations = JSONAttribute(null=True)
     notes = UnicodeSetAttribute(null=True)
