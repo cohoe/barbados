@@ -1,3 +1,4 @@
+import barbados.config
 from pynamodb.models import Model
 from pynamodb.indexes import GlobalSecondaryIndex, IncludeProjection
 from pynamodb.attributes import UnicodeAttribute, UnicodeSetAttribute, JSONAttribute, NumberAttribute
@@ -13,7 +14,7 @@ class CocktailNameIndex(GlobalSecondaryIndex):
 class CocktailModel(Model):
     class Meta:
         table_name = 'cocktails'
-        host = 'http://127.0.0.1:8000'
+        host = barbados.config.database.dynamodb_endpoint
         read_capacity_units = 1
         write_capacity_units = 1
 

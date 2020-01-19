@@ -4,6 +4,7 @@ import json
 from barbados.models import CocktailModel
 from barbados.factories import CocktailFactory
 from barbados.connectors import RedisConnector
+import barbados.config
 
 import json
 import logging
@@ -30,4 +31,4 @@ results = [result.attribute_values for result in index_scan_results]
 rc = RedisConnector()
 # rc.set('cocktail_name_list', json.dumps(results))
 
-print(json.loads(rc.get('cocktail_name_list')))
+print(json.loads(rc.get(barbados.config.cache.cocktail_name_list_key)))

@@ -25,6 +25,7 @@ setup(
         'wkhtmltopdf',
         'PyYAML',
         'pynamodb',
-        'requests'
+        'requests',
+        'redis'
     ]
 )

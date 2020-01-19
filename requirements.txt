@@ -6,3 +6,4 @@ wkhtmltopdf
 PyYAML
 pynamodb
 requests
+redis
