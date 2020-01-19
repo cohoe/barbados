@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 from barbados.models import CocktailModel
+from barbados.factories import CocktailFactory
 
 import logging
 
@@ -9,7 +10,7 @@ log = logging.getLogger("pynamodb")
 log.setLevel(logging.DEBUG)
 log.propagate = True
 
-results = CocktailModel.query(hash_key="flor-de-jerez", attributes_to_get=['display_name', 'status', 'notes'])
+result = CocktailModel.query(hash_key="margarita").next()
 
-for result in results:
-    print(result.notes)
+c_obj = CocktailFactory.model_to_obj(result)
+print(c_obj)

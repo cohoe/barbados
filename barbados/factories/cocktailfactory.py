@@ -76,3 +76,7 @@ class CocktailFactory:
                 raw_recipe[key] = required_keys[key]
 
         return raw_recipe
+
+    @staticmethod
+    def model_to_obj(model):
+        return CocktailFactory.raw_to_obj(raw_recipe=model.attribute_values, slug=model.slug)
