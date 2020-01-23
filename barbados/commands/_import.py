@@ -2,6 +2,7 @@ import argparse
 import sys
 from barbados.models import CocktailModel
 from barbados.factories import CocktailFactory
+from barbados.connectors import PostgresqlConnector
 
 
 class Import:
@@ -17,10 +18,9 @@ class Import:
 
         print(c.serialize())
 
-        ddb = CocktailModel(**c.serialize())
-        ddb.save()
-
-
+        db_obj = CocktailModel(**c.serialize())
+        conn = PostgresqlConnector()
+        conn.save(db_obj)
 
     @staticmethod
     def _setup_args():

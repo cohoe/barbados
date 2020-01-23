@@ -24,8 +24,9 @@ setup(
         'pdfkit',
         'wkhtmltopdf',
         'PyYAML',
-        'pynamodb',
+        'SQLAlchemy',
         'requests',
-        'redis'
+        'redis',
+        'psycopg2-binary'
     ]
 )

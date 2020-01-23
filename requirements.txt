@@ -4,6 +4,7 @@ jinja2
 pdfkit
 wkhtmltopdf
 PyYAML
-pynamodb
+SQLAlchemy
 requests
 redis
+psycopg2-binary

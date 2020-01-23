@@ -8,3 +8,4 @@ from .search import Search
 from .index import Index
 from ._import import Import
 from .list import List
+from .initdb import Initdb

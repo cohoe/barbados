@@ -79,4 +79,11 @@ class CocktailFactory:
 
     @staticmethod
     def model_to_obj(model):
-        return CocktailFactory.raw_to_obj(raw_recipe=model.attribute_values, slug=model.slug)
+        raw_data = {
+            'display_name': model.display_name,
+            'notes': model.notes,
+            'specs': model.specs,
+            'status': model.status,
+        }
+
+        return CocktailFactory.raw_to_obj(raw_recipe=raw_data, slug=model.slug)

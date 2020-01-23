@@ -1,30 +1,18 @@
-import barbados.config
-from pynamodb.models import Model
-from pynamodb.indexes import GlobalSecondaryIndex, IncludeProjection
-from pynamodb.attributes import UnicodeAttribute, UnicodeSetAttribute, JSONAttribute, NumberAttribute
+from barbados.models.base import Base
+from sqlalchemy import Column, Integer, JSON, String
 
 
-class CocktailNameIndex(GlobalSecondaryIndex):
-    class Meta:
-        projection = IncludeProjection(['display_name'])
+class CocktailModel(Base):
+    __tablename__ = 'cocktails'
 
-    slug = UnicodeAttribute(hash_key=True)
+    slug = Column(String, primary_key=True)
+    display_name = Column(String, nullable=False)
+    specs = Column(JSON, nullable=False)
+    status = Column(String, nullable=False)
+    citations = Column(JSON, nullable=True)
+    notes = Column(JSON, nullable=True)
+    origin = Column(JSON, nullable=False)
+    spec_count = Column(Integer, nullable=False)
 
-
-class CocktailModel(Model):
-    class Meta:
-        table_name = 'cocktails'
-        host = barbados.config.database.dynamodb_endpoint
-        read_capacity_units = 1
-        write_capacity_units = 1
-
-    slug = UnicodeAttribute(hash_key=True)
-    display_name = UnicodeAttribute(null=False)
-    specs = JSONAttribute(null=False)
-    status = UnicodeAttribute(null=False)
-    citations = JSONAttribute(null=True)
-    notes = UnicodeSetAttribute(null=True)
-    origin = JSONAttribute(null=True)
-    spec_count = NumberAttribute(null=False)
-
-    name_index = CocktailNameIndex()
+    def __repr__(self):
+        return "<Barbaros::Models::CocktailModel[%s]>" % self.slug
