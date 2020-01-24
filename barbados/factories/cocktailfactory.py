@@ -79,6 +79,8 @@ class CocktailFactory:
 
     @staticmethod
     def model_to_obj(model):
+        if model is None:
+            raise KeyError('empty object')
         raw_data = {
             'display_name': model.display_name,
             'notes': model.notes,
