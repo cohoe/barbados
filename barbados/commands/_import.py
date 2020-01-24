@@ -18,6 +18,7 @@ class Import:
 
         print(c.serialize())
 
+        # @TODO upsert or at least deal with re-import
         db_obj = CocktailModel(**c.serialize())
         conn = PostgresqlConnector()
         conn.save(db_obj)
