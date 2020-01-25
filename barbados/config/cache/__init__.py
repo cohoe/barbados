@@ -4,3 +4,4 @@ redis_port = 6379
 redis_username = None
 redis_password = None
 redis_ssl = False
+jamaica_prefix = 'fcache::'
