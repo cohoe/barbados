@@ -27,6 +27,7 @@ setup(
         'SQLAlchemy',
         'requests',
         'redis',
-        'psycopg2-binary'
+        'psycopg2-binary',
+        'python-slugify'
     ]
 )

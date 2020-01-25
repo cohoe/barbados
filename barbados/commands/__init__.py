@@ -10,3 +10,4 @@ from ._import import Import
 from .list import List
 from .initdb import Initdb
 from .cache_rebuild import CacheRebuild
+from .scrape import Scrape
