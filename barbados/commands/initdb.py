@@ -3,6 +3,7 @@ import sys
 from barbados.connectors import PostgresqlConnector
 from barbados.models.base import Base
 
+
 class Initdb:
     def __init__(self):
         pass

@@ -1,7 +1,7 @@
 import sqlalchemy
 import barbados.config
 from sqlalchemy.orm import sessionmaker, Session
-from barbados.models import CocktailModel
+from barbados.models import CocktailModel, IngredientModel
 
 
 class PostgresqlConnector:

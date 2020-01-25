@@ -15,4 +15,4 @@ class CocktailModel(Base):
     spec_count = Column(Integer, nullable=False)
 
     def __repr__(self):
-        return "<Barbaros::Models::CocktailModel[%s]>" % self.slug
+        return "<Barbados::Models::CocktailModel[%s]>" % self.slug
