@@ -1,10 +1,4 @@
-import enum
-
-
-class IngredientTypeEnum(enum.Enum):
-    CATEGORY = 'category'
-    FAMILY = 'family'
-    INGREDIENT = 'ingredient'
+from barbados.constants import IngredientTypeEnum
 
 
 class Ingredient:

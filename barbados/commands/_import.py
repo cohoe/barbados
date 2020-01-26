@@ -5,7 +5,8 @@ from barbados.models import CocktailModel, IngredientModel
 from barbados.factories import CocktailFactory
 from barbados.connectors import PostgresqlConnector
 from barbados.objects import Ingredient
-from barbados.objects.ingredient import IngredientTypeEnum
+from barbados.constants import IngredientTypeEnum
+
 
 class Import:
     def __init__(self):
