@@ -1,6 +1,8 @@
 import redis
 import barbados.config
 
+# @TODO implement global connection pooling somewhere
+
 
 class RedisConnector:
     def __init__(self):
