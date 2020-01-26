@@ -2,7 +2,7 @@ import argparse
 import sys
 import barbados.util
 import json
-from barbados.mixtech.database import Database
+from barbados.connectors.mixologytech import Database
 
 
 class Extract:
