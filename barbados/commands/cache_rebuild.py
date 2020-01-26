@@ -3,7 +3,9 @@ import sys
 import barbados.config
 import json
 from barbados.connectors import PostgresqlConnector, RedisConnector
-from barbados.models import CocktailModel
+from barbados.models import CocktailModel, IngredientModel
+from barbados.objects.ingredient import IngredientTypeEnum
+from sqlalchemy import or_
 
 
 class CacheRebuild:
@@ -18,6 +20,22 @@ class CacheRebuild:
         conn = PostgresqlConnector()
         sess = conn.Session()
 
+        self._build_cocktail_cache(sess, redis)
+        self._build_ingredient_cache(sess, redis)
+
+    @staticmethod
+    def _setup_args():
+        parser = argparse.ArgumentParser(description='Rebuild cache',
+                                         usage='drink cache-rebuild')
+
+        return parser.parse_args(sys.argv[2:])
+
+    @staticmethod
+    def _validate_args(args):
+        pass
+
+    @staticmethod
+    def _build_cocktail_cache(sess, redis):
         # This is still returning all values, just not populating them
         scan_results = sess.query(CocktailModel).add_columns(CocktailModel.slug, CocktailModel.display_name).all()
 
@@ -36,12 +54,15 @@ class CacheRebuild:
         redis.set(barbados.config.cache.cocktail_name_list_key, json.dumps(index))
 
     @staticmethod
-    def _setup_args():
-        parser = argparse.ArgumentParser(description='Rebuild cache',
-                                         usage='drink cache-rebuild')
+    def _build_ingredient_cache(sess, redis):
+        # This is still returning all values, just not populating them
+        scan_results = sess.query(IngredientModel).add_columns(IngredientModel.slug, IngredientModel.display_name).filter(or_(IngredientModel.type == IngredientTypeEnum.INGREDIENT.value, IngredientModel.type == IngredientTypeEnum.FAMILY.value))
 
-        return parser.parse_args(sys.argv[2:])
+        index = []
+        for result in scan_results:
+            index.append({
+                'slug': result.slug,
+                'display_name': result.display_name
+            })
 
-    @staticmethod
-    def _validate_args(args):
-        pass
+        redis.set(barbados.config.cache.ingredient_name_list_key, json.dumps(index))
