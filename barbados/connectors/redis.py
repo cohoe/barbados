@@ -24,3 +24,6 @@ class RedisConnector:
             raise KeyError
 
         return value
+
+    def delete(self, key):
+        self.client.delete(key)
