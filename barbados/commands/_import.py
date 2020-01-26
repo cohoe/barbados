@@ -20,14 +20,11 @@ class Import:
         sess = conn.Session()
 
         if args.object == 'recipe':
-            c = CocktailFactory.obj_from_file(args.recipepath)
-            print("Working %s" % args.recipepath)
-
-            print(c.serialize())
-
-            # @TODO upsert or at least deal with re-import
-            db_obj = CocktailModel(**c.serialize())
-            conn.save(db_obj)
+            self._import_recipe(args.filepath, conn, sess)
+        elif args.object == 'recipes':
+            recipe_dir = args.filepath
+            for filename in barbados.util.list_files(recipe_dir):
+                self._import_recipe("%s/%s" % (recipe_dir, filename), conn, sess)
         elif args.object == 'ingredients':
             data = barbados.util.read_yaml_file(args.filepath)
 
@@ -73,11 +70,28 @@ class Import:
     def _setup_args():
         parser = argparse.ArgumentParser(description='Import something to the database',
                                          usage='drink import <object> <recipepath>')
-        parser.add_argument('object', help='object to import', choices=['recipe', 'ingredients'])
-        parser.add_argument('filepath', help='path to the yaml file containing the objects')
+        parser.add_argument('object', help='object to import', choices=['recipe', 'recipes', 'ingredients'])
+        parser.add_argument('filepath', help='path to the yaml file (or directory) containing the objects')
 
         return parser.parse_args(sys.argv[2:])
 
     @staticmethod
     def _validate_args(args):
         pass
+
+    @staticmethod
+    def _import_recipe(filepath, db_conn, db_sess):
+        c = CocktailFactory.obj_from_file(filepath)
+        print("Working %s" % filepath)
+
+        # Drop the data and reload
+        print("deleting old data")
+        # Test for existing
+        existing = db_sess.query(CocktailModel).get(c.slug)
+        if existing:
+            db_sess.delete(existing)
+            db_sess.commit()
+
+        db_obj = CocktailModel(**c.serialize())
+        db_conn.save(db_obj)
+        print("created new")
