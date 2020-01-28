@@ -57,7 +57,6 @@ class Import:
             ingredients = sess.query(IngredientModel).all()
             for ingredient in ingredients:
                 # find parent
-                print(ingredient.parent)
                 if not ingredient.parent:
                     continue
                 parent = sess.query(IngredientModel).get(ingredient.parent)

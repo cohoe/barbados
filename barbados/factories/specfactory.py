@@ -58,7 +58,7 @@ class SpecFactory:
                      notes=n_obj_list,
                      straw=straw,
                      garnish=garnish_obj_list,
-                     instructions=instr_obj_list
+                     instructions=instr_obj_list,
                      construction=raw_spec['construction'])
 
         return s_obj
