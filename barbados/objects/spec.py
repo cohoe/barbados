@@ -1,5 +1,5 @@
 class Spec:
-    def __init__(self, name, origin, glassware, ingredients, citations, notes, straw, garnish, instructions):
+    def __init__(self, name, origin, glassware, ingredients, citations, notes, straw, garnish, instructions, construction):
         self.name = name
         self.origin = origin
         self.glassware = glassware
@@ -9,6 +9,7 @@ class Spec:
         self.straw = straw
         self.garnish = garnish
         self.instructions = instructions
+        self.construction = construction
 
     def __repr__(self):
         return "<Object:Spec::name=%s>" % self.name
@@ -26,6 +27,7 @@ class Spec:
             'name': self.name,
             'origin': self.origin.serialize(),
             'glassware': self.glassware.serialize(),
+            'construction': self.construction,
             'ingredients': [ingredient.serialize() for ingredient in self.ingredients],
             'ingredient_count': self.ingredient_count,
             'instructions': [instruction.serialize() for instruction in self.instructions],

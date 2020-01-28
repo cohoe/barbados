@@ -48,6 +48,8 @@ class SpecFactory:
             instr_obj_list.append(Text(text=instruction))
         # print(instr_obj_list)
 
+        # @TODO enum for construction
+
         s_obj = Spec(name=raw_spec['name'],
                      origin=origin_obj,
                      glassware=glassware_obj,
@@ -56,7 +58,8 @@ class SpecFactory:
                      notes=n_obj_list,
                      straw=straw,
                      garnish=garnish_obj_list,
-                     instructions=instr_obj_list)
+                     instructions=instr_obj_list
+                     construction=raw_spec['construction'])
 
         return s_obj
 
@@ -71,7 +74,8 @@ class SpecFactory:
             'notes': list(),
             'straw': None,
             'garnish': list(),
-            'instructions': list()
+            'instructions': list(),
+            'construction': None,
         }
 
         for key in required_keys.keys():
