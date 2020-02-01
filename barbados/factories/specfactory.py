@@ -1,4 +1,3 @@
-import barbados.util
 from barbados.objects import Spec, Origin, Glassware, SpecIngredient, Text
 from .citationfactory import CitationFactory
 
@@ -10,7 +9,7 @@ class SpecFactory:
     @staticmethod
     def raw_to_obj(raw_spec):
         if 'name' not in raw_spec.keys():
-            barbados.util.die('Spec is missing name')
+            raise Exception('Spec is missing name')
 
         raw_spec = SpecFactory.sanitize_raw(raw_spec)
 
@@ -35,7 +34,7 @@ class SpecFactory:
             n_obj_list.append(Text(text=note))
         # print(n_obj_list)
 
-        straw = barbados.util.infer_bool(raw_spec['straw'])
+        straw = SpecFactory.infer_bool(raw_spec['straw'])
         # print(straw)
 
         garnish_obj_list = []
@@ -88,3 +87,29 @@ class SpecFactory:
                 raw_spec[key] = required_keys[key]
 
         return raw_spec
+
+    @staticmethod
+    def infer_bool(input_value):
+        """
+        Infer a boolean from the given value
+        :param input_value: String, Integer, Boolean, None
+        :return: Boolean
+        """
+        # Boolean
+        if isinstance(input_value, bool):
+            return input_value
+
+        # Integer
+        if isinstance(input_value, int):
+            return bool(input_value)
+
+        # String
+        if isinstance(input_value, str):
+            if 'Y' in input_value.upper():
+                return True
+            else:
+                return False
+
+        # None
+        if input_value is None:
+            return False

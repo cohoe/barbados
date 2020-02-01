@@ -1,5 +1,4 @@
 from barbados.objects import Citation
-import barbados.util
 
 
 class CitationFactory:
@@ -16,7 +15,7 @@ class CitationFactory:
     @staticmethod
     def raw_list_to_obj(raw_citations):
         if not isinstance(raw_citations, list):
-            barbados.util.die("Calling raw_list_to_obj on a not-list?")
+            raise Exception("Calling raw_list_to_obj on a not-list?")
 
         c_objs = []
         for raw_citation in raw_citations:

@@ -1,4 +1,3 @@
-import barbados.util
 from barbados.objects import Cocktail, Status, Origin, Text
 from .specfactory import SpecFactory
 from .citationfactory import CitationFactory
@@ -9,17 +8,11 @@ class CocktailFactory:
         pass
 
     @staticmethod
-    def obj_from_file(path):
-        raw_recipe = barbados.util.read_yaml_file(path)[0]
-        slug = barbados.util.get_slug_from_path(path)
-        return CocktailFactory.raw_to_obj(raw_recipe, slug)
-
-    @staticmethod
     def raw_to_obj(raw_recipe, slug):
         raw_recipe = CocktailFactory.sanitize_raw(raw_recipe)
 
         if raw_recipe.get('display_name') is None:
-            barbados.util.die("display_name cannot be none")
+            raise Exception("display_name cannot be none")
 
         status_obj = Status(color=raw_recipe['status'])
 
