@@ -9,3 +9,4 @@ requests
 redis
 psycopg2-binary
 python-slugify
+kazoo

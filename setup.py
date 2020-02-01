@@ -28,6 +28,7 @@ setup(
         'requests',
         'redis',
         'psycopg2-binary',
-        'python-slugify'
+        'python-slugify',
+        'kazoo'
     ]
 )
