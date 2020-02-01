@@ -1,7 +1,7 @@
 from barbados.connectors import ZookeeperConnector
 
 
-class Config:
+class AppConfig:
     """
     Generic configuration class. This exists to provide a common interface
     to the connectors. Potential connectors could be:
@@ -19,7 +19,7 @@ class Config:
         :param path: Normalized path in the hierarchy to the key.
         :return: str or Exception
         """
-        return Config.appconfig_connector.get(path)
+        return AppConfig.appconfig_connector.get(path)
 
     @staticmethod
     def set(path, value):
@@ -30,4 +30,4 @@ class Config:
         :param value: String of the value to set
         :return: None or Exception
         """
-        return Config.appconfig_connector.set(path, value)
+        return AppConfig.appconfig_connector.set(path, value)

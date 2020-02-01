@@ -1,6 +1,6 @@
 import argparse
 import sys
-from barbados.objects import Config as config
+from barbados.objects import AppConfig
 
 
 class Config:
@@ -17,14 +17,17 @@ class Config:
         test_key_value = "127.0.0.1"
 
         try:
-            print(config.get(test_key_path))
-            print(config.get(test_key_path))
-            print(config.get(test_key_path))
-            print(config.get(test_key_path))
+            print(AppConfig.get(test_key_path))
+            print(AppConfig.get(test_key_path))
+            print(AppConfig.get(test_key_path))
+            print(AppConfig.get(test_key_path))
         except KeyError:
             print("KeyError")
-        config.set(test_key_path, test_key_value)
+        AppConfig.set(test_key_path, test_key_value)
         # print(zk.get(test_key_path))
+
+        AppConfig.set('/jamaica/api/v1/cocktail_name_list_key', 'cocktail_name_list')
+        AppConfig.set('/jamaica/api/v1/ingredient_name_list_key', 'ingredient_name_list')
 
 
     @staticmethod
