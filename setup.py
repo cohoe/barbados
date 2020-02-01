@@ -16,13 +16,7 @@ setup(
     author_email='grant@grantcohoe.com',
     description='A cocktail recipe management system',
     long_description=__doc__,
-    scripts=['scripts/drink'],
     install_requires=[
-        'jinja2',
-        'MarkupSafe',
-        'python-editor',
-        'pdfkit',
-        'wkhtmltopdf',
         'PyYAML',
         'SQLAlchemy',
         'requests',
