@@ -1,9 +1,33 @@
+from barbados.connectors import ZookeeperConnector
+
+
 class Config:
-    def __init__(self):
-        pass
+    """
+    Generic configuration class. This exists to provide a common interface
+    to the connectors. Potential connectors could be:
+    * Zookeeper
+    * AWS SSM Parameter Store
+    * etcd
+    """
 
-    def get(self, path):
-        pass
+    appconfig_connector = ZookeeperConnector()
 
-    def set(self, path, value):
-        pass
+    @staticmethod
+    def get(path):
+        """
+        Fetch the value from the configuration store for the given key.
+        :param path: Normalized path in the hierarchy to the key.
+        :return: str or Exception
+        """
+        return Config.appconfig_connector.get(path)
+
+    @staticmethod
+    def set(path, value):
+        """
+        Set a given key in the configuration store to a value. This
+        will create the key if it does not exist.
+        :param path: Normalized path in the hierarchy to the key.
+        :param value: String of the value to set
+        :return: None or Exception
+        """
+        return Config.appconfig_connector.set(path, value)

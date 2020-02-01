@@ -16,7 +16,7 @@ class Import:
         args = self._setup_args()
         self._validate_args(args)
 
-        conn = PostgresqlConnector()
+        conn = PostgresqlConnector(username='postgres', password='s3krAt', database='amari')
         sess = conn.Session()
 
         if args.object == 'recipe':

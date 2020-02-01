@@ -1,6 +1,6 @@
 import argparse
 import sys
-from barbados.connectors import ZookeeperConnector
+from barbados.objects import Config as config
 
 
 class Config:
@@ -11,19 +11,19 @@ class Config:
         args = self._setup_args()
         self._validate_args(args)
 
-        zk = ZookeeperConnector()
+        # zk = ZookeeperConnector()
 
         test_key_path = "/barbados/cache/redis/host"
         test_key_value = "127.0.0.1"
 
         try:
-            print(zk.get(test_key_path))
-            print(zk.get(test_key_path))
-            print(zk.get(test_key_path))
-            print(zk.get(test_key_path))
+            print(config.get(test_key_path))
+            print(config.get(test_key_path))
+            print(config.get(test_key_path))
+            print(config.get(test_key_path))
         except KeyError:
             print("KeyError")
-        zk.set(test_key_path, test_key_value)
+        config.set(test_key_path, test_key_value)
         # print(zk.get(test_key_path))
 
 

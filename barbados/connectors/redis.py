@@ -1,16 +1,15 @@
 import redis
-import barbados.config
 
 # @TODO implement global connection pooling somewhere
 
 
 class RedisConnector:
-    def __init__(self):
-        self.host = barbados.config.cache.redis_host
-        self.port = barbados.config.cache.redis_port
-        self.username = barbados.config.cache.redis_username  # this isn't here yet
-        self.password = barbados.config.cache.redis_password
-        self.ssl = barbados.config.cache.redis_ssl
+    def __init__(self, host='127.0.0.1', port=6379, username=None, password=None, ssl=False):
+        self.host = host
+        self.port = port
+        self.username = username
+        self.password = password
+        self.ssl = ssl
 
         self.client = redis.Redis(host=self.host, port=self.port, password=self.password, ssl=self.ssl, db=0)
 
