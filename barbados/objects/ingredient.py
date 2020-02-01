@@ -1,11 +1,11 @@
-from barbados.constants import IngredientTypeEnum
+from barbados.constants import IngredientTypes
 
 
 class Ingredient:
     def __init__(self, slug, display_name, type, parent=None):
         self.slug = slug
         self.display_name = display_name
-        self.type_ = IngredientTypeEnum(type)
+        self.type_ = IngredientTypes(type)
         self.parent = parent
 
     def serialize(self):

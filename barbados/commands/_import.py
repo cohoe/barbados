@@ -5,7 +5,7 @@ from barbados.models import CocktailModel, IngredientModel
 from barbados.factories import CocktailFactory
 from barbados.connectors import PostgresqlConnector
 from barbados.objects import Ingredient
-from barbados.constants import IngredientTypeEnum
+from barbados.constants import IngredientTypes
 
 
 class Import:
@@ -42,8 +42,8 @@ class Import:
                 # Test for existing
                 existing = sess.query(IngredientModel).get(i.slug)
                 if existing:
-                    if existing.type == IngredientTypeEnum.CATEGORY.value or existing.type == IngredientTypeEnum.FAMILY.value:
-                        if i.type_ is IngredientTypeEnum.INGREDIENT:
+                    if existing.type == IngredientTypes.CATEGORY.value or existing.type == IngredientTypes.FAMILY.value:
+                        if i.type_ is IngredientTypes.INGREDIENT:
                             print("Skipping %s (t:%s) since a broader entry exists (%s)" % (i.slug, i.type_.value, existing.type))
                         else:
                             print("%s (p:%s) already exists as a %s (p:%s)" % (i.slug, i.parent, existing.type, existing.parent))

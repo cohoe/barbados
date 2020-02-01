@@ -1,7 +1,7 @@
 import enum
 
 
-class IngredientTypeEnum(enum.Enum):
+class IngredientTypes(enum.Enum):
     CATEGORY = 'category'
     FAMILY = 'family'
     INGREDIENT = 'ingredient'
