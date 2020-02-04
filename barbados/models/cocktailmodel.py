@@ -14,9 +14,14 @@ class CocktailModel(Base):
     origin = Column(JSON, nullable=False)
     spec_count = Column(Integer, nullable=False)
 
-    @staticmethod
-    def get_all(session):
-        return session.query(CocktailModel).add_columns(CocktailModel.slug, CocktailModel.display_name).all()
+    def __init__(self, session):
+        self.session = session
+
+    def get_all(self):
+        return self.session.query(CocktailModel).add_columns(CocktailModel.slug, CocktailModel.display_name).all()
+
+    def get_by_slug(self, slug):
+        return self.session.query(CocktailModel).get(slug)
 
     def __repr__(self):
         return "<Barbados::Models::CocktailModel[%s]>" % self.slug
