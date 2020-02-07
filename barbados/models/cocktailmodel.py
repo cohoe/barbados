@@ -1,8 +1,8 @@
-from barbados.models.base import Base
+from barbados.models.base import BarbadosModel
 from sqlalchemy import Column, Integer, JSON, String
 
 
-class CocktailModel(Base):
+class CocktailModel(BarbadosModel):
     __tablename__ = 'cocktails'
 
     slug = Column(String, primary_key=True)
@@ -14,14 +14,14 @@ class CocktailModel(Base):
     origin = Column(JSON, nullable=False)
     spec_count = Column(Integer, nullable=False)
 
-    def __init__(self, session):
-        self.session = session
 
-    def get_all(self):
-        return self.session.query(CocktailModel).add_columns(CocktailModel.slug, CocktailModel.display_name).all()
+    @staticmethod
+    def get_all():
+        return CocktailModel.query.add_columns(CocktailModel.slug, CocktailModel.display_name).all()
 
-    def get_by_slug(self, slug):
-        return self.session.query(CocktailModel).get(slug)
+    @staticmethod
+    def get_by_slug(slug):
+        return CocktailModel.query.get(slug)
 
     def __repr__(self):
         return "<Barbados::Models::CocktailModel[%s]>" % self.slug

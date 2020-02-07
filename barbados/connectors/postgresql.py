@@ -1,21 +1,18 @@
 import sqlalchemy
-from sqlalchemy.orm import sessionmaker
-from barbados.models.base import Base
+from barbados.models.base import BarbadosModel, session
 
 
 class PostgresqlConnector:
 
     def __init__(self, username, password, database, host='127.0.0.1', port=5432):
-        self.connection_string = "postgres://%s:%s@%s:%i/%s" % (username, password, host, port, database)
+        connection_string = "postgres://%s:%s@%s:%i/%s" % (username, password, host, port, database)
 
-        self.engine = sqlalchemy.create_engine(self.connection_string)
-        self.Session = sessionmaker(bind=self.engine)
-        self.connection = self.engine.connect()
+        self.engine = sqlalchemy.create_engine(connection_string)
+        session.configure(bind=self.engine)
 
     def create_all(self):
-        Base.metadata.create_all(self.engine)
+        BarbadosModel.metadata.create_all(self.engine)
 
-    # def save(self, model_object):
-    #     session = self.Session(bind=self.connection)
-    #     session.add(model_object)
-    #     session.commit()
+    @staticmethod
+    def commit():
+        session.commit()
