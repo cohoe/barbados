@@ -11,15 +11,14 @@ class IngredientModel(Base):
     type = Column(String, nullable=False)
     parent = Column(String, nullable=True)
 
-    def __init__(self, session):
-        self.session = session
-
-    def get_usable_ingredients(self):
-        return self.session.query(IngredientModel).add_columns(IngredientModel.slug, IngredientModel.display_name).filter(
+    @staticmethod
+    def get_usable_ingredients(session):
+        return session.query(IngredientModel).add_columns(IngredientModel.slug, IngredientModel.display_name).filter(
             or_(IngredientModel.type == IngredientTypes.INGREDIENT.value, IngredientModel.type == IngredientTypes.FAMILY.value))
 
-    def get_by_type(self, type_):
-        return self.session.query(IngredientModel).filter(IngredientModel.type == type_.value)
+    @staticmethod
+    def get_by_type(session, type_):
+        return session.query(IngredientModel).filter(IngredientModel.type == type_.value)
 
     def __repr__(self):
         return "<Barbados::Models::IngredientModel[%s]>" % self.slug
