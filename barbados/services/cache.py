@@ -30,3 +30,12 @@ class Cache:
         :return: None or Exception
         """
         return Cache.cache_connector.set(key, value)
+
+    @staticmethod
+    def delete(key):
+        """
+        Delete a given key.
+        :param key: cache key
+        :return: None or Exception
+        """
+        return Cache.cache_connector.delete(key)
