@@ -18,7 +18,11 @@ class IngredientTree:
         for item in IngredientModel.get_by_type(IngredientTypes.FAMILY):
             tree.create_node(item.slug, item.slug, parent=item.parent, data=self._create_tree_data(item))
 
-        ingredients_to_place = list(IngredientModel.get_by_type(IngredientTypes.INGREDIENT))
+        # @TODO
+        ingredients = list(IngredientModel.get_by_type(IngredientTypes.INGREDIENT))
+        products = list(IngredientModel.get_by_type(IngredientTypes.PRODUCT))
+        aliases = list(IngredientModel.get_by_type(IngredientTypes.ALIAS))
+        ingredients_to_place = ingredients + products + aliases
 
         for i in range(1, passes+1):
             print("Pass %i/%i" % (i, passes))

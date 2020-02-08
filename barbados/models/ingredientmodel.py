@@ -14,7 +14,7 @@ class IngredientModel(BarbadosModel):
     @staticmethod
     def get_usable_ingredients():
         return IngredientModel.query.add_columns(IngredientModel.slug, IngredientModel.display_name).filter(
-            or_(IngredientModel.type == IngredientTypes.INGREDIENT.value, IngredientModel.type == IngredientTypes.FAMILY.value))
+            or_(IngredientModel.type == IngredientTypes.INGREDIENT.value, IngredientModel.type == IngredientTypes.FAMILY.value, IngredientModel.type == IngredientTypes.ALIAS.value, IngredientModel.type == IngredientTypes.PRODUCT.value))
 
     @staticmethod
     def get_by_type(type_):
