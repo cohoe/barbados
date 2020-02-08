@@ -21,8 +21,7 @@ class IngredientTree:
         # @TODO
         ingredients = list(IngredientModel.get_by_type(IngredientTypes.INGREDIENT))
         products = list(IngredientModel.get_by_type(IngredientTypes.PRODUCT))
-        aliases = list(IngredientModel.get_by_type(IngredientTypes.ALIAS))
-        ingredients_to_place = ingredients + products + aliases
+        ingredients_to_place = ingredients + products
 
         for i in range(1, passes+1):
             print("Pass %i/%i" % (i, passes))
