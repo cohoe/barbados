@@ -23,6 +23,7 @@ setup(
         'redis',
         'psycopg2-binary',
         'python-slugify',
-        'kazoo'
+        'kazoo',
+        'treelib'
     ]
 )
