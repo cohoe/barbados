@@ -13,10 +13,10 @@ class IngredientTree:
 
         tree.create_node(root, root)
         for item in IngredientModel.get_by_type(IngredientTypes.CATEGORY):
-            tree.create_node(item.display_name, item.slug, parent=root, data=self._create_tree_data(item))
+            tree.create_node(item.slug, item.slug, parent=root, data=self._create_tree_data(item))
 
         for item in IngredientModel.get_by_type(IngredientTypes.FAMILY):
-            tree.create_node(item.display_name, item.slug, parent=item.parent, data=self._create_tree_data(item))
+            tree.create_node(item.slug, item.slug, parent=item.parent, data=self._create_tree_data(item))
 
         ingredients_to_place = list(IngredientModel.get_by_type(IngredientTypes.INGREDIENT))
 
@@ -25,7 +25,7 @@ class IngredientTree:
 
             for item in ingredients_to_place[:]:
                 try:
-                    tree.create_node(item.display_name, item.slug, parent=item.parent, data=self._create_tree_data(item))
+                    tree.create_node(item.slug, item.slug, parent=item.parent, data=self._create_tree_data(item))
                     ingredients_to_place.remove(item)
                 except NodeIDAbsentError:
                     print("skipping %s (Attempt %i/%s)" % (item.slug, i, passes))
@@ -35,6 +35,20 @@ class IngredientTree:
                 break
 
         return tree
+
+    def subtree(self, node_id):
+        return self.tree.subtree(node_id)
+
+    def parent(self, node_id):
+        parent_id = self.tree.get_node(node_id).bpointer
+        return self.tree.get_node(parent_id)
+
+    def node(self, node_id):
+        node = self.tree.get_node(node_id)
+        if not node:
+            raise KeyError("Node %s could not be found." % node_id)
+
+        return node
 
     @staticmethod
     def _create_tree_data(item):
