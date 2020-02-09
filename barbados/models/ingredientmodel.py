@@ -16,8 +16,8 @@ class IngredientModel(BarbadosModel):
     @staticmethod
     def get_usable_ingredients():
         return IngredientModel.query.add_columns(IngredientModel.slug, IngredientModel.display_name).filter(
-            or_(IngredientModel.kind == IngredientKinds.INGREDIENT.value, IngredientModel.kind == IngredientKinds.FAMILY.value,
-                IngredientModel.kind == IngredientKinds.PRODUCT.value))
+            or_(IngredientModel.kind == IngredientKinds('ingredient').value, IngredientModel.kind == IngredientKinds('family').value,
+                IngredientModel.kind == IngredientKinds('product').value))
 
     @staticmethod
     def get_by_kind(kind):
