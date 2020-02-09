@@ -1,7 +1,7 @@
 from treelib import Node, Tree
 from treelib.exceptions import NodeIDAbsentError
 from barbados.models import IngredientModel
-from barbados.constants import IngredientKinds
+from barbados.constants import CategoryKind, ProductKind, FamilyKind, IngredientKind
 
 
 class IngredientTree:
@@ -12,15 +12,15 @@ class IngredientTree:
         tree = Tree()
 
         tree.create_node(root, root)
-        for item in IngredientModel.get_by_kind(IngredientKinds.CATEGORY):
+        for item in IngredientModel.get_by_kind(CategoryKind):
             tree.create_node(item.slug, item.slug, parent=root, data=self._create_tree_data(item))
 
-        for item in IngredientModel.get_by_kind(IngredientKinds.FAMILY):
+        for item in IngredientModel.get_by_kind(FamilyKind):
             tree.create_node(item.slug, item.slug, parent=item.parent, data=self._create_tree_data(item))
 
         # @TODO
-        ingredients = list(IngredientModel.get_by_kind(IngredientKinds.INGREDIENT))
-        products = list(IngredientModel.get_by_kind(IngredientKinds.PRODUCT))
+        ingredients = list(IngredientModel.get_by_kind(IngredientKind))
+        products = list(IngredientModel.get_by_kind(ProductKind))
         ingredients_to_place = ingredients + products
 
         for i in range(1, passes+1):

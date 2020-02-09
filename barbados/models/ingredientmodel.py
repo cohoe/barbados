@@ -1,5 +1,5 @@
 from barbados.models.base import BarbadosModel
-from barbados.constants import IngredientKinds
+from barbados.constants import IngredientKind, FamilyKind, ProductKind, IngredientKinds
 from barbados.exceptions import ValidationException
 from sqlalchemy import Column, String, or_
 
@@ -16,8 +16,8 @@ class IngredientModel(BarbadosModel):
     @staticmethod
     def get_usable_ingredients():
         return IngredientModel.query.add_columns(IngredientModel.slug, IngredientModel.display_name).filter(
-            or_(IngredientModel.kind == IngredientKinds('ingredient').value, IngredientModel.kind == IngredientKinds('family').value,
-                IngredientModel.kind == IngredientKinds('product').value))
+            or_(IngredientModel.kind == IngredientKind.value, IngredientModel.kind == FamilyKind.value,
+                IngredientModel.kind == ProductKind.value))
 
     @staticmethod
     def get_by_kind(kind):
