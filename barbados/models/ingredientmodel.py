@@ -1,5 +1,5 @@
 from barbados.models.base import BarbadosModel
-from barbados.constants import IngredientKinds, TopIngredientKind
+from barbados.constants import IngredientKinds
 from barbados.exceptions import ValidationException
 from sqlalchemy import Column, String, or_
 
@@ -24,15 +24,38 @@ class IngredientModel(BarbadosModel):
         return IngredientModel.query.filter(IngredientModel.kind == kind.value)
 
     def validate(self):
+        self._check_kind()
         self._check_parent_existence()
+        self._check_parent_kind()
+
+    def _check_kind(self):
+        try:
+            kind_class = IngredientKinds(self.kind)
+        except KeyError:
+            ValidationException("Ingredient %s has bad kind: %s" % (self.slug, self.kind))
 
     def _check_parent_existence(self):
-        if self.kind == TopIngredientKind.value:
+        if self.kind == IngredientKinds.top.value:
             return
 
-        parent = self.query.get(self.parent)
+        parent = self._get_parent()
         if not parent:
             raise ValidationException("Parent of %s does not exist (%s)" % (self.slug, self.parent))
+
+    def _check_parent_kind(self):
+        parent = self._get_parent()
+
+        if parent is None and IngredientKinds(self.kind) == IngredientKinds.top:
+            return
+
+        try:
+            if IngredientKinds(parent.kind).value not in IngredientKinds(self.kind).allowed_parents:
+                raise ValidationException("Parent (%s) of %s has invalid kind (%s)." % (parent.slug, self.slug, parent.kind))
+        except KeyError:
+            raise ValidationException("Parent (%s) of %s has bad kind (%s)"% (parent.slug, self.slug, parent.kind))
+
+    def _get_parent(self):
+        return self.query.get(self.parent)
 
     def __repr__(self):
         return "<Barbados::Models::IngredientModel[%s]>" % self.slug

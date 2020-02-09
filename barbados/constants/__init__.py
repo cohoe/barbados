@@ -1,31 +1,54 @@
-from aenum import Enum, extend_enum
-
-
-class IngredientKinds(Enum):
+class IngredientKinds(object):
     """
-    https://stackoverflow.com/questions/28126314/adding-members-to-python-enums/35899963
+    https://realpython.com/factory-method-python/
     """
-    pass
+    kinds = {}
+    top = None
+
+    # Apparently __call__() didn't work?
+    # https://stackoverflow.com/questions/34777773/typeerror-object-takes-no-parameters-after-defining-new
+    def __new__(cls, value):
+        return cls.kinds[value]
+
+    @classmethod
+    def register_kind(cls, kind_class):
+        cls.kinds[kind_class.value] = kind_class
+        if kind_class.top:
+            cls.top = kind_class
 
 
-class CategoryKind:
-    extend_enum(IngredientKinds, 'CATEGORY', 'category')
+class Kind(object):
+    top = False
 
 
-class FamilyKind:
-    extend_enum(IngredientKinds, 'FAMILY', 'family')
+class CategoryKind(Kind):
+    value = 'category'
+    allowed_parents = [None]
+    top = True
 
 
-class IngredientKind:
-    extend_enum(IngredientKinds, 'INGREDIENT', 'ingredient')
+class FamilyKind(Kind):
+    value = 'family'
+    allowed_parents = [CategoryKind.value]
 
 
-class ProductKind:
-    extend_enum(IngredientKinds, 'PRODUCT', 'product')
+class IngredientKind(Kind):
+    value = 'ingredient'
+    allowed_parents = [FamilyKind.value, value]
 
 
-class CustomKind:
-    extend_enum(IngredientKinds, 'CUSTOM', 'custom')
+class ProductKind(Kind):
+    value = 'product'
+    allowed_parents = [IngredientKind.value, FamilyKind.value]
 
 
-TopIngredientKind = IngredientKinds.CATEGORY
+class CustomKind(Kind):
+    value = 'custom'
+    allowed_parents = [IngredientKind.value, value]
+
+
+IngredientKinds.register_kind(CategoryKind)
+IngredientKinds.register_kind(FamilyKind)
+IngredientKinds.register_kind(IngredientKind)
+IngredientKinds.register_kind(ProductKind)
+IngredientKinds.register_kind(CustomKind)
