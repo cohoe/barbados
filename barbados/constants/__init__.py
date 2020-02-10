@@ -44,7 +44,7 @@ class ProductKind(Kind):
 
 class CustomKind(Kind):
     value = 'custom'
-    allowed_parents = [IngredientKind.value, value]
+    allowed_parents = [IngredientKind.value, ProductKind.value, value]
 
 
 IngredientKinds.register_kind(CategoryKind)
