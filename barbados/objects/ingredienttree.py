@@ -1,7 +1,7 @@
 from treelib import Node, Tree
 from treelib.exceptions import NodeIDAbsentError
 from barbados.models import IngredientModel
-from barbados.constants import CategoryKind, ProductKind, FamilyKind, IngredientKind
+from barbados.constants import CategoryKind, ProductKind, FamilyKind, IngredientKind, CustomKind
 
 
 class IngredientTree:
@@ -21,7 +21,8 @@ class IngredientTree:
         # @TODO
         ingredients = list(IngredientModel.get_by_kind(IngredientKind))
         products = list(IngredientModel.get_by_kind(ProductKind))
-        ingredients_to_place = ingredients + products
+        customs = list(IngredientModel.get_by_kind(CustomKind))
+        ingredients_to_place = ingredients + products + customs
 
         for i in range(1, passes+1):
             print("Pass %i/%i" % (i, passes))
