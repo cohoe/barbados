@@ -55,7 +55,8 @@ class IngredientModel(BarbadosModel):
             raise ValidationException("Parent (%s) of %s has bad kind (%s)"% (parent.slug, self.slug, parent.kind))
 
     def _get_parent(self):
-        return self.query.get(self.parent)
+        # https://github.com/sqlalchemy/sqlalchemy/commit/997f4b5f2b3b4725de0960824e95fcb1150ff215
+        return self.query.get(self.parent) if self.parent is not None else None
 
     def __repr__(self):
         return "<Barbados::Models::IngredientModel[%s]>" % self.slug
