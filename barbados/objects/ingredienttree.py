@@ -59,4 +59,5 @@ class IngredientTree:
         return ({
             'display_name': item.display_name,
             'kind': item.kind,
+            'aliases': item.aliases,
         })

@@ -90,7 +90,7 @@ class CustomKind(Kind):
         * Szechuan-peppercorn infused gin
     """
     value = 'custom'
-    allowed_parents = [IngredientKind.value, ProductKind.value, value]
+    allowed_parents = [IngredientKind.value, ProductKind.value, FamilyKind.value, value]
 
 
 IngredientKinds.register_kind(CategoryKind)
