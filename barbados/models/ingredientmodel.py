@@ -1,7 +1,7 @@
 from barbados.models.base import BarbadosModel
 from barbados.constants import IngredientKind, FamilyKind, ProductKind, IngredientKinds, CustomKind
 from barbados.exceptions import ValidationException
-from sqlalchemy import Column, String, or_
+from sqlalchemy import Column, String, or_, ARRAY
 
 
 class IngredientModel(BarbadosModel):
@@ -11,6 +11,7 @@ class IngredientModel(BarbadosModel):
     display_name = Column(String, nullable=False)
     kind = Column(String, nullable=False)
     parent = Column(String, nullable=True)
+    aliases = Column(ARRAY(String), nullable=True)
 
     # @TODO figure this out in a sane expandable way
     @staticmethod
@@ -27,6 +28,7 @@ class IngredientModel(BarbadosModel):
         self._check_kind()
         self._check_parent_existence()
         self._check_parent_kind()
+        # @TODO check_aliases display_name not in aliases
 
     def _check_kind(self):
         try:
