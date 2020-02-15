@@ -8,4 +8,3 @@ class IngredientFactory:
     # @staticmethod
     # def node_to_obj(node):
     #     return Ingredient(slug=node.tag, display_name=node.data['display_name'], kind=node.data['kind'], parent=node.bpointer)
-    # @TODO nodes should pass through object-land to get all the goodie bits

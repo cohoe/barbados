@@ -54,6 +54,30 @@ class IngredientTree:
 
         return node
 
+    def substitutions(self, node_id):
+        """
+        TODO:
+        * masking certain ingredients
+        * dont recommend categories or families
+        * weighting? (favored: true)
+        * limit results?
+        :param node_id:
+        :return:
+        """
+        node = self.node(node_id)
+        parent = self.parent(node_id)
+
+        children = node.fpointer
+        siblings = parent.fpointer
+        siblings.remove(node.identifier)
+
+        return ({
+            'self': node.identifier,
+            'parent': parent.identifier,
+            'children': children,
+            'siblings': siblings,
+        })
+
     @staticmethod
     def _create_tree_data(item):
         return ({
