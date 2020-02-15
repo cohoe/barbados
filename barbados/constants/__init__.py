@@ -76,7 +76,7 @@ class ProductKind(Kind):
         * El Dorado 12-year Rum
     """
     value = 'product'
-    allowed_parents = [IngredientKind.value, FamilyKind.value]
+    allowed_parents = [IngredientKind.value, FamilyKind.value, value]
 
 
 class CustomKind(Kind):
