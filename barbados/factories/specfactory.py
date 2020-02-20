@@ -1,4 +1,8 @@
-from barbados.objects import Spec, Origin, Glassware, SpecIngredient, Text
+from barbados.objects.spec import Spec
+from barbados.objects.origin import Origin
+from barbados.objects.glassware import Glassware
+from barbados.objects.specingredient import SpecIngredient
+from barbados.objects.text import Text
 from .citationfactory import CitationFactory
 
 

@@ -1,4 +1,6 @@
-from barbados.objects import Cocktail, Status, Origin, Text
+from barbados.objects.cocktail import Cocktail, Status
+from barbados.objects.origin import Origin
+from barbados.objects.text import Text
 from .specfactory import SpecFactory
 from .citationfactory import CitationFactory
 

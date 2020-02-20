@@ -1,8 +1,10 @@
-from barbados.constants import IngredientKinds
+from barbados.objects.ingredientkinds import IngredientKinds
 
 
 class Ingredient:
-    def __init__(self, slug, display_name, kind, parent=None, aliases=[]):
+    def __init__(self, slug, display_name, kind, parent=None, aliases=None):
+        if aliases is None:
+            aliases = []
         self.slug = slug
         self.display_name = display_name
         self.kind = IngredientKinds(kind)

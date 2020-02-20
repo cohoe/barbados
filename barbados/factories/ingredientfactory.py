@@ -1,4 +1,4 @@
-from barbados.objects import Ingredient
+from barbados.objects.ingredient import Ingredient
 
 
 class IngredientFactory:

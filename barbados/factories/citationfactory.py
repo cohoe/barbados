@@ -1,4 +1,4 @@
-from barbados.objects import Citation
+from barbados.objects.citation import Citation
 
 
 class CitationFactory:

@@ -93,8 +93,22 @@ class CustomKind(Kind):
     allowed_parents = [IngredientKind.value, ProductKind.value, FamilyKind.value, value]
 
 
+class IndexKind(Kind):
+    """
+    Loose classifications of various ingredients that present an alternative
+    view of the tree. They cannot have children.
+
+    Examples:
+        * Jamaican Rum
+        * Peaty Scotch
+    """
+    value = 'index'
+    allowed_parents = [FamilyKind.value]
+
+
 IngredientKinds.register_kind(CategoryKind)
 IngredientKinds.register_kind(FamilyKind)
 IngredientKinds.register_kind(IngredientKind)
 IngredientKinds.register_kind(ProductKind)
 IngredientKinds.register_kind(CustomKind)
+IngredientKinds.register_kind(IndexKind)

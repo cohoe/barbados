@@ -1,5 +1,5 @@
 from barbados.models.base import BarbadosModel
-from barbados.constants import IngredientKind, FamilyKind, ProductKind, IngredientKinds, CustomKind
+from barbados.objects.ingredientkinds import IngredientKind, FamilyKind, ProductKind, IngredientKinds, CustomKind
 from barbados.exceptions import ValidationException
 from sqlalchemy import Column, String, or_, ARRAY
 
