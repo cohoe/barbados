@@ -16,12 +16,18 @@ class Ingredient:
         self.aliases = aliases
         self.elements = elements
 
-    def serialize(self):
-        return ({
-            'slug': self.slug,
-            'display_name': self.display_name,
-            'kind': self.kind.value,
-            'parent': self.parent,
-            'aliases': self.aliases,
-            'elements': self.elements,
-        })
+    def serialize(self, serializer):
+        serializer.add_property('slug', self.slug)
+        serializer.add_property('display_name', self.display_name)
+        serializer.add_property('kind', self.kind.value)
+        serializer.add_property('parent', self.parent)
+        serializer.add_property('aliases', self.aliases)
+        serializer.add_property('elements', self.elements)
+    #     return ({
+    #         'slug': self.slug,
+    #         'display_name': self.display_name,
+    #         'kind': self.kind.value,
+    #         'parent': self.parent,
+    #         'aliases': self.aliases,
+    #         'elements': self.elements,
+    #     })
