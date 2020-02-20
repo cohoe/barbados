@@ -23,11 +23,3 @@ class Ingredient:
         serializer.add_property('parent', self.parent)
         serializer.add_property('aliases', self.aliases)
         serializer.add_property('elements', self.elements)
-    #     return ({
-    #         'slug': self.slug,
-    #         'display_name': self.display_name,
-    #         'kind': self.kind.value,
-    #         'parent': self.parent,
-    #         'aliases': self.aliases,
-    #         'elements': self.elements,
-    #     })

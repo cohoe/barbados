@@ -1,7 +1,6 @@
-import json
 
 
-class JsonSerializer:
+class DictSerializer:
     """
     https://realpython.com/factory-method-python/
     """
@@ -12,4 +11,4 @@ class JsonSerializer:
         self._current_object[name] = value
 
     def serialize(self):
-        return json.dumps(self._current_object)
+        return self._current_object
