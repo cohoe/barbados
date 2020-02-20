@@ -1,7 +1,7 @@
 from treelib import Node, Tree
 from treelib.exceptions import NodeIDAbsentError
 from barbados.models import IngredientModel
-from barbados.objects.ingredientkinds import CategoryKind, ProductKind, FamilyKind, IngredientKind, CustomKind
+from barbados.objects.ingredientkinds import CategoryKind, ProductKind, FamilyKind, IngredientKind, CustomKind, IndexKind
 
 
 class IngredientTree:
@@ -22,7 +22,8 @@ class IngredientTree:
         ingredients = list(IngredientModel.get_by_kind(IngredientKind))
         products = list(IngredientModel.get_by_kind(ProductKind))
         customs = list(IngredientModel.get_by_kind(CustomKind))
-        ingredients_to_place = ingredients + products + customs
+        indexes = list(IngredientModel.get_by_kind(IndexKind))
+        ingredients_to_place = ingredients + products + customs + indexes
 
         for i in range(1, passes+1):
             print("Pass %i/%i" % (i, passes))
@@ -70,11 +71,12 @@ class IngredientTree:
         children = node.fpointer
         siblings = parent.fpointer
         siblings.remove(node.identifier)
+        elements = node.data['elements']
 
         return ({
             'self': node.identifier,
             'parent': parent.identifier,
-            'children': children,
+            'children': children + elements,
             'siblings': siblings,
         })
 
@@ -84,4 +86,5 @@ class IngredientTree:
             'display_name': item.display_name,
             'kind': item.kind,
             'aliases': item.aliases,
+            'elements': item.elements,
         })

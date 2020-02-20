@@ -103,7 +103,7 @@ class IndexKind(Kind):
         * Peaty Scotch
     """
     value = 'index'
-    allowed_parents = [FamilyKind.value]
+    allowed_parents = [FamilyKind.value, IngredientKind.value]
 
 
 IngredientKinds.register_kind(CategoryKind)
