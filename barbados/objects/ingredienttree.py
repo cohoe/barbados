@@ -1,7 +1,7 @@
 from treelib import Node, Tree
 from treelib.exceptions import NodeIDAbsentError
 from barbados.models import IngredientModel
-from barbados.objects.ingredientkinds import CategoryKind, ProductKind, FamilyKind, IngredientKind, CustomKind, IndexKind
+from barbados.objects.ingredientkinds import CategoryKind, FamilyKind
 
 
 class IngredientTree:
