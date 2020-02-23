@@ -2,6 +2,7 @@ from barbados.models.base import BarbadosModel
 from barbados.objects.ingredientkinds import IngredientKinds
 from barbados.exceptions import ValidationException
 from sqlalchemy import Column, String, or_, ARRAY
+from barbados.objects.slug import Slug
 
 
 class IngredientModel(BarbadosModel):
@@ -41,6 +42,7 @@ class IngredientModel(BarbadosModel):
         self._check_parent_existence()
         self._check_parent_kind()
         self._check_elements()
+        self._check_slug()
         # @TODO check_aliases display_name not in aliases
 
     def _check_kind(self):
@@ -82,6 +84,10 @@ class IngredientModel(BarbadosModel):
                 child = self.query.get(slug)
                 if child is None:
                     raise ValidationException("Element %s of %s does not exist." % (slug, self.slug))
+
+    def _check_slug(self):
+        if self.slug != Slug(self.display_name):
+            raise ValidationException("Slug (%s) is inconsistent with display_name." % self.slug)
 
     def __repr__(self):
         return "<Barbados::Models::IngredientModel[%s]>" % self.slug
