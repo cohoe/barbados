@@ -4,6 +4,8 @@ class IngredientKinds(object):
     """
     kinds = {}
     top = None
+    index = None
+    usables = []
 
     # Apparently __call__() didn't work?
     # https://stackoverflow.com/questions/34777773/typeerror-object-takes-no-parameters-after-defining-new
@@ -15,10 +17,24 @@ class IngredientKinds(object):
         cls.kinds[kind_class.value] = kind_class
         if kind_class.top:
             cls.top = kind_class
+        if kind_class.usable:
+            cls.usables.append(kind_class)
+        if kind_class.index:
+            cls.index = kind_class
 
 
 class Kind(object):
+    # Top indicates if this kind is the highest level of the tree.
     top = False
+
+    # Usable indicates if ingredients of this kind are eligible to be
+    # referenced in recipes.
+    usable = False
+
+    # Index indicates if this kind acts like an index (view). It can have
+    # no direct children but can list "adopted" children (called Elements)
+    # as a way to provide alternative collections of ingredients.
+    index = False
 
 
 class CategoryKind(Kind):
@@ -40,12 +56,13 @@ class FamilyKind(Kind):
     High-level container of a genre of products.
 
     Examples:
-        * Rum
+        * Sugarcane
         * Citrus
         * Dairy
     """
     value = 'family'
     allowed_parents = [CategoryKind.value]
+    usable = True
 
 
 class IngredientKind(Kind):
@@ -63,6 +80,7 @@ class IngredientKind(Kind):
     """
     value = 'ingredient'
     allowed_parents = [FamilyKind.value, value]
+    usable = True
 
 
 class ProductKind(Kind):
@@ -77,6 +95,7 @@ class ProductKind(Kind):
     """
     value = 'product'
     allowed_parents = [IngredientKind.value, FamilyKind.value, value]
+    usable = True
 
 
 class CustomKind(Kind):
@@ -91,6 +110,7 @@ class CustomKind(Kind):
     """
     value = 'custom'
     allowed_parents = [IngredientKind.value, ProductKind.value, FamilyKind.value, value]
+    usable = True
 
 
 class IndexKind(Kind):
@@ -104,6 +124,8 @@ class IndexKind(Kind):
     """
     value = 'index'
     allowed_parents = [FamilyKind.value, IngredientKind.value]
+    usable = True
+    index = True
 
 
 IngredientKinds.register_kind(CategoryKind)

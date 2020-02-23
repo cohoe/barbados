@@ -1,5 +1,5 @@
 from barbados.models.base import BarbadosModel
-from barbados.objects.ingredientkinds import IngredientKind, FamilyKind, ProductKind, IngredientKinds, CustomKind, IndexKind
+from barbados.objects.ingredientkinds import IngredientKinds
 from barbados.exceptions import ValidationException
 from sqlalchemy import Column, String, or_, ARRAY
 
@@ -14,16 +14,22 @@ class IngredientModel(BarbadosModel):
     aliases = Column(ARRAY(String), nullable=True)
     elements = Column(ARRAY(String), nullable=True)
 
-    # @TODO figure this out in a sane expandable way
     @staticmethod
     def get_usable_ingredients():
-        return IngredientModel.query.add_columns(IngredientModel.slug, IngredientModel.display_name).filter(
-            or_(IngredientModel.kind == IngredientKind.value, IngredientModel.kind == FamilyKind.value,
-                IngredientModel.kind == ProductKind.value, IngredientModel.kind == CustomKind.value,
-                IngredientModel.kind == IndexKind.value))
+        """
+        The or_() does some voodoo magic.
+        :return: list of IngredientModels matching the query.
+        """
+        expressions = [IngredientModel.kind == kind_class.value for kind_class in IngredientKinds.usables]
+        return IngredientModel.query.add_columns(IngredientModel.slug, IngredientModel.display_name).filter(or_(*expressions))
 
     @staticmethod
     def get_by_kind(kind):
+        """
+        Return a list of all ingredients of a particular kind.
+        :param kind: Kind class to match against.
+        :return: List of IngredientModels matching the query.
+        """
         return IngredientModel.query.filter(IngredientModel.kind == kind.value)
 
     def validate(self):
@@ -57,7 +63,7 @@ class IngredientModel(BarbadosModel):
             if IngredientKinds(parent.kind).value not in IngredientKinds(self.kind).allowed_parents:
                 raise ValidationException("Parent (%s) of %s has invalid kind (%s)." % (parent.slug, self.slug, parent.kind))
         except KeyError:
-            raise ValidationException("Parent (%s) of %s has bad kind (%s)"% (parent.slug, self.slug, parent.kind))
+            raise ValidationException("Parent (%s) of %s has bad kind (%s)" % (parent.slug, self.slug, parent.kind))
 
     def _get_parent(self):
         # https://github.com/sqlalchemy/sqlalchemy/commit/997f4b5f2b3b4725de0960824e95fcb1150ff215
@@ -65,7 +71,7 @@ class IngredientModel(BarbadosModel):
 
     def _check_elements(self):
         if self.elements:
-            if self.kind != IndexKind.value:
+            if self.kind != IngredientKinds.index.value:
                 raise ValidationException("Kind %s of %s cannot have elements." % (self.kind, self.slug))
 
             for slug in self.elements:
