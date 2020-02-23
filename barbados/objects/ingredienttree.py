@@ -5,10 +5,10 @@ from barbados.objects.ingredientkinds import CategoryKind, FamilyKind
 
 
 class IngredientTree:
-    def __init__(self, root='ingredients', passes=5):
-        self.tree = self._build_tree(root=root, passes=passes)
+    def __init__(self, passes=5):
+        self.tree = self._build_tree(passes=passes)
 
-    def _build_tree(self, root, passes):
+    def _build_tree(self, passes, root='ingredients'):
         tree = Tree()
 
         tree.create_node(root, root)
@@ -20,7 +20,7 @@ class IngredientTree:
 
         ingredients_to_place = list(IngredientModel.get_usable_ingredients())
 
-        for i in range(1, passes+1):
+        for i in range(1, passes + 1):
             print("Pass %i/%i" % (i, passes))
 
             for item in ingredients_to_place[:]:
@@ -41,11 +41,17 @@ class IngredientTree:
         return tree
 
     def subtree(self, node_id):
-        return self.tree.subtree(node_id)
+        try:
+            return self.tree.subtree(node_id)
+        except NodeIDAbsentError:
+            raise KeyError("Node %s could not be found." % node_id)
 
     def parent(self, node_id):
-        parent_id = self.tree.get_node(node_id).bpointer
-        return self.tree.get_node(parent_id)
+        try:
+            parent_id = self.tree.get_node(node_id).bpointer
+            return self.tree.get_node(parent_id)
+        except AttributeError:
+            raise KeyError("%s has no parent." % node_id)
 
     def node(self, node_id):
         node = self.tree.get_node(node_id)

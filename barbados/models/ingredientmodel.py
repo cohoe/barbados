@@ -15,6 +15,10 @@ class IngredientModel(BarbadosModel):
     elements = Column(ARRAY(String), nullable=True)
 
     @staticmethod
+    def get_by_slug(slug):
+        return IngredientModel.query.get(slug)
+
+    @staticmethod
     def get_usable_ingredients():
         """
         The or_() does some voodoo magic.

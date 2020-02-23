@@ -27,7 +27,7 @@ class ObjectSerializer:
     https://realpython.com/factory-method-python/
     """
     @staticmethod
-    def serialize(serializable, format):
-        serializer = serializer_factory.get_serializer(format)
+    def serialize(serializable, output_format):
+        serializer = serializer_factory.get_serializer(output_format)
         serializable.serialize(serializer)
         return serializer.serialize()
