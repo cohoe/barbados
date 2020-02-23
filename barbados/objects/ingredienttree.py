@@ -18,17 +18,16 @@ class IngredientTree:
         for item in IngredientModel.get_by_kind(FamilyKind):
             tree.create_node(item.slug, item.slug, parent=item.parent, data=self._create_tree_data(item))
 
-        # @TODO
-        ingredients = list(IngredientModel.get_by_kind(IngredientKind))
-        products = list(IngredientModel.get_by_kind(ProductKind))
-        customs = list(IngredientModel.get_by_kind(CustomKind))
-        indexes = list(IngredientModel.get_by_kind(IndexKind))
-        ingredients_to_place = ingredients + products + customs + indexes
+        ingredients_to_place = list(IngredientModel.get_usable_ingredients())
 
         for i in range(1, passes+1):
             print("Pass %i/%i" % (i, passes))
 
             for item in ingredients_to_place[:]:
+                if item.kind == FamilyKind.value:
+                    ingredients_to_place.remove(item)
+                    print("Skipping %s because it is a family." % item.slug)
+                    continue
                 try:
                     tree.create_node(item.slug, item.slug, parent=item.parent, data=self._create_tree_data(item))
                     ingredients_to_place.remove(item)

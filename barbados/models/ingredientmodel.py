@@ -18,17 +18,17 @@ class IngredientModel(BarbadosModel):
     def get_usable_ingredients():
         """
         The or_() does some voodoo magic.
-        :return: list of IngredientModels matching the query.
+        :return: Result object matching the query.
         """
         expressions = [IngredientModel.kind == kind_class.value for kind_class in IngredientKinds.usables]
-        return IngredientModel.query.add_columns(IngredientModel.slug, IngredientModel.display_name).filter(or_(*expressions))
+        return IngredientModel.query.filter(or_(*expressions))
 
     @staticmethod
     def get_by_kind(kind):
         """
         Return a list of all ingredients of a particular kind.
         :param kind: Kind class to match against.
-        :return: List of IngredientModels matching the query.
+        :return: Result object matching the query.
         """
         return IngredientModel.query.filter(IngredientModel.kind == kind.value)
 
