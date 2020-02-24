@@ -2,6 +2,7 @@ from treelib import Node, Tree
 from treelib.exceptions import NodeIDAbsentError
 from barbados.models import IngredientModel
 from barbados.objects.ingredientkinds import CategoryKind, FamilyKind
+import logging
 
 
 class IngredientTree:
@@ -19,23 +20,22 @@ class IngredientTree:
             tree.create_node(item.slug, item.slug, parent=item.parent, data=self._create_tree_data(item))
 
         ingredients_to_place = list(IngredientModel.get_usable_ingredients())
-
         for i in range(1, passes + 1):
-            print("Pass %i/%i" % (i, passes))
+            logging.debug("Pass %i/%i" % (i, passes))
 
             for item in ingredients_to_place[:]:
                 if item.kind == FamilyKind.value:
                     ingredients_to_place.remove(item)
-                    # print("Skipping %s because it is a family." % item.slug)
+                    logging.debug("Skipping %s because it is a family." % item.slug)
                     continue
                 try:
                     tree.create_node(item.slug, item.slug, parent=item.parent, data=self._create_tree_data(item))
                     ingredients_to_place.remove(item)
                 except NodeIDAbsentError:
-                    print("skipping %s (Attempt %i/%s)" % (item.slug, i, passes))
+                    logging.debug("skipping %s (Attempt %i/%s)" % (item.slug, i, passes))
 
             if len(ingredients_to_place) == 0:
-                print("All done after pass %i" % i)
+                logging.info("All done after pass %i" % i)
                 break
 
         return tree

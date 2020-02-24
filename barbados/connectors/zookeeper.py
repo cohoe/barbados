@@ -1,3 +1,4 @@
+import logging
 from kazoo.client import KazooClient, KazooState
 from kazoo.exceptions import NoNodeError
 
@@ -24,8 +25,8 @@ class ZookeeperConnector:
         except NoNodeError:
             raise KeyError("%s does not exist." % path)
         except Exception as e:
-            print(e.__class__)
-            print(e)
+            logging.error(e.__class__)
+            logging.error(e)
 
     def _connect(self):
         if not hasattr(self, 'zk'):
