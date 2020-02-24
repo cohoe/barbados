@@ -26,7 +26,7 @@ class IngredientTree:
             for item in ingredients_to_place[:]:
                 if item.kind == FamilyKind.value:
                     ingredients_to_place.remove(item)
-                    print("Skipping %s because it is a family." % item.slug)
+                    # print("Skipping %s because it is a family." % item.slug)
                     continue
                 try:
                     tree.create_node(item.slug, item.slug, parent=item.parent, data=self._create_tree_data(item))
