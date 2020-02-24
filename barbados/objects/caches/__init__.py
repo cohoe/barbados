@@ -7,29 +7,62 @@ from barbados.objects.ingredienttree import IngredientTree
 
 
 class Caches(object):
+    """
+    Holder for all data caches. This enables simple lookup by cache_key
+    such as Caches('ingredient_name_index').
+    """
     caches = {}
 
     # Apparently __call__() didn't work?
     # https://stackoverflow.com/questions/34777773/typeerror-object-takes-no-parameters-after-defining-new
     def __new__(cls, cache_key):
+        """
+        Act kinda like an enum in that this will return the class for a given
+        cache key
+        :param cache_key: String of the cache key.
+        :return class or KeyError.
+        """
         return cls.caches[cache_key]
 
     @classmethod
     def register_cache(cls, cache_class):
+        """
+        Register a cache class for use and lookup by this class.
+        :param cache_class: Class (the class, not a string) to register
+        :return: None
+        """
         cls.caches[cache_class.cache_key] = cache_class
 
 
 class CacheBase(object):
+    """
+    Base Cache class. Implements basic functions.
+    """
     @staticmethod
     def populate(cls):
+        """
+        Code that populates the cache should go here. It could take in
+        parameters if you want, but you have to implement it in the
+        subclasses.
+        :param cls:
+        :return:
+        """
         raise NotImplementedError()
 
     @classmethod
     def retrieve(cls):
+        """
+        Retrieve the cache's value
+        :return: Various
+        """
         return Cache.get(cls.cache_key)
 
     @classmethod
     def invalidate(cls):
+        """
+        Invalidate (delete) the cache value and key.
+        :return: None
+        """
         return Cache.delete(cls.cache_key)
 
 
