@@ -22,20 +22,30 @@ class Cocktail:
     def __repr__(self):
         return "<Barbados::Object::Cocktail[slug=%s]>" % self.slug
 
-    def serialize(self):
-        """
-        Return a JSON-encodable dictionary representing all aspects of this
-        object, generally used for search.
-        :return:
-        """
-        ser = {
-            'display_name': self.display_name,
-            'slug': self.slug,
-            'status': self.status.color,
-            'origin': self.origin.serialize(),
-            'specs': [spec.serialize() for spec in self.specs],
-            'spec_count': self.spec_count,
-            'citations': [citation.serialize() for citation in self.citations],
-            'notes': [note.serialize() for note in self.notes],
-        }
-        return ser
+    # def serialize(self):
+    #     """
+    #     Return a JSON-encodable dictionary representing all aspects of this
+    #     object, generally used for search.
+    #     :return:
+    #     """
+    #     ser = {
+    #         'display_name': self.display_name,
+    #         'slug': self.slug,
+    #         'status': self.status.color,
+    #         'origin': self.origin.serialize(),
+    #         'specs': [spec.serialize() for spec in self.specs],
+    #         'spec_count': self.spec_count,
+    #         'citations': [citation.serialize() for citation in self.citations],
+    #         'notes': [note.serialize() for note in self.notes],
+    #     }
+    #     return ser
+
+    def serialize(self, serializer):
+        serializer.add_property('slug', self.slug)
+        serializer.add_property('display_name', self.display_name)
+        serializer.add_property('status', self.status.color)
+        serializer.add_property('origin', self.origin.serialize())
+        serializer.add_property('specs', [spec.serialize() for spec in self.specs])
+        serializer.add_property('spec_count', self.spec_count)
+        serializer.add_property('citations', [citation.serialize() for citation in self.citations])
+        serializer.add_property('notes', [note.serialize() for note in self.notes])
