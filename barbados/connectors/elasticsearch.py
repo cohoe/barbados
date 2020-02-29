@@ -1,25 +1,24 @@
-import requests
+from elasticsearch import Elasticsearch
 
 
 class ElasticsearchConnector:
-    def __init__(self, protocol='http', host='localhost', port=9200):
-        self.protocol = protocol
-        self.host = host
+    def __init__(self, scheme='http', hosts=None, port=9200):
+        if hosts is None:
+            hosts = ['localhost']
+        self.scheme = scheme
+        self.hosts = hosts
         self.port = port
 
-    # @TODO maybe make this take an object instead?
-    def upload_doc(self, index, id, obj):
-        url = "%s://%s:%i/%s/_doc/%s" % (self.protocol, self.host, self.port, index, id)
+    def _connect(self):
+        if not hasattr(self, 'client'):
+            self.client = Elasticsearch(hosts=self.hosts, scheme=self.scheme, port=self.port)
 
-        # headers = {
-        #     'Content-Type': 'application/json'
-        # }
+    def insert(self, index, id, body):
+        self._connect()
+        result = self.client.index(index=index, id=id, body=body)
+        return result['result']
 
-        req = requests.put(url, json=obj.serialize())
-
-        if req.status_code == 200:
-            print('Updated index')
-        elif req.status_code == 201:
-            print('Created key in index')
-        else:
-            raise Exception("Web request failed! Resp: %i: %s" % (req.status_code, req.text))
+    def get(self, index, id):
+        self._connect()
+        result = self.client.get(index=index, id=id)
+        return result
