@@ -22,3 +22,8 @@ class ElasticsearchConnector:
         self._connect()
         result = self.client.get(index=index, id=id)
         return result
+
+    def search(self, index, body):
+        self._connect()
+        results = self.client.search(index=index, body=body)
+        return results
