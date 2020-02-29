@@ -6,10 +6,13 @@ import logging
 
 
 class IngredientTree:
+
+    root_node = 'ingredients'
+
     def __init__(self, passes=5):
         self.tree = self._build_tree(passes=passes)
 
-    def _build_tree(self, passes, root='ingredients'):
+    def _build_tree(self, passes, root=root_node):
         tree = Tree()
 
         tree.create_node(root, root)
@@ -84,6 +87,16 @@ class IngredientTree:
             'children': children + elements,
             'siblings': siblings,
         })
+
+    def parents(self, node_id):
+        parents = []
+
+        node = self.node(node_id)
+        while not node.is_root():
+            parents.append(node.tag) if node.tag != node_id else None
+            node = self.parent(node.tag)
+
+        return parents
 
     @staticmethod
     def _create_tree_data(item):
