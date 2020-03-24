@@ -1,3 +1,5 @@
+from barbados.objects.caches import IngredientTreeCache
+from barbados.objects.slug import Slug
 
 
 class SpecIngredient:
@@ -5,6 +7,10 @@ class SpecIngredient:
         self.name = name
         self.quantity = quantity
         self.unit = unit
+        self.slug = Slug(name)
+
+        ingredient_tree = IngredientTreeCache.retrieve()
+        self.parents = ingredient_tree.parents(self.slug)
 
         if isinstance(self.name, str):
             if len(self.name) <= 1:
@@ -14,7 +20,7 @@ class SpecIngredient:
         return "<Object:SpecIngredient::name=%s>" % self.name
 
     def serialize(self):
-        keys = ['name', 'quantity', 'unit']
+        keys = ['name', 'quantity', 'unit', 'parents']
         ser = {}
         for key in keys:
             if getattr(self, key) is not None:
