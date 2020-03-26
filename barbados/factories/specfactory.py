@@ -43,7 +43,7 @@ class SpecFactory:
 
         garnish_obj_list = []
         for raw_garnish in raw_spec['garnish']:
-            garnish_obj_list.append(SpecIngredient(name=raw_garnish))
+            garnish_obj_list.append(SpecIngredient(name=raw_garnish, include_parents=False))
         # print(garnish_obj_list)
 
         instr_obj_list = []
