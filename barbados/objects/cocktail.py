@@ -1,5 +1,5 @@
 from .status import Status
-
+from barbados.serializers import ObjectSerializer
 
 class Cocktail:
     def __init__(self, display_name, status, origin, specs, citations, notes, tags, slug):
@@ -45,7 +45,7 @@ class Cocktail:
         serializer.add_property('display_name', self.display_name)
         serializer.add_property('status', self.status.color)
         serializer.add_property('origin', self.origin.serialize())
-        serializer.add_property('specs', [spec.serialize() for spec in self.specs])
+        serializer.add_property('specs', [ObjectSerializer.serialize(spec, 'dict') for spec in self.specs])
         serializer.add_property('spec_count', self.spec_count)
         serializer.add_property('citations', [citation.serialize() for citation in self.citations])
         serializer.add_property('notes', [note.serialize() for note in self.notes])

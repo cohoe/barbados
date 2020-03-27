@@ -1,3 +1,6 @@
+from barbados.serializers import ObjectSerializer
+
+
 class Spec:
     def __init__(self, name, origin, glassware, ingredients, citations, notes, straw, garnish, instructions, construction):
         self.name = name
@@ -22,19 +25,16 @@ class Spec:
                 count += 1
         return count
 
-    def serialize(self):
-        ser = {
-            'name': self.name,
-            'origin': self.origin.serialize(),
-            'glassware': self.glassware.serialize(),
-            'construction': self.construction,
-            'ingredients': [ingredient.serialize() for ingredient in self.ingredients],
-            'ingredient_count': self.ingredient_count,
-            'instructions': [instruction.serialize() for instruction in self.instructions],
-            'garnish': [garnish.serialize() for garnish in self.garnish],
-            'straw': self.straw,
-            'citations': [citation.serialize() for citation in self.citations],
-            'notes': [note.serialize() for note in self.notes],
-        }
-
-        return ser
+    def serialize(self, serializer):
+        # @TODO expand the other serializers
+        # @TODO format from the base serializer
+        serializer.add_property('name', self.name)
+        serializer.add_property('origin', self.origin.serialize())
+        serializer.add_property('glassware', self.glassware.serialize())
+        serializer.add_property('construction', self.construction)
+        serializer.add_property('ingredients', [ingredient.serialize() for ingredient in self.ingredients])
+        serializer.add_property('ingredient_count', self.ingredient_count)
+        serializer.add_property('garnish', [ObjectSerializer.serialize(garnish, 'dict') for garnish in self.garnish])
+        serializer.add_property('straw', self.straw)
+        serializer.add_property('citations', [citation.serialize() for citation in self.citations])
+        serializer.add_property('notes', [note.serialize() for note in self.notes])

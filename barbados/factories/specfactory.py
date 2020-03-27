@@ -3,6 +3,7 @@ from barbados.objects.origin import Origin
 from barbados.objects.glassware import Glassware
 from barbados.objects.specingredient import SpecIngredient
 from barbados.objects.text import Text
+from barbados.objects.garnish import Garnish
 from .citationfactory import CitationFactory
 
 
@@ -43,7 +44,7 @@ class SpecFactory:
 
         garnish_obj_list = []
         for raw_garnish in raw_spec['garnish']:
-            garnish_obj_list.append(SpecIngredient(name=raw_garnish, include_parents=False))
+            garnish_obj_list.append(Garnish(name=raw_garnish))
         # print(garnish_obj_list)
 
         instr_obj_list = []

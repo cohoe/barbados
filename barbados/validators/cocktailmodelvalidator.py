@@ -19,7 +19,7 @@ class CocktailModelValidator(BaseValidator):
         calculated_slug = Slug(self.model.display_name)
 
         if slug != calculated_slug:
-            self.fail("Slug (%s) is inconsistent with display_name." % self.model.slug)
+            self.fail("Slug (%s) is inconsistent with display_name (%s)." % (self.model.slug, self.model.display_name))
 
     def _check_spec(self):
         for spec in self.model.specs:
