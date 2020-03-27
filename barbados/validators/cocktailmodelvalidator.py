@@ -23,8 +23,8 @@ class CocktailModelValidator(BaseValidator):
 
     def _check_spec(self):
         for spec in self.model.specs:
-            for ingredient in spec['ingredients']:
-                ingredient_slug = Slug(ingredient['name'])
-                i = IngredientModel.get_by_slug(ingredient_slug)
+            for component in spec['components']:
+                # It's been serialized at this point
+                i = IngredientModel.get_by_slug(component['slug'])
                 if not i:
-                    self.fail("Ingredient %s does not exist." % ingredient_slug)
+                    self.fail("Ingredient %s does not exist." % component['slug'])

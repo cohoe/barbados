@@ -5,6 +5,9 @@ class JsonSerializer:
     """
     https://realpython.com/factory-method-python/
     """
+
+    format = 'json'
+
     def __init__(self):
         self._current_object = {}
 

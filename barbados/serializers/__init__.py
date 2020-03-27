@@ -7,8 +7,8 @@ class SerializerFactory:
     def __init__(self):
         self._creators = {}
 
-    def register_format(self, format, creator):
-        self._creators[format] = creator
+    def register_format(self, creator):
+        self._creators[creator.format] = creator
 
     def get_serializer(self, format):
         creator = self._creators.get(format)
@@ -18,8 +18,8 @@ class SerializerFactory:
 
 
 serializer_factory = SerializerFactory()
-serializer_factory.register_format('JSON', JsonSerializer)
-serializer_factory.register_format('dict', DictSerializer)
+serializer_factory.register_format(JsonSerializer)
+serializer_factory.register_format(DictSerializer)
 
 
 class ObjectSerializer:

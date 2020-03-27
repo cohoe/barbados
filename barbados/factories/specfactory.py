@@ -1,7 +1,7 @@
 from barbados.objects.spec import Spec
 from barbados.objects.origin import Origin
 from barbados.objects.glassware import Glassware
-from barbados.objects.specingredient import SpecIngredient
+from barbados.objects.speccomponent import SpecComponent
 from barbados.objects.text import Text
 from barbados.objects.garnish import Garnish
 from .citationfactory import CitationFactory
@@ -25,10 +25,11 @@ class SpecFactory:
 
         glassware_obj = Glassware(name=raw_spec['glassware'])
 
-        ingredient_obj_list = []
+        components = []
+        # ingredients == specingredient == component. Yay evolution
         for raw_ingredient in raw_spec['ingredients']:
-            spec_ing_obj = SpecIngredient(**raw_ingredient)
-            ingredient_obj_list.append(spec_ing_obj)
+            spec_ing_obj = SpecComponent(**raw_ingredient)
+            components.append(spec_ing_obj)
         # print(ingredient_obj_list)
 
         c_obj_list = CitationFactory.raw_list_to_obj(raw_spec['citations'])
@@ -57,7 +58,7 @@ class SpecFactory:
         s_obj = Spec(name=raw_spec['name'],
                      origin=origin_obj,
                      glassware=glassware_obj,
-                     ingredients=ingredient_obj_list,
+                     components=components,
                      citations=c_obj_list,
                      notes=n_obj_list,
                      straw=straw,
@@ -73,7 +74,7 @@ class SpecFactory:
             'name': None,
             'origin': None,
             'glassware': None,
-            'ingredients': list(),
+            'components': list(),
             'citations': list(),
             'notes': list(),
             'straw': None,
@@ -86,7 +87,7 @@ class SpecFactory:
             if key not in raw_spec.keys():
                 raw_spec[key] = required_keys[key]
 
-        lists = ['ingredients', 'citations', 'notes', 'garnish', 'instructions']
+        lists = ['components', 'citations', 'notes', 'garnish', 'instructions']
         for key in lists:
             if raw_spec[key] is None:
                 raw_spec[key] = required_keys[key]
