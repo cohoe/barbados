@@ -21,7 +21,7 @@ class Cocktail:
         return len(self.specs)
 
     def __repr__(self):
-        return "<Barbados::Object::Cocktail[slug=%s]>" % self.slug
+        return "Barbados::Objects::Cocktail[%s]>" % self.slug
 
     def serialize(self, serializer):
         serializer.add_property('slug', self.slug)
@@ -31,4 +31,4 @@ class Cocktail:
         serializer.add_property('specs', [ObjectSerializer.serialize(spec, serializer.format) for spec in self.specs])
         serializer.add_property('spec_count', self.spec_count)
         serializer.add_property('citations', [citation.serialize() for citation in self.citations])
-        serializer.add_property('notes', [note.serialize() for note in self.notes])
+        serializer.add_property('notes', [ObjectSerializer.serialize(note, serializer.format) for note in self.notes])

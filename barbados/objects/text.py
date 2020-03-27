@@ -3,7 +3,7 @@ class Text:
         self.text = text
 
     def __repr__(self):
-        return "<Object:Text>"
+        return "Barbados::Object::Text[]"
 
-    def serialize(self):
-        return self.text
+    def serialize(self, serializer):
+        serializer.add_property('text', self.text)

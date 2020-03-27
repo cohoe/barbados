@@ -43,5 +43,5 @@ class Spec:
         serializer.add_property('garnish', [ObjectSerializer.serialize(garnish, serializer.format) for garnish in self.garnish])
         serializer.add_property('straw', self.straw)
         serializer.add_property('citations', [citation.serialize() for citation in self.citations])
-        serializer.add_property('notes', [note.serialize() for note in self.notes])
-        serializer.add_property('instructions', [instruction.serialize() for instruction in self.instructions])
+        serializer.add_property('notes', [ObjectSerializer.serialize(note, serializer.format) for note in self.notes])
+        serializer.add_property('instructions', [ObjectSerializer.serialize(instruction, serializer.format) for instruction in self.instructions])
