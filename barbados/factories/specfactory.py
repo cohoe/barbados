@@ -4,6 +4,7 @@ from barbados.objects.glassware import Glassware
 from barbados.objects.speccomponent import SpecComponent
 from barbados.objects.text import Text
 from barbados.objects.garnish import Garnish
+from barbados.objects.slug import Slug
 from .citationfactory import CitationFactory
 
 
@@ -23,7 +24,11 @@ class SpecFactory:
         else:
             origin_obj = Origin()
 
-        glassware_obj = Glassware(name=raw_spec['glassware'])
+        # As of Tortuga Data Format v2, glassware is a single string.
+        # This is future-proofing for the ability to allow multiple
+        # glassware definitions (likely to be defined as an | situation.
+        glassware_slug = Slug(raw_spec['glassware'])
+        glassware_obj_list = [Glassware(slug=glassware_slug)]
 
         components = []
         # ingredients == specingredient == component. Yay evolution
@@ -57,7 +62,7 @@ class SpecFactory:
 
         s_obj = Spec(name=raw_spec['name'],
                      origin=origin_obj,
-                     glassware=glassware_obj,
+                     glassware=glassware_obj_list,
                      components=components,
                      citations=c_obj_list,
                      notes=n_obj_list,
@@ -73,7 +78,7 @@ class SpecFactory:
         required_keys = {
             'name': None,
             'origin': None,
-            'glassware': None,
+            'glassware': list(),
             'components': list(),
             'citations': list(),
             'notes': list(),

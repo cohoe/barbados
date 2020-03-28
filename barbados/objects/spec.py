@@ -36,7 +36,7 @@ class Spec:
         # @TODO expand the other serializers
         serializer.add_property('name', self.name)
         serializer.add_property('origin', self.origin.serialize())
-        serializer.add_property('glassware', self.glassware.serialize())
+        serializer.add_property('glassware', [ObjectSerializer.serialize(glassware, serializer.format) for glassware in self.glassware])
         serializer.add_property('construction', self.construction)
         serializer.add_property('components', [ObjectSerializer.serialize(component, serializer.format) for component in self.components])
         serializer.add_property('component_counts', self.component_counts)
