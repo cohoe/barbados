@@ -25,12 +25,11 @@ class SpecFactory:
         else:
             origin_obj = Origin()
 
-        # As of Tortuga Data Format v2, glassware is a single string.
-        # This is future-proofing for the ability to allow multiple
-        # glassware definitions (likely to be defined as an | situation.
-        glassware_slug = Slug(raw_spec['glassware'])
-        glassware_display_name = DisplayName(glassware_slug)
-        glassware_obj_list = [Glassware(slug=glassware_slug, display_name=glassware_display_name)]
+        glassware_obj_list = []
+        for glassware in raw_spec['glassware']:
+            glassware_slug = Slug(glassware)
+            glassware_display_name = DisplayName(glassware_slug)
+            glassware_obj_list.append(Glassware(slug=glassware_slug, display_name=glassware_display_name))
 
         components = []
         # ingredients == specingredient == component. Yay evolution
@@ -99,10 +98,15 @@ class SpecFactory:
             if key not in raw_spec.keys():
                 raw_spec[key] = required_keys[key]
 
-        lists = ['components', 'citations', 'notes', 'garnish', 'instructions']
+        lists = ['components', 'citations', 'notes', 'garnish', 'instructions', 'glassware']
         for key in lists:
             if raw_spec[key] is None:
                 raw_spec[key] = required_keys[key]
+            # As of Tortuga Data Format v2, glassware is a single string.
+            # This is future-proofing for the ability to allow multiple
+            # glassware definitions (likely to be defined as an | situation.
+            if raw_spec[key].__class__ == str:
+                raw_spec[key] = [raw_spec[key]]
 
         return raw_spec
 
