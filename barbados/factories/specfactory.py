@@ -5,6 +5,7 @@ from barbados.objects.speccomponent import SpecComponent
 from barbados.objects.text import Text
 from barbados.objects.garnish import Garnish
 from barbados.objects.slug import Slug
+from barbados.objects.displayname import DisplayName
 from .citationfactory import CitationFactory
 
 
@@ -28,12 +29,16 @@ class SpecFactory:
         # This is future-proofing for the ability to allow multiple
         # glassware definitions (likely to be defined as an | situation.
         glassware_slug = Slug(raw_spec['glassware'])
-        glassware_obj_list = [Glassware(slug=glassware_slug)]
+        glassware_display_name = DisplayName(glassware_slug)
+        glassware_obj_list = [Glassware(slug=glassware_slug, display_name=glassware_display_name)]
 
         components = []
         # ingredients == specingredient == component. Yay evolution
         for raw_ingredient in raw_spec['ingredients']:
-            spec_ing_obj = SpecComponent(**raw_ingredient)
+            component_slug = Slug(raw_ingredient['name'])
+            component_display_name = DisplayName(component_slug)
+            del(raw_ingredient['name'])
+            spec_ing_obj = SpecComponent(slug=component_slug, display_name=component_display_name, **raw_ingredient)
             components.append(spec_ing_obj)
         # print(ingredient_obj_list)
 
@@ -48,9 +53,11 @@ class SpecFactory:
         straw = SpecFactory.infer_bool(raw_spec['straw'])
         # print(straw)
 
+        # @TODO v2 model does not deal with quantity of garnish
         garnish_obj_list = []
         for raw_garnish in raw_spec['garnish']:
-            garnish_obj_list.append(Garnish(name=raw_garnish))
+            garnish_slug = Slug(raw_garnish)
+            garnish_obj_list.append(Garnish(slug=garnish_slug))
         # print(garnish_obj_list)
 
         instr_obj_list = []

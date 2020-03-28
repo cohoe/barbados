@@ -1,13 +1,6 @@
-from barbados.objects.displayname import DisplayName
-
-
 class Glassware:
-    def __init__(self, slug, display_name=None):
+    def __init__(self, slug, display_name):
         self.slug = slug
-
-        if display_name is None:
-            display_name = DisplayName(slug)
-
         self.display_name = display_name
 
     def __repr__(self):

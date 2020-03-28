@@ -7,15 +7,12 @@ class Garnish:
     @TODO this may someday get more fancy, but for now it's just a more specific version of the Text object.
     Someday the direct name part might be able to go away.
     """
-    def __init__(self, name, display_name=None, slug=None):
-        self.name = name
+    def __init__(self, slug, display_name=None):
         self.slug = slug
         self.display_name = display_name
 
-        if self.slug is None:
-            self.slug = Slug(name)
         if self.display_name is None:
-            self.display_name = DisplayName(name)
+            self.display_name = DisplayName(slug)
 
     def __repr__(self):
         return "Barbados::Objects::Garnish[%s]" % self.slug

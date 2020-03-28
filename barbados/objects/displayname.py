@@ -4,6 +4,13 @@ class DisplayName:
     based on consistent rules.
     """
 
+    # Custom replacements
+    replacements = [
+        ["-", ' ']
+    ]
+
     def __new__(cls, text):
-        # @TODO do anything more fancy
+        for replacement in cls.replacements:
+            text = text.replace(replacement[0], replacement[1])
+
         return text.title()

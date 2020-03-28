@@ -1,5 +1,3 @@
-from barbados.objects.slug import Slug
-from barbados.objects.displayname import DisplayName
 from barbados.objects.caches import IngredientTreeCache
 
 
@@ -12,18 +10,12 @@ class SpecComponent:
     # from the count.
     ingredient_count_excludes = ['bitters']
 
-    def __init__(self, name, quantity=None, unit=None, display_name=None, slug=None):
-        self.name = name
+    def __init__(self, slug, display_name, quantity=None, unit=None):
         self.slug = slug
         self.display_name = display_name
         self.quantity = quantity
         self.unit = unit
         self.countable = True
-
-        if self.slug is None:
-            self.slug = Slug(name)
-        if self.display_name is None:
-            self.display_name = DisplayName(name)
 
         ingredient_tree = IngredientTreeCache.retrieve()
         self.parents = ingredient_tree.parents(self.slug)
