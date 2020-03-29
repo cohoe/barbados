@@ -11,15 +11,18 @@ class SpecComponent:
     # @TODO move this to zookeeper config
     ingredient_count_excludes = ['bitters']
 
-    def __init__(self, slug, display_name, quantity=None, unit=None):
+    def __init__(self, slug, display_name, quantity=None, unit=None, parents=None):
         self.slug = slug
         self.display_name = display_name
         self.quantity = quantity
         self.unit = unit
         self.countable = True
+        self.parents = parents
 
-        ingredient_tree = IngredientTreeCache.retrieve()
-        self.parents = ingredient_tree.parents(self.slug)
+        # @TODO don't store this in the database? Or have some facility for refresh.
+        if self.parents is None:
+            ingredient_tree = IngredientTreeCache.retrieve()
+            self.parents = ingredient_tree.parents(self.slug)
 
         if self.slug in self.ingredient_count_excludes:
             self.countable = False

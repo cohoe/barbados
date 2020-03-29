@@ -28,17 +28,23 @@ class SpecFactory:
 
         glassware_obj_list = []
         for glassware in raw_spec['glassware']:
-            glassware_slug = Slug(glassware)
-            glassware_display_name = DisplayName(glassware_slug)
-            glassware_obj_list.append(Glassware(slug=glassware_slug, display_name=glassware_display_name))
+            if type(glassware) is dict:
+                glassware_obj_list.append(Glassware(**glassware))
+            else:
+                glassware_slug = Slug(glassware)
+                glassware_display_name = DisplayName(glassware_slug)
+                glassware_obj_list.append(Glassware(slug=glassware_slug, display_name=glassware_display_name))
 
         components = []
         # ingredients == specingredient == component. Yay evolution
-        for raw_ingredient in raw_spec['ingredients']:
-            component_slug = Slug(raw_ingredient['name'])
-            component_display_name = DisplayName(component_slug)
-            del (raw_ingredient['name'])
-            spec_ing_obj = SpecComponent(slug=component_slug, display_name=component_display_name, **raw_ingredient)
+        for raw_ingredient in raw_spec['components']:
+            try:
+                component_slug = Slug(raw_ingredient['name'])
+                component_display_name = DisplayName(component_slug)
+                del (raw_ingredient['name'])
+                spec_ing_obj = SpecComponent(slug=component_slug, display_name=component_display_name, **raw_ingredient)
+            except KeyError:
+                spec_ing_obj = SpecComponent(**raw_ingredient)
             components.append(spec_ing_obj)
         # print(ingredient_obj_list)
 
@@ -56,17 +62,20 @@ class SpecFactory:
         garnish_obj_list = []
         for raw_garnish in raw_spec['garnish']:
             if type(raw_garnish) is dict:
-                garnish_slug = Slug(raw_garnish['name'])
-                garnish_quantity = raw_garnish['quantity']
-                garnish_note = None
-                if 'note' in raw_garnish.keys():
-                    garnish_note = raw_garnish['note']
+                try:
+                    garnish_slug = Slug(raw_garnish['name'])
+                    garnish_quantity = raw_garnish['quantity']
+                    garnish_note = None
+                    if 'note' in raw_garnish.keys():
+                        garnish_note = raw_garnish['note']
+                    garnish_obj = Garnish(slug=garnish_slug, quantity=garnish_quantity, note=garnish_note)
+                except KeyError:
+                    garnish_obj = Garnish(**raw_garnish)
             else:
                 garnish_slug = Slug(raw_garnish)
-                garnish_quantity = None
-                garnish_note = None
+                garnish_obj = Garnish(slug=garnish_slug)
 
-            garnish_obj_list.append(Garnish(slug=garnish_slug, quantity=garnish_quantity, note=garnish_note))
+            garnish_obj_list.append(garnish_obj)
         # print(garnish_obj_list)
 
         instr_obj_list = []
@@ -74,7 +83,10 @@ class SpecFactory:
             instr_obj_list.append(Text(text=instruction))
         # print(instr_obj_list)
 
-        construction_obj = Construction(slug=raw_spec['construction'])
+        if type(raw_spec['construction']) is dict:
+            construction_obj = Construction(**raw_spec['construction'])
+        else:
+            construction_obj = Construction(slug=raw_spec['construction'])
 
         s_obj = Spec(name=raw_spec['name'],
                      origin=origin_obj,
