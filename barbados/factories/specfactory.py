@@ -55,8 +55,18 @@ class SpecFactory:
         # @TODO v2 model does not deal with quantity of garnish
         garnish_obj_list = []
         for raw_garnish in raw_spec['garnish']:
-            garnish_slug = Slug(raw_garnish)
-            garnish_obj_list.append(Garnish(slug=garnish_slug))
+            if type(raw_garnish) is dict:
+                garnish_slug = Slug(raw_garnish['name'])
+                garnish_quantity = raw_garnish['quantity']
+                garnish_note = None
+                if 'note' in raw_garnish.keys():
+                    garnish_note = raw_garnish['note']
+            else:
+                garnish_slug = Slug(raw_garnish)
+                garnish_quantity = None
+                garnish_note = None
+
+            garnish_obj_list.append(Garnish(slug=garnish_slug, quantity=garnish_quantity, note=garnish_note))
         # print(garnish_obj_list)
 
         instr_obj_list = []
