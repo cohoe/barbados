@@ -27,8 +27,9 @@ class SpecComponentCounts:
 
 
 class Spec:
-    def __init__(self, name, origin, glassware, components, citations, notes, straw, garnish, instructions, construction):
-        self.name = name
+    def __init__(self, slug, display_name, origin, glassware, components, citations, notes, straw, garnish, instructions, construction):
+        self.slug = slug
+        self.display_name = display_name
         self.origin = origin
         self.glassware = glassware
         self.components = components
@@ -41,18 +42,19 @@ class Spec:
         self.component_counts = SpecComponentCounts(components, garnish)
 
     def __repr__(self):
-        return "<Object:Spec::name=%s>" % self.name
+        return "Barbados::Objects::Spec[%s]" % self.slug
 
     def serialize(self, serializer):
         # @TODO expand the other serializers
-        serializer.add_property('name', self.name)
-        serializer.add_property('origin', self.origin.serialize())
+        serializer.add_property('slug', self.slug)
+        serializer.add_property('display_name', self.display_name)
+        serializer.add_property('origin', ObjectSerializer.serialize(self.origin, serializer.format))
         serializer.add_property('glassware', [ObjectSerializer.serialize(glassware, serializer.format) for glassware in self.glassware])
         serializer.add_property('construction', ObjectSerializer.serialize(self.construction, serializer.format))
         serializer.add_property('components', [ObjectSerializer.serialize(component, serializer.format) for component in self.components])
         serializer.add_property('component_counts', ObjectSerializer.serialize(self.component_counts, serializer.format))
         serializer.add_property('garnish', [ObjectSerializer.serialize(garnish, serializer.format) for garnish in self.garnish])
         serializer.add_property('straw', self.straw)
-        serializer.add_property('citations', [citation.serialize() for citation in self.citations])
+        serializer.add_property('citations', [ObjectSerializer.serialize(citation, serializer.format) for citation in self.citations])
         serializer.add_property('notes', [ObjectSerializer.serialize(note, serializer.format) for note in self.notes])
         serializer.add_property('instructions', [ObjectSerializer.serialize(instruction, serializer.format) for instruction in self.instructions])

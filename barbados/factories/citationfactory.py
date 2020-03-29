@@ -1,5 +1,6 @@
 from barbados.objects.citation import Citation
-
+from barbados.objects.text import Text
+from datetime import date as Date
 
 class CitationFactory:
     def __init__(self):
@@ -8,7 +9,23 @@ class CitationFactory:
     @staticmethod
     def raw_to_obj(raw_citation):
         raw_citation = CitationFactory.sanitize_raw(raw_citation)
-        c_obj = Citation(**raw_citation)
+
+        notes = []
+        if 'notes' in raw_citation.keys():
+            for note in raw_citation['notes']:
+                notes.append(Text(text=note))
+            del(raw_citation['notes'])
+
+        if 'date' in raw_citation.keys():
+            raw_date = raw_citation['date']
+            del(raw_citation['date'])
+
+            if type(raw_date) != Date:
+                raise Exception("Date is invalid '%s'" % raw_date)
+        else:
+            raw_date = None
+
+        c_obj = Citation(notes=notes, date=raw_date, **raw_citation)
 
         return c_obj
 

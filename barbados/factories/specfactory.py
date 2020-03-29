@@ -88,7 +88,12 @@ class SpecFactory:
         else:
             construction_obj = Construction(slug=raw_spec['construction'])
 
-        s_obj = Spec(name=raw_spec['name'],
+        # Tortuga Data Model v2 does display_name as the spec name (and cocktail name too)
+        spec_slug = Slug(raw_spec['name'])
+        spec_display_name = raw_spec['name']
+
+        s_obj = Spec(slug=spec_slug,
+                     display_name=spec_display_name,
                      origin=origin_obj,
                      glassware=glassware_obj_list,
                      components=components,

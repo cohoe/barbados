@@ -1,9 +1,18 @@
+# @TODO Oh gods.... all of this.
+from barbados.serializers import ObjectSerializer
 
 
 class Citation:
-    def __init__(self, **kwargs):
-        for key, value in kwargs.items():
-            setattr(self, key, value)
+    def __init__(self, title=None, author=None, date=None, publisher=None, page=None, notes=None, href=None, location=None, issue=None):
+        self.title = title
+        self.author = author
+        self.date = date
+        self.publisher = publisher
+        self.page = page
+        self.notes = notes
+        self.href = href
+        self.location = location
+        self.issue = issue
 
     def to_mla_ish(self, html=False):
         if hasattr(self, 'author'):
@@ -36,19 +45,20 @@ class Citation:
 
     def __repr__(self):
         if hasattr(self, 'title'):
-            return "<Object:Citation::title=%s>" % self.title
+            return "Barbados::Objects::Citation[%s]" % self.title
         else:
-            return "<Object:Citation>"
+            return "Barbados::Objects::Citation[]"
 
-    def serialize(self):
-        ser = {}
-        keys = ['title', 'author', 'date', 'publisher', 'page']
-
-        for key in keys:
-            if hasattr(self, key):
-                ser[key] = getattr(self, key)
-
-        if 'date' in ser.keys():
-            ser['date'] = str(ser['date'])
-
-        return ser
+    def serialize(self, serializer):
+        serializer.add_property('notes', [ObjectSerializer.serialize(note, serializer.format) for note in self.notes])
+        serializer.add_property('title', self.title, even_if_none=False)
+        serializer.add_property('author', self.author, even_if_none=False)
+        if self.date:
+            serializer.add_property('date', self.date.isoformat())
+        else:
+            serializer.add_property('date', self.date, even_if_none=False)
+        serializer.add_property('publisher', self.publisher, even_if_none=False)
+        serializer.add_property('page', self.page, even_if_none=False)
+        serializer.add_property('href', self.href, even_if_none=False)
+        serializer.add_property('location', self.location, even_if_none=False)
+        serializer.add_property('issue', self.issue, even_if_none=False)

@@ -1,7 +1,5 @@
 class Origin:
-    UNKNOWN = 'UNKNOWN'
-
-    def __init__(self, creator=UNKNOWN, venue=UNKNOWN, location=UNKNOWN, year=UNKNOWN, story=UNKNOWN, era=UNKNOWN):
+    def __init__(self, creator=None, venue=None, location=None, year=None, story=None, era=None):
         self.creator = creator
         self.venue = venue
         self.location = location
@@ -9,32 +7,16 @@ class Origin:
         self.story = story
         self.era = era
 
-    # def __iter__(self):
-    #     keys = ['creator', 'venue', 'location', 'year', 'story']
-    #
-    #     output = []
-    #     for key in keys:
-    #         if hasattr(self, key):
-    #             output.append(str(getattr(self, key)))
-    #
-    #     if len(output) == 0:
-    #         output.append('Origin Unknown')
-    #
-    #     print(output)
-    #     return iter(output)
-
     def __repr__(self):
         if hasattr(self, 'location'):
-            return "<Object:Origin::location=%s>" % self.location
+            return "Barbados::Object::Origin[%s]" % self.location
         else:
-            return "<Object:Origin::unknown>"
+            return "Barbados::Object::Origin[]"
 
-    def serialize(self):
-        keys = ['creator', 'venue', 'location', 'year', 'story', 'era']
-        ser = {}
-
-        for key in keys:
-            if getattr(self, key) != Origin.UNKNOWN:
-                ser[key] = getattr(self, key)
-
-        return ser
+    def serialize(self, serializer):
+        serializer.add_property('creator', self.creator, even_if_none=False)
+        serializer.add_property('venue', self.venue, even_if_none=False)
+        serializer.add_property('location', self.creator, even_if_none=False)
+        serializer.add_property('year', self.year, even_if_none=False)
+        serializer.add_property('story', self.story, even_if_none=False)
+        serializer.add_property('era', self.era, even_if_none=False)
