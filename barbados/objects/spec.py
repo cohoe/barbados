@@ -5,11 +5,13 @@ class SpecComponentCounts:
     # @TODO consider ComponentKinds['Primary', 'Accents', 'Garnish']
     # That may be hard to implement since some drinks like the
     # Trinidad Sour are based on traditional accents.
-    def __init__(self, components):
+    def __init__(self, components, garnish):
         self.components = components
+        self.garnish = garnish
         self.counts = {
             'all': len(self.components),
             'primary': self._get_countable_components(),
+            'garnish': len(self.garnish),
         }
 
     def _get_countable_components(self):
@@ -36,7 +38,7 @@ class Spec:
         self.garnish = garnish
         self.instructions = instructions
         self.construction = construction
-        self.component_counts = SpecComponentCounts(components)
+        self.component_counts = SpecComponentCounts(components, garnish)
 
     def __repr__(self):
         return "<Object:Spec::name=%s>" % self.name
