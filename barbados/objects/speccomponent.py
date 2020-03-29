@@ -8,6 +8,7 @@ class SpecComponent:
 
     # This defines nodes in the IngredientTree that should be excluded
     # from the count.
+    # @TODO move this to zookeeper config
     ingredient_count_excludes = ['bitters']
 
     def __init__(self, slug, display_name, quantity=None, unit=None):

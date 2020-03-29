@@ -6,6 +6,7 @@ from barbados.objects.text import Text
 from barbados.objects.garnish import Garnish
 from barbados.objects.slug import Slug
 from barbados.objects.displayname import DisplayName
+from barbados.objects.construction import Construction
 from .citationfactory import CitationFactory
 
 
@@ -36,7 +37,7 @@ class SpecFactory:
         for raw_ingredient in raw_spec['ingredients']:
             component_slug = Slug(raw_ingredient['name'])
             component_display_name = DisplayName(component_slug)
-            del(raw_ingredient['name'])
+            del (raw_ingredient['name'])
             spec_ing_obj = SpecComponent(slug=component_slug, display_name=component_display_name, **raw_ingredient)
             components.append(spec_ing_obj)
         # print(ingredient_obj_list)
@@ -52,7 +53,6 @@ class SpecFactory:
         straw = SpecFactory.infer_bool(raw_spec['straw'])
         # print(straw)
 
-        # @TODO v2 model does not deal with quantity of garnish
         garnish_obj_list = []
         for raw_garnish in raw_spec['garnish']:
             if type(raw_garnish) is dict:
@@ -74,7 +74,7 @@ class SpecFactory:
             instr_obj_list.append(Text(text=instruction))
         # print(instr_obj_list)
 
-        # @TODO enum for construction
+        construction_obj = Construction(slug=raw_spec['construction'])
 
         s_obj = Spec(name=raw_spec['name'],
                      origin=origin_obj,
@@ -85,7 +85,8 @@ class SpecFactory:
                      straw=straw,
                      garnish=garnish_obj_list,
                      instructions=instr_obj_list,
-                     construction=raw_spec['construction'])
+                     construction=construction_obj,
+                     )
 
         return s_obj
 
