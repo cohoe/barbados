@@ -14,9 +14,9 @@ class Origin:
             return "Barbados::Object::Origin[]"
 
     def serialize(self, serializer):
-        serializer.add_property('creator', self.creator, even_if_none=False)
-        serializer.add_property('venue', self.venue, even_if_none=False)
-        serializer.add_property('location', self.creator, even_if_none=False)
-        serializer.add_property('year', self.year, even_if_none=False)
-        serializer.add_property('story', self.story, even_if_none=False)
-        serializer.add_property('era', self.era, even_if_none=False)
+        serializer.add_property('creator', self.creator, even_if_empty=False)
+        serializer.add_property('venue', self.venue, even_if_empty=False)
+        serializer.add_property('location', self.creator, even_if_empty=False)
+        serializer.add_property('year', self.year, even_if_empty=False)
+        serializer.add_property('story', self.story, even_if_empty=False)
+        serializer.add_property('era', self.era, even_if_empty=False)

@@ -12,8 +12,9 @@ class BaseSerializer:
     def __init__(self):
         self._current_object = {}
 
-    def add_property(self, name, value, even_if_none=True):
-        if not even_if_none:
+    def add_property(self, name, value, even_if_empty=True):
+        if not even_if_empty:
+            # [], {}, None are all False-y.
             if not value:
                 return
         self._current_object[name] = value

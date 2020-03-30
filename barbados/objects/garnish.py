@@ -17,5 +17,5 @@ class Garnish:
     def serialize(self, serializer):
         serializer.add_property('slug', self.slug)
         serializer.add_property('display_name', self.display_name)
-        serializer.add_property('note', self.note, even_if_none=False)
-        serializer.add_property('quantity', self.quantity, even_if_none=False)
+        serializer.add_property('note', self.note, even_if_empty=False)
+        serializer.add_property('quantity', self.quantity, even_if_empty=False)

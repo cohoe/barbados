@@ -51,14 +51,14 @@ class Citation:
 
     def serialize(self, serializer):
         serializer.add_property('notes', [ObjectSerializer.serialize(note, serializer.format) for note in self.notes])
-        serializer.add_property('title', self.title, even_if_none=False)
-        serializer.add_property('author', self.author, even_if_none=False)
+        serializer.add_property('title', self.title, even_if_empty=False)
+        serializer.add_property('author', self.author, even_if_empty=False)
         if self.date:
             serializer.add_property('date', self.date.isoformat())
         else:
-            serializer.add_property('date', self.date, even_if_none=False)
-        serializer.add_property('publisher', self.publisher, even_if_none=False)
-        serializer.add_property('page', self.page, even_if_none=False)
-        serializer.add_property('href', self.href, even_if_none=False)
-        serializer.add_property('location', self.location, even_if_none=False)
-        serializer.add_property('issue', self.issue, even_if_none=False)
+            serializer.add_property('date', self.date, even_if_empty=False)
+        serializer.add_property('publisher', self.publisher, even_if_empty=False)
+        serializer.add_property('page', self.page, even_if_empty=False)
+        serializer.add_property('href', self.href, even_if_empty=False)
+        serializer.add_property('location', self.location, even_if_empty=False)
+        serializer.add_property('issue', self.issue, even_if_empty=False)
