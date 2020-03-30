@@ -17,7 +17,11 @@ class SpecFactory:
     @staticmethod
     def raw_to_obj(raw_spec):
         if 'name' not in raw_spec.keys():
-            raise Exception('Spec is missing name')
+            spec_slug = raw_spec['slug']
+            spec_display_name = raw_spec['display_name']
+        else:
+            spec_slug = Slug(raw_spec['name'])
+            spec_display_name = raw_spec['name']
 
         raw_spec = SpecFactory.sanitize_raw(raw_spec)
 
@@ -80,17 +84,16 @@ class SpecFactory:
 
         instr_obj_list = []
         for instruction in raw_spec['instructions']:
-            instr_obj_list.append(Text(text=instruction))
+            if type(instruction) is dict:
+                instr_obj_list.append(Text(**instruction))
+            else:
+                instr_obj_list.append(Text(text=instruction))
         # print(instr_obj_list)
 
         if type(raw_spec['construction']) is dict:
             construction_obj = Construction(**raw_spec['construction'])
         else:
             construction_obj = Construction(slug=raw_spec['construction'])
-
-        # Tortuga Data Model v2 does display_name as the spec name (and cocktail name too)
-        spec_slug = Slug(raw_spec['name'])
-        spec_display_name = raw_spec['name']
 
         s_obj = Spec(slug=spec_slug,
                      display_name=spec_display_name,
