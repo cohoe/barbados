@@ -4,10 +4,10 @@ from barbados.objects.text import Text
 from .specfactory import SpecFactory
 from .citationfactory import CitationFactory
 from barbados.serializers import ObjectSerializer
-import json
+from .base import BaseFactory
 
 
-class CocktailFactory:
+class CocktailFactory(BaseFactory):
     def __init__(self):
         pass
 
@@ -87,7 +87,3 @@ class CocktailFactory:
         }
 
         return CocktailFactory.raw_to_obj(raw_recipe=raw_data, slug=model.slug)
-
-    @staticmethod
-    def obj_to_index(obj, index_class):
-        return index_class(meta={'id': obj.slug}, **ObjectSerializer.serialize(obj, 'dict'))

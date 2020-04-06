@@ -1,7 +1,8 @@
 from barbados.objects.ingredient import Ingredient
+from .base import BaseFactory
 
 
-class IngredientFactory:
+class IngredientFactory(BaseFactory):
     def __init__(self):
         pass
 

@@ -63,6 +63,15 @@ class IngredientTree:
 
         return node
 
+    def nodes(self):
+        """
+        Return a list of all nodes in the tree. The first node is the root
+        node and doesn't conform to object properties, so we exclude it
+        from the return.
+        :return: List of treelib.Node's
+        """
+        return self.tree.all_nodes()[1:]
+
     def substitutions(self, node_id):
         """
         TODO:

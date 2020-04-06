@@ -1,5 +1,6 @@
 import logging
 from .recipe import RecipeIndex
+from .ingredient import IngredientIndex
 from barbados.connectors.elasticsearch import ElasticsearchConnector
 
 
@@ -26,3 +27,4 @@ class IndexFactory:
 
 index_factory = IndexFactory()
 index_factory.register_index(RecipeIndex)
+index_factory.register_index(IngredientIndex)

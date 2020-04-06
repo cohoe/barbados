@@ -1,12 +1,9 @@
 from elasticsearch_dsl import Document, Text
+from .base import BaseIndex
 
 
 class RecipeIndex(Document):
     slug = Text()
 
-    class Index:
+    class Index(BaseIndex):
         name = 'recipe'
-        settings = {
-            'number_of_shards': 1,
-            'number_of_replicas': 0,
-        }
