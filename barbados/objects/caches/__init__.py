@@ -55,7 +55,13 @@ class CacheBase(object):
         Retrieve the cache's value
         :return: Various
         """
-        return Cache.get(cls.cache_key)
+        # return Cache.get(cls.cache_key)
+        try:
+            return Cache.get(cls.cache_key)
+        except KeyError:
+            logging.warning("Attempted to retrieve '%s' but it was empty. Repopulating..." % cls.cache_key)
+            cls.populate()
+            return Cache.get(cls.cache_key)
 
     @classmethod
     def invalidate(cls):
