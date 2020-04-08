@@ -2,6 +2,7 @@ from barbados.objects.citation import Citation
 from barbados.objects.text import Text
 from datetime import date as Date
 
+
 class CitationFactory:
     def __init__(self):
         pass
@@ -21,7 +22,16 @@ class CitationFactory:
             del(raw_citation['date'])
 
             if type(raw_date) != Date:
-                raise Exception("Date is invalid '%s'" % raw_date)
+                try:
+                    # @TODO de-sketchify this.
+                    # raw_date is not a Date() when it comes from YAML but
+                    # is a Str() when it comes from database or other sources.
+                    # There is a way of disabling the auto-casting in the yaml
+                    # loader, it may be a good idea to revisit that.
+                    raw_date = Date(*[int(i) for i in raw_date.split('-')])
+                except Exception as e:
+                    print(e)
+                    raise Exception("Date is invalid '%s'" % raw_date)
         else:
             raw_date = None
 
