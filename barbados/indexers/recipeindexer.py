@@ -9,5 +9,5 @@ class RecipeIndexer(BaseIndexer):
 
     @staticmethod
     def index(cocktail_object):
-        index = CocktailFactory.obj_to_index(cocktail_object, RecipeIndex)
-        index.save()
+        indexables = CocktailFactory.obj_to_index(cocktail_object, RecipeIndex)
+        [indexable.save() for indexable in indexables]

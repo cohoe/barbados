@@ -5,6 +5,7 @@ from .specfactory import SpecFactory
 from .citationfactory import CitationFactory
 from barbados.serializers import ObjectSerializer
 from .base import BaseFactory
+import copy
 
 
 class CocktailFactory(BaseFactory):
@@ -87,3 +88,19 @@ class CocktailFactory(BaseFactory):
         }
 
         return CocktailFactory.raw_to_obj(raw_recipe=raw_data, slug=model.slug)
+
+    @staticmethod
+    def obj_to_index(obj, index_class, format='dict'):
+        base_recipe = ObjectSerializer.serialize(obj, format)
+        specs = base_recipe.pop('specs')
+
+        searchable_recipes = {}
+        for spec in specs:
+            # Holy Fuck this took too long to figure out
+            # https://thispointer.com/python-how-to-copy-a-dictionary-shallow-copy-vs-deep-copy/
+            searchable = copy.deepcopy(base_recipe)
+            searchable['spec'] = spec
+            searchable_id = '%s::%s' % (searchable['slug'], spec['slug'])
+            searchable_recipes[searchable_id] = searchable
+
+        return [index_class(meta={'id': key}, **value) for key, value in searchable_recipes.items()]
