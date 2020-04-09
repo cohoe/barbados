@@ -29,31 +29,6 @@ class QueryParameter:
             raise Exception("Unsupported QueryParameter kind: %s" % kind)
 
 
-class QueryResult:
-    """
-    Standardized query response object. Provides the ElasticSearch document ID and
-    the score, along with the actual result as defined by the appropriate
-    QueryResult class. This is not really an object, more of a class manifestation
-    of a dict.
-    """
-    def __new__(cls, hit):
-        return {
-            'id': hit.meta.id,
-            'score': hit.meta.score,
-            'result': cls._build_query_result(hit=hit)
-        }
-
-    @classmethod
-    def _build_query_result(cls, hit):
-        """
-        Required function to build a dictionary of attributes to return from the
-        index.
-        :param hit: ElasticSearch result.
-        :return: dict of attributes.
-        """
-        raise NotImplementedError
-
-
 class BaseQuery:
     """
     Generic class to manage querying an ElasticSearch index. This class is wicked yuuuge

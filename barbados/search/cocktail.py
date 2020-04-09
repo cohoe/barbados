@@ -2,19 +2,7 @@ from barbados.search import QueryResult, BaseQuery
 from barbados.indexes import RecipeIndex
 
 
-class CocktailQueryResult(QueryResult):
-    """
-    Definition of what a query to the cocktail index should return.
-    """
-    @classmethod
-    def _build_query_result(cls, hit):
-        return {
-            'cocktail_slug': hit.slug,
-            'cocktail_display_name': hit.display_name,
-            'spec_slug': hit.spec.slug,
-            'spec_display_name': hit.spec.display_name,
-            'component_display_names': [component['display_name'] for component in hit.spec.components],
-        }
+
 
 
 class CocktailQuery(BaseQuery):
