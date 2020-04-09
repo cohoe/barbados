@@ -45,12 +45,36 @@ class CocktailSearchResults(SearchResults):
         }
 
 
-class CocktailQuery:
+class BaseQuery:
+    def __init__(self):
+        self.q = None
+        self.sort = None
+
+    @property
+    def index_class(self):
+        raise NotImplementedError
+
+    @property
+    def result_class(self):
+        raise NotImplementedError
+
+    def execute(self):
+        """
+        Actually talk to ElasticSearch and run the query.
+        :return: SearchResults child class.
+        """
+        results = self.index_class.search()[0:1000].query(self.q).sort(self.sort).execute()
+        logging.info("Got %s results." % results.hits.total.value)
+        return self.result_class(hits=results)
+
+
+class CocktailQuery(BaseQuery):
 
     index_class = RecipeIndex
     result_class = CocktailSearchResults
 
-    def __new__(cls, name, components, alpha, sort='_score'):
+    def __init__(self, name, components, alpha, sort='_score'):
+        super().__init__()
         logging.info("Searching on name=%s,components=%s,alpha=%s" % (name, components, alpha))
         names = name.split(',')
         components = components.split(',')
@@ -77,8 +101,5 @@ class CocktailQuery:
             musts.append(Prefix(alpha=alpha))
 
         print(musts)
-        q = Bool(must=musts)
-
-        results = cls.index_class.search()[0:1000].query(q).sort(sort).execute()
-        logging.info("Got %s results." % results.hits.total.value)
-        return cls.result_class(hits=results)
+        self.q = Bool(must=musts)
+        self.sort = sort
