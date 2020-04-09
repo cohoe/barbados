@@ -92,6 +92,7 @@ class CocktailFactory(BaseFactory):
     @staticmethod
     def obj_to_index(obj, index_class, format='dict'):
         base_recipe = ObjectSerializer.serialize(obj, format)
+        base_recipe['alpha'] = base_recipe['slug'][0]
         specs = base_recipe.pop('specs')
 
         searchable_recipes = {}
