@@ -10,6 +10,7 @@ class SearchResults:
     SearchResult child class. This is not really an object, more of a class manifestation
     of a dict.
     """
+
     def __new__(cls, hits):
         response = []
         for hit in hits:
@@ -34,6 +35,7 @@ class CocktailSearchResults(SearchResults):
     """
     Definition of what a query to the cocktail index should return.
     """
+
     @classmethod
     def _serialize_hit(cls, hit):
         return {
@@ -45,10 +47,13 @@ class CocktailSearchResults(SearchResults):
         }
 
 
-class BaseQuery:
+class BaseSearch:
     def __init__(self):
         self.q = None
         self.sort = None
+        self.query_parameters = {}
+
+        self._build_query_parameters()
 
     @property
     def index_class(self):
@@ -56,6 +61,9 @@ class BaseQuery:
 
     @property
     def result_class(self):
+        raise NotImplementedError
+
+    def _build_query_parameters(self):
         raise NotImplementedError
 
     def execute(self):
@@ -67,9 +75,25 @@ class BaseQuery:
         logging.info("Got %s results." % results.hits.total.value)
         return self.result_class(hits=results)
 
+    def add_query_parameter(self, parameter, query_class, query_key, **attributes):
+        self.query_parameters[parameter] = {
+            'parameter': parameter,
+            'query_class': query_class,
+            'query_key': query_key,
+            'attributes': attributes
+        }
+        logging.info("%s: %s" % (parameter, self.query_parameters[parameter]))
 
-class CocktailQuery(BaseQuery):
+    def get_query_object(self, parameter, value):
+        settings = self.query_parameters.get(parameter)
+        if not settings:
+            raise KeyError("Parameter %s has no query parameters defined." % parameter)
 
+        query_class_parameters = {**{settings.get('query_key'): value}, **settings.get('attributes')}
+        return settings.get('query_class')(**query_class_parameters)
+
+
+class CocktailSearch(BaseSearch):
     index_class = RecipeIndex
     result_class = CocktailSearchResults
 
@@ -86,20 +110,26 @@ class CocktailQuery(BaseQuery):
             # @TODO fix this
             if not component:
                 continue
-            musts.append(MultiMatch(query=component, type='phrase_prefix',
-                                    fields=['spec.components.slug', 'specs.component.display_name', 'spec.components.parents']))
+            musts.append(self.get_query_object(parameter='components', value=component))
 
         for name in names:
             if not name:
                 continue
-            musts.append(MultiMatch(query=name, type='phrase_prefix', fields=['spec.name', 'display_name']))
+            musts.append(self.get_query_object(parameter='name', value=name))
 
         # Need to do ||, not &&
         for alpha in alphas:
             if not alpha:
                 continue
-            musts.append(Prefix(alpha=alpha))
+            musts.append(self.get_query_object(parameter='alpha', value=alpha))
 
         print(musts)
         self.q = Bool(must=musts)
         self.sort = sort
+
+    def _build_query_parameters(self):
+        self.add_query_parameter(parameter='components', query_class=MultiMatch, query_key='query', type='phrase_prefix',
+                                 fields=['spec.components.slug', 'specs.component.display_name', 'spec.components.parents'])
+        self.add_query_parameter(parameter='name', query_class=MultiMatch, query_key='query', type='phrase_prefix',
+                                 fields=['spec.name', 'display_name'])
+        self.add_query_parameter(parameter='alpha', query_class=Prefix, query_key='alpha')
