@@ -1,138 +1,143 @@
 import logging
+from elasticsearch_dsl.query import Bool
 
 
-class QueryParameter:
+class SearchResults:
     """
-    This class defines an ElasticSearch query parameter. Designed for multi_match.
-    https://www.elastic.co/guide/en/elasticsearch/reference/current/full-text-queries.html
-    This is not really an object, more of a class manifestation of a dict.
+    Standardized search response object. Provides the ElasticSearch document ID and
+    the score, along with the actual result as defined by the appropriate
+    SearchResult child class. This is not really an object, more of a class manifestation
+    of a dict.
     """
-    # def __new__(cls, query, fields, kind='multi_match', type_='phrase_prefix'):
-    def __new__(cls, kind, **kwargs):
-        if kind is 'multi_match':
-            return {
-                kind: {
-                    'query': kwargs.get('query'),
-                    'type': 'phrase_prefix',
-                    'fields': kwargs.get('fields'),
-                }
-            }
-        elif kind is 'prefix':
-            return {
-                kind: {
-                    kwargs.get('fields')[0]: { # @TODO dont reuse
-                        'value': kwargs.get('query') # @TODO dont reuse
-                    }
-                }
-            }
-        else:
-            raise Exception("Unsupported QueryParameter kind: %s" % kind)
+
+    def __new__(cls, hits):
+        response = []
+        for hit in hits:
+            response.append({
+                'id': hit.meta.id,
+                'score': hit.meta.score,
+                'hit': cls._serialize_hit(hit=hit)
+            })
+        return response
+
+    @classmethod
+    def _serialize_hit(cls, hit):
+        """
+        Required function to build a dictionary of attributes to return from the index.
+        :param hit: ElasticSearch result.
+        :return: dict of attributes.
+        """
+        raise NotImplementedError
 
 
-class BaseQuery:
+class SearchBase:
     """
     Generic class to manage querying an ElasticSearch index. This class is wicked yuuuge
     so that the specific index implementations don't have to be.
     """
-    def __init__(self, index_class, result_class, sort, input_parameters):
-        self.index_class = index_class
-        self.result_class = result_class
-        self._param_mappings = {}
-        self.input_parameters = input_parameters
+
+    def __init__(self, **kwargs):
         self.query_parameters = {}
-        self.query_config = {}
-        self.sort = sort
+        self._build_query_parameters()
 
-    def add_parameter_field_mapping(self, parameter, fields):
-        """
-        Query parameters (input via API) map to a set of fields in the index.
-        These are referred to as "parameter-field mappings". This method adds
-        a new mapping.
-        :param parameter: Query parameter.
-        :param fields: list of fields to search when querying on this parameter.
-        :return: None
-        """
-        self._param_mappings[parameter] = fields
+        for key, value in kwargs.items():
+            if key not in self.supported_parameters:
+                raise KeyError("Query parameter %s is not supported" % key)
+            setattr(self, key, value)
 
-    def get_parameter_field_mapping(self, parameter):
-        """
-        Look up the fields to search for a particular parameter.
-        :param parameter: Query parameter.
-        :return: List of fields (strings), or KeyError
-        """
-        fields = self._param_mappings.get(parameter)
-        if fields is None:
-            raise KeyError("No parameter-field mapping for %s" % parameter)
-        logging.info("%s maps to %s" % (parameter, fields))
-        return fields
+        self.q = self._build_search_query()
 
-    def add_query_parameter(self, parameter, type_):
+    @property
+    def index_class(self):
         """
-        Define an input parameter of this query. To determine appropriate search
-        settings its type is also needed.
-        :param parameter: Query parameter.
-        :param type_: Python type class corresponding to the expected value of the parameter.
-        :return: None
-        """
-        self.query_parameters[parameter] = type_
-
-    @staticmethod
-    def _generate_results(results, result_class):
-        """
-        Generate a list of QueryResult-ish objects to return to the caller
-        :param results: List of ElasticSearch results.
-        :param result_class: QueryResult-ish class to turn everything into.
-        :return: List of result_class objects.
-        """
-        return [result_class(result) for result in results]
-
-    def _build_parameter_field_mappings(self):
-        """
-        Define all parameter-field mappings for a particular BaseQuery-ish object.
-        :return: None
+        Define the class of the ElasticSearch index for this search.
+        :return:
         """
         raise NotImplementedError
+
+    @property
+    def result_class(self):
+        """
+        Define the class that represents results of this search.
+        :return:
+        """
+        raise NotImplementedError
+
+    @property
+    def supported_parameters(self):
+        """
+        Return a list of the supported query parameters of the class.
+        :return: List of Strings.
+        """
+        return list(self.query_parameters.keys())
 
     def _build_query_parameters(self):
         """
-        Define all query input parameters for this BaseQuery-ish object.
-        :return: None
+        Perform a series of self.add_query_parameter() to define what the parameters
+        are that this class supports.
+        :return:
         """
         raise NotImplementedError
 
-    def _build_query_condition(self, parameter, value, kind='prefix'):
-        """
-        Build an ElasticSearch query condition based on a parameters value and its fields.
-        :param parameter: The query parameter to then go find its fields (look for parameter-field mapping).
-        :param value: The value to look for in the index.
-        :return: QueryParameter or None
-        """
-        if not value:
-            return
-
-        return QueryParameter(kind=kind, query=value, fields=self.get_parameter_field_mapping(parameter))
-
-    def _build_query_conditions(self):
-        """
-        Build a list of all query conditions.
-        :return: List of QueryParameter
-        """
-        conditions = []
-        for parameter, type_ in self.query_parameters.items():
-            logging.info("Building condition for %s of type %s" % (parameter, type_))
-            if type_ is str:
-                conditions.append(self._build_query_condition(parameter=parameter, value=self.input_parameters.get(parameter)))
-            elif type_ is list:
-                for param in self.input_parameters.get(parameter):
-                    conditions.append(self._build_query_condition(parameter=parameter, value=param))
-
-        # https://www.geeksforgeeks.org/python-remove-none-values-from-list/
-        return list(filter(None, conditions))
-
-    def execute(self):
+    def execute(self, sort='_score'):
         """
         Actually talk to ElasticSearch and run the query.
-        :return: List of QueryResult-ish objects.
+        :param sort: ElasticSearch attribute on which to sort the results.
+        :return: SearchResults child class.
         """
-        results = self.index_class.search()[0:1000].query(**self.query_config).sort(self.sort).execute()
-        return self._generate_results(results=results, result_class=self.result_class)
+        results = self.index_class.search()[0:1000].query(self.q).sort(sort).execute()
+        logging.info("Got %s results." % results.hits.total.value)
+        return self.result_class(hits=results)
+
+    def add_query_parameter(self, parameter, query_class, query_key, **attributes):
+        """
+        Define a queriable parameter for this search index.
+        :param parameter: URL/input parameter to key from.
+        :param query_class: ElasticSearch DSL query class.
+        :param query_key: ElasticSearch query key field (usually not the same as an input parameter)
+        :param attributes: Dictionary of extra params to pass to the query_class consturctor
+        :return: None
+        """
+        self.query_parameters[parameter] = {
+            'parameter': parameter,
+            'query_class': query_class,
+            'query_key': query_key,
+            'attributes': attributes
+        }
+
+    def get_query_condition(self, parameter, value):
+        """
+        Build an ElasticSearch query object by looking up the parameter settings
+        and assigning an input value for the condition.
+        :param parameter: URL query parameter.
+        :param value: The value to look for in the index.
+        :return: Query() child object.
+        """
+        settings = self.query_parameters.get(parameter)
+        if not settings:
+            raise KeyError("Parameter %s has no query parameters defined." % parameter)
+
+        query_class_parameters = {**{settings.get('query_key'): value}, **settings.get('attributes')}
+        return settings.get('query_class')(**query_class_parameters)
+
+    def _build_search_query(self):
+        """
+        Construct the ElasticSearch query object containing all conditions
+        :return:
+        """
+        musts = []
+        for parameter in self.supported_parameters:
+            values = getattr(self, parameter, None)
+            if not values:
+                continue
+
+            # We split in the URL based on ,'s.
+            values = values.split(',')
+
+            for value in values:
+                if not value:
+                    continue
+                musts.append(self.get_query_condition(parameter=parameter, value=value))
+
+        logging.info("Search Conditions are %s" % musts)
+        return Bool(must=musts)
