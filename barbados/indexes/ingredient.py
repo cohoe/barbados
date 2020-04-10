@@ -7,6 +7,7 @@ class IngredientIndex(Document):
     display_name = Text()
     parent = Text()
     parents = Text()
+    aliases = Text()
 
     class Index(BaseIndex):
         name = 'ingredient'

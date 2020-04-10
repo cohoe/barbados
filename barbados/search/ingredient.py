@@ -1,5 +1,6 @@
+import logging
 from barbados.search import SearchResults, SearchBase
-from elasticsearch_dsl.query import MultiMatch, Prefix, Match
+from elasticsearch_dsl.query import MultiMatch, Match
 from barbados.indexes import IngredientIndex
 
 
@@ -10,11 +11,12 @@ class IngredientSearchResults(SearchResults):
 
     @classmethod
     def _serialize_hit(cls, hit):
+        logging.info("Serializing search hit %s" % hit.slug)
         return {
             'slug': hit.slug,
             'display_name': hit.display_name,
             'kind': hit.kind,
-            'aliases': hit.aliases,
+            'aliases': [alias for alias in hit.aliases] if hit.aliases else [],
         }
 
 
