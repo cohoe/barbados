@@ -1,4 +1,4 @@
-from barbados.search import SearchResults, SearchBase
+from barbados.search import SearchBase
 from elasticsearch_dsl.query import MultiMatch, Prefix
 from barbados.indexes import RecipeIndex
 

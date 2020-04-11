@@ -18,3 +18,12 @@ class IngredientFactory(BaseFactory):
             'elements': input_object.elements,
         }
         return Ingredient(**mapping)
+
+    @staticmethod
+    def model_to_obj(model):
+        """
+        This exists to ensure common functionality with CocktailModel.
+        :param model:
+        :return:
+        """
+        return IngredientFactory.to_obj(model)
