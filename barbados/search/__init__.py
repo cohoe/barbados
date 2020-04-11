@@ -16,18 +16,9 @@ class SearchResults:
             response.append({
                 'id': hit.meta.id,
                 'score': hit.meta.score,
-                'hit': cls._serialize_hit(hit=hit)
+                'hit': hit.to_dict()
             })
         return response
-
-    @classmethod
-    def _serialize_hit(cls, hit):
-        """
-        Required function to build a dictionary of attributes to return from the index.
-        :param hit: ElasticSearch result.
-        :return: dict of attributes.
-        """
-        raise NotImplementedError
 
 
 class SearchBase:
@@ -56,14 +47,6 @@ class SearchBase:
         raise NotImplementedError
 
     @property
-    def result_class(self):
-        """
-        Define the class that represents results of this search.
-        :return:
-        """
-        raise NotImplementedError
-
-    @property
     def supported_parameters(self):
         """
         Return a list of the supported query parameters of the class.
@@ -87,7 +70,7 @@ class SearchBase:
         """
         results = self.index_class.search()[0:1000].query(self.q).sort(sort).execute()
         logging.info("Got %s results." % results.hits.total.value)
-        return self.result_class(hits=results)
+        return SearchResults(hits=results)
 
     def add_query_parameter(self, parameter, query_class, query_key, **attributes):
         """
