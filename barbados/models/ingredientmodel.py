@@ -2,7 +2,7 @@ from barbados.models.base import BarbadosModel
 from barbados.objects.ingredientkinds import IngredientKinds
 from barbados.exceptions import ValidationException
 from sqlalchemy import Column, String, or_, ARRAY
-from barbados.objects.slug import Slug
+from barbados.text import Slug
 
 
 class IngredientModel(BarbadosModel):

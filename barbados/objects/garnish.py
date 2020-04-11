@@ -1,4 +1,4 @@
-from barbados.objects.displayname import DisplayName
+from barbados.text import DisplayName
 
 
 class Garnish:

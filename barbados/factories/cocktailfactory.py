@@ -1,6 +1,6 @@
 from barbados.objects.cocktail import Cocktail, Status
 from barbados.objects.origin import Origin
-from barbados.objects.text import Text
+from barbados.text import Text
 from .specfactory import SpecFactory
 from .citationfactory import CitationFactory
 from barbados.serializers import ObjectSerializer
