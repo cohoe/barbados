@@ -1,4 +1,4 @@
-from barbados.objects.caches import IngredientTreeCache
+from barbados.caches import IngredientTreeCache
 
 
 class SpecComponent:
