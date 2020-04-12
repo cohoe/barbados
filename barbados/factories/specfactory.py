@@ -57,7 +57,10 @@ class SpecFactory:
 
         n_obj_list = []
         for note in raw_spec['notes']:
-            n_obj_list.append(Text(text=note))
+            if type(note) is dict:
+                n_obj_list.append(Text(**note))
+            else:
+                n_obj_list.append(Text(text=note))
         # print(n_obj_list)
 
         straw = SpecFactory.infer_bool(raw_spec['straw'])
