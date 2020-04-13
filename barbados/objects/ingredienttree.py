@@ -84,6 +84,7 @@ class IngredientTree:
         """
         node = self.node(node_id)
         parent = self.parent(node_id)
+        parents = self.parents(node_id)
 
         children = node.fpointer
         siblings = parent.fpointer
@@ -93,6 +94,7 @@ class IngredientTree:
         return ({
             'self': node.identifier,
             'parent': parent.identifier,
+            'parents': parents,
             'children': children + elements,
             'siblings': siblings,
         })
