@@ -1,5 +1,6 @@
 import logging
 from elasticsearch_dsl.query import Bool
+from barbados.exceptions import ValidationException
 
 
 class SearchResults:
@@ -72,10 +73,11 @@ class SearchBase:
         logging.info("Got %s results." % results.hits.total.value)
         return SearchResults(hits=results)
 
-    def add_query_parameter(self, parameter, query_class, query_key, **attributes):
+    def add_query_parameter(self, parameter, query_class, query_key, parameter_type=str, **attributes):
         """
         Define a queriable parameter for this search index.
         :param parameter: URL/input parameter to key from.
+        :param parameter_type: Python type class of this parameter from the URL.
         :param query_class: ElasticSearch DSL query class.
         :param query_key: ElasticSearch query key field (usually not the same as an input parameter)
         :param attributes: Dictionary of extra params to pass to the query_class consturctor
@@ -83,6 +85,7 @@ class SearchBase:
         """
         self.query_parameters[parameter] = {
             'parameter': parameter,
+            'parameter_type': parameter_type,
             'query_class': query_class,
             'query_key': query_key,
             'attributes': attributes
@@ -105,22 +108,38 @@ class SearchBase:
 
     def _build_search_query(self):
         """
-        Construct the ElasticSearch query object containing all conditions
-        :return:
+        Construct the ElasticSearch query object containing all conditions.
+        :return: ElasticSearch Bool() query object.
         """
         musts = []
         for parameter in self.supported_parameters:
-            values = getattr(self, parameter, None)
-            if not values:
+
+            raw_value = getattr(self, parameter, None)
+            if not raw_value:
                 continue
 
-            # We split in the URL based on ,'s.
-            values = values.split(',')
-
-            for value in values:
-                if not value:
-                    continue
-                musts.append(self.get_query_condition(parameter=parameter, value=value))
+            expected_value_type = self.query_parameters[parameter].get('parameter_type')
+            if expected_value_type is str:
+                self._validate_query_parameter(parameter=parameter, value=raw_value, type_=str)
+                musts.append(self.get_query_condition(parameter=parameter, value=raw_value))
+            elif expected_value_type is list:
+                self._validate_query_parameter(parameter=parameter, value=raw_value, type_=list)
+                for value in raw_value:
+                    musts.append(self.get_query_condition(parameter=parameter, value=value))
 
         logging.info("Search Conditions are %s" % musts)
         return Bool(must=musts)
+
+    @staticmethod
+    def _validate_query_parameter(parameter, value, type_):
+        """
+        Ensure that the value of a query parameter matches the expected type.
+        This is somewhat redundant now that proper request parsing works on
+        the API end, but hey better to be sure right?
+        :param parameter: URL parameter.
+        :param value: Value as passed by the user (after modeling).
+        :param type_: expected python type class.
+        :return: None
+        """
+        if type(value) is not type_:
+            raise ValidationException("Value of parameter '%s' is not a '%s' (got '%s')" % (parameter, type_, value))
