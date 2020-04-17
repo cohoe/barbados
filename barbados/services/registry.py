@@ -1,4 +1,5 @@
 from barbados.connectors import ZookeeperConnector
+from barbados.connectors import PostgresqlConnector
 
 
 class Registry:
@@ -31,3 +32,16 @@ class Registry:
         :return: None or Exception
         """
         return Registry.registry_connector.set(path, value)
+
+    @staticmethod
+    def get_database_connection():
+        """
+        @TODO I don't like this is here but until a better place
+        presents itself its good enough.
+        :return:
+        """
+        db_database = Registry.get('/database/postgres/database')
+        db_username = Registry.get('/database/postgres/username')
+        db_password = Registry.get('/database/postgres/password')
+
+        return PostgresqlConnector(database=db_database, username=db_username, password=db_password)
