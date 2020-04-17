@@ -1,7 +1,7 @@
 from .baseindexer import BaseIndexer
 from barbados.factories import IngredientFactory
 from barbados.indexes import IngredientIndex
-from barbados.objects.caches import IngredientTreeCache
+from barbados.caches import IngredientTreeCache
 
 
 class IngredientIndexer(BaseIndexer):
