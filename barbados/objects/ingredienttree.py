@@ -51,6 +51,9 @@ class IngredientTree:
 
     def parent(self, node_id):
         try:
+            # bpointer was deprecated somewhere between 1.5.5 and 1.6.1, but they
+            # broke is_root() which is used later on in this class. Freezing to
+            # 1.5.5 to avoid dealing with this for the moment.
             parent_id = self.tree.get_node(node_id).bpointer
             return self.tree.get_node(parent_id)
         except AttributeError:
