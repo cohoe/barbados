@@ -72,10 +72,11 @@ class SpecFactory:
                 try:
                     garnish_slug = Slug(raw_garnish['name'])
                     garnish_quantity = raw_garnish['quantity']
-                    garnish_note = None
+                    garnish_notes = []
                     if 'note' in raw_garnish.keys():
-                        garnish_note = raw_garnish['note']
-                    garnish_obj = Garnish(slug=garnish_slug, quantity=garnish_quantity, note=garnish_note)
+                        for note in raw_garnish['notes']:
+                            garnish_notes.append(Text(**note))
+                    garnish_obj = Garnish(slug=garnish_slug, quantity=garnish_quantity, notes=garnish_notes)
                 except KeyError:
                     garnish_obj = Garnish(**raw_garnish)
             else:
@@ -136,11 +137,6 @@ class SpecFactory:
         for key in lists:
             if raw_spec[key] is None:
                 raw_spec[key] = required_keys[key]
-            # As of Tortuga Data Format v2, glassware is a single string.
-            # This is future-proofing for the ability to allow multiple
-            # glassware definitions (likely to be defined as an | situation.
-            if raw_spec[key].__class__ == str:
-                raw_spec[key] = [raw_spec[key]]
 
         return raw_spec
 
