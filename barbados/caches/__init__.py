@@ -69,6 +69,7 @@ class CacheBase(object):
         Invalidate (delete) the cache value and key.
         :return: None
         """
+        logging.info("Invalidating cache key %s" % cls.cache_key)
         return Cache.delete(cls.cache_key)
 
 
