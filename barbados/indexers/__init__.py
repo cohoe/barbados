@@ -1,4 +1,5 @@
 from .recipeindexer import RecipeIndexer
+from .ingredientindexer import IngredientIndexer
 
 
 class IndexerFactory:
@@ -10,7 +11,7 @@ class IndexerFactory:
         self._indexers[for_class] = indexer
 
     def get_indexer(self, indexable):
-        class_name = indexable.__class__.__name__
+        class_name = indexable.__class__
         indexer = self._indexers.get(class_name)
         if not indexer:
             raise ValueError(class_name)
@@ -19,3 +20,4 @@ class IndexerFactory:
 
 indexer_factory = IndexerFactory()
 indexer_factory.register_class(RecipeIndexer)
+indexer_factory.register_class(IngredientIndexer)
