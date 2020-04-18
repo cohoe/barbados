@@ -1,5 +1,11 @@
+from barbados.text import DisplayName
+
+
 class Glassware:
-    def __init__(self, slug, display_name):
+    def __init__(self, slug, display_name=None):
+        if not display_name:
+            display_name = DisplayName(slug)
+
         self.slug = slug
         self.display_name = display_name
 
