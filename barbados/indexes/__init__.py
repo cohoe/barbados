@@ -22,6 +22,7 @@ class IndexFactory:
     def init(self):
         for name in self._indexes.keys():
             logging.debug("Init on %s" % name)
+            self._indexes[name]._index.delete()
             self._indexes[name].init()
 
 
