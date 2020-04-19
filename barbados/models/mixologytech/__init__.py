@@ -50,6 +50,14 @@ class IngredientCategoryModel(BarbadosModel):
     remote_id = Column(String, name='ZREMOTEID', doc='???????')
 
 
+class IngredientCategoryMappingModel(BarbadosModel):
+    __tablename__ = 'Z_1CATEGORIES'
+
+    ingredient_id = Column(Integer, primary_key=True, name='Z_1INGREDIENTS1', doc='Ingredient ID')
+    category_id = Column(Integer, primary_key=True, name='Z_3CATEGORIES', doc='Category ID')
+    fok_3categories = Column(Integer, name='Z_FOK_3CATEGORIES', doc='???????')
+
+
 class IngredientDependencyModel(BarbadosModel):
     __tablename__ = 'ZINGREDIENTDEPENDENCY'
 
