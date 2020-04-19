@@ -69,3 +69,24 @@ class IngredientSynonymModel(BarbadosModel):
     ingredient_id = Column(Integer, ForeignKey('IngredientModel.id'), name='ZINGREDIENT', doc='Foreign ID of the base ingredient.')
     fok_ingredient = Column(Integer, name='Z_FOK_INGREDIENT', doc='????')
     synonym = Column(String, name='ZCONTENT', doc='The synonym')
+
+
+class RecipeModel(BarbadosModel):
+    __tablename__ = 'ZRECIPE'
+
+    id = Column(Integer, name='Z_PK', primary_key=True, doc='Table primary key ID.')
+    # flagged, disliked, favorited, liked aren't used?
+    is_ingredient = Column(Boolean, name='ZISINGREDIENT', doc='Is this a custom ingredient recipe.')
+    missing_ingredients_count = Column(Integer, name='ZMISSINGINGREDIENTSCOUNT', doc='Number of missing ingredients based on inventory.')
+    # zservings.... now that's an idea.
+    synonymous_ingredient_id = Column(Integer, name='ZSYNONYMOUSINGREDIENT', doc='Primary Key of Ingredient if this is a Custom recipe.')
+    citation_year = Column(String, name='ZCITATIONYEAR', doc='Drink citation year (or "????"), likely used for era')
+    detail_json = Column(JSON, name='ZDETAILJSON', doc='Detail view JSON')
+    ingredient_dependencies_json = Column(JSON, name='ZINGREDIENTDEPDENCIESJSON', doc='List of Lists of ingredent IDs that this recipe needs')
+    original_title = Column(String, name='ZORIGTITLE')
+    # zpresentation == 'pdt2', wonder if thats different per-app?
+    remote_id = Column(String, name='ZREMOTEID')
+    sort_key = Column(String, name='ZSORTKEY')
+    sort_key_initial = Column(String, name='ZSORTKEYINITIAL')
+    summary = Column(String, name='ZSUMMARY', doc='Summary description of ingredients under the list item.')
+    title = Column(String, name='ZTITLE', doc='Drink title')
