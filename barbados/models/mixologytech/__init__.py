@@ -55,7 +55,7 @@ class IngredientDependencyModel(BarbadosModel):
 
     id = Column(Integer, name='Z_PK', primary_key=True, doc='Table primary key ID.')
     position = Column(Integer, name='ZPOSITION', doc='???????') # @TODO this might be the small ingredient text below each recipe?
-    recipe = Column(Integer, name='ZPOSITION', doc='Primary Key of Recipe.')
+    recipe = Column(Integer, name='ZRECIPE', doc='Primary Key of Recipe.')
 
     # status = Column(Integer, name='ZSTATUS')
     # satisfied_ingredient = Column(Integer, name='ZSATISFIEDINGREDIENT')
@@ -82,7 +82,7 @@ class RecipeModel(BarbadosModel):
     synonymous_ingredient_id = Column(Integer, name='ZSYNONYMOUSINGREDIENT', doc='Primary Key of Ingredient if this is a Custom recipe.')
     citation_year = Column(String, name='ZCITATIONYEAR', doc='Drink citation year (or "????"), likely used for era')
     detail_json = Column(JSON, name='ZDETAILJSON', doc='Detail view JSON')
-    ingredient_dependencies_json = Column(JSON, name='ZINGREDIENTDEPDENCIESJSON', doc='List of Lists of ingredent IDs that this recipe needs')
+    ingredient_dependencies_json = Column(JSON, name='ZINGREDIENTDEPENDENCIESJSON', doc='List of Lists of ingredent remote IDs that this recipe needs')
     original_title = Column(String, name='ZORIGTITLE')
     # zpresentation == 'pdt2', wonder if thats different per-app?
     remote_id = Column(String, name='ZREMOTEID')
@@ -90,3 +90,33 @@ class RecipeModel(BarbadosModel):
     sort_key_initial = Column(String, name='ZSORTKEYINITIAL')
     summary = Column(String, name='ZSUMMARY', doc='Summary description of ingredients under the list item.')
     title = Column(String, name='ZTITLE', doc='Drink title')
+
+
+class RecipeFactoidModel(BarbadosModel):
+    __tablename__ = 'ZRECIPEFACTOID'
+
+    id = Column(Integer, name='Z_PK', primary_key=True, doc='Table primary key ID.')
+    recipe_id = Column(Integer, ForeignKey('RecipeModel.id'), name='ZRECIPE', doc='Recipe ID')
+    fok_recipe = Column(Integer, name='Z_FOK_RECIPE', doc='Parameter kind ID ?????')
+    name = Column(String, name='ZNAME', doc='Key')
+    content = Column(String, name='ZCONTENT', doc='Value')
+
+
+class RecipeKeywordGroup(BarbadosModel):
+    __tablename__ = 'ZRECIPEKEYWORDGROUP'
+
+    id = Column(Integer, name='Z_PK', primary_key=True, doc='Table primary key ID.')
+    position = Column(Integer, name='ZPOSITION', doc='Sort order for group.')
+    show_in_menu = Column(Boolean, name='ZSHOULDSHOWINMENU')
+    remote_id = Column(String, name='ZREMOTEID', doc='Keyword Group')
+
+
+class RecipeKeywordModel(BarbadosModel):
+    __tablename__ = 'ZRECIPEKEYWORD'
+
+    id = Column(Integer, name='Z_PK', primary_key=True, doc='Table primary key ID.')
+    recipes_count = Column(Integer, name='ZRECIPESCOUNT', doc='Count of recipes????')
+    group_id = Column(Integer, ForeignKey('RecipeKeywordGroup.id'), name='ZGROUP')
+    fok_group = Column(Integer, name='Z_FOK_GROUP')
+    remote_id = Column(String, name='ZREMOTEID', doc='Keyword value')
+    shortname = Column(String, name='ZSHORTNAME', doc='Keyword Display Name')
