@@ -34,3 +34,5 @@ class Base(object):
 
 BarbadosModel = declarative_base(cls=Base)
 BarbadosModel.query = session.query_property()
+MixologyTechModel = declarative_base(cls=Base)
+MixologyTechModel.query = session.query_property()

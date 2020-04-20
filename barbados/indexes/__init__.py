@@ -2,6 +2,7 @@ import logging
 from .recipe import RecipeIndex
 from .ingredient import IngredientIndex
 from barbados.connectors.elasticsearch import ElasticsearchConnector
+from elasticsearch.exceptions import NotFoundError
 
 
 class IndexFactory:
@@ -22,7 +23,10 @@ class IndexFactory:
     def init(self):
         for name in self._indexes.keys():
             logging.debug("Init on %s" % name)
-            self._indexes[name]._index.delete()
+            try:
+                self._indexes[name]._index.delete()
+            except NotFoundError:
+                pass
             self._indexes[name].init()
 
 

@@ -1,8 +1,8 @@
-from barbados.models.base import BarbadosModel
+from barbados.models.base import MixologyTechModel
 from sqlalchemy import Column, Integer, JSON, String, TIMESTAMP, Boolean, ForeignKey
 
 
-class IngredientModel(BarbadosModel):
+class IngredientModel(MixologyTechModel):
     __tablename__ = 'ZINGREDIENT'
 
     id = Column(Integer, name='Z_PK', primary_key=True, doc='Table primary key ID.')
@@ -30,7 +30,7 @@ class IngredientModel(BarbadosModel):
     # syncstate = Column(Integer, name='ZSYNCSTATE')
 
 
-class IngredientAlternateSpellingModel(BarbadosModel):
+class IngredientAlternateSpellingModel(MixologyTechModel):
     __tablename__ = 'ZINGREDIENTALTERNATESPELLING'
 
     id = Column(Integer, name='Z_PK', primary_key=True, doc='Table primary key ID.')
@@ -39,7 +39,7 @@ class IngredientAlternateSpellingModel(BarbadosModel):
     fok_ingredient = Column(Integer, name='Z_FOK_INGREDIENT', doc='????????')
 
 
-class IngredientCategoryModel(BarbadosModel):
+class IngredientCategoryModel(MixologyTechModel):
     __tablename__ = 'ZINGREDIENTCATEGORY'
 
     id = Column(Integer, name='Z_PK', primary_key=True, doc='Table primary key ID.')
@@ -50,7 +50,7 @@ class IngredientCategoryModel(BarbadosModel):
     remote_id = Column(String, name='ZREMOTEID', doc='???????')
 
 
-class IngredientCategoryMappingModel(BarbadosModel):
+class IngredientCategoryMappingModel(MixologyTechModel):
     __tablename__ = 'Z_1CATEGORIES'
 
     ingredient_id = Column(Integer, primary_key=True, name='Z_1INGREDIENTS1', doc='Ingredient ID')
@@ -58,7 +58,7 @@ class IngredientCategoryMappingModel(BarbadosModel):
     fok_3categories = Column(Integer, name='Z_FOK_3CATEGORIES', doc='???????')
 
 
-class IngredientDependencyModel(BarbadosModel):
+class IngredientDependencyModel(MixologyTechModel):
     __tablename__ = 'ZINGREDIENTDEPENDENCY'
 
     id = Column(Integer, name='Z_PK', primary_key=True, doc='Table primary key ID.')
@@ -70,7 +70,7 @@ class IngredientDependencyModel(BarbadosModel):
     # satisfier = Column(Integer, name='ZSATISFIER')
 
 
-class IngredientSynonymModel(BarbadosModel):
+class IngredientSynonymModel(MixologyTechModel):
     __tablename__ = 'ZINGREDIENTSYNONYM'
 
     id = Column(Integer, name='Z_PK', primary_key=True, doc='Table primary key ID.')
@@ -79,7 +79,7 @@ class IngredientSynonymModel(BarbadosModel):
     synonym = Column(String, name='ZCONTENT', doc='The synonym')
 
 
-class RecipeModel(BarbadosModel):
+class RecipeModel(MixologyTechModel):
     __tablename__ = 'ZRECIPE'
 
     id = Column(Integer, name='Z_PK', primary_key=True, doc='Table primary key ID.')
@@ -100,7 +100,7 @@ class RecipeModel(BarbadosModel):
     title = Column(String, name='ZTITLE', doc='Drink title')
 
 
-class RecipeFactoidModel(BarbadosModel):
+class RecipeFactoidModel(MixologyTechModel):
     __tablename__ = 'ZRECIPEFACTOID'
 
     id = Column(Integer, name='Z_PK', primary_key=True, doc='Table primary key ID.')
@@ -110,7 +110,7 @@ class RecipeFactoidModel(BarbadosModel):
     content = Column(String, name='ZCONTENT', doc='Value')
 
 
-class RecipeKeywordGroup(BarbadosModel):
+class RecipeKeywordGroup(MixologyTechModel):
     __tablename__ = 'ZRECIPEKEYWORDGROUP'
 
     id = Column(Integer, name='Z_PK', primary_key=True, doc='Table primary key ID.')
@@ -119,7 +119,7 @@ class RecipeKeywordGroup(BarbadosModel):
     remote_id = Column(String, name='ZREMOTEID', doc='Keyword Group')
 
 
-class RecipeKeywordModel(BarbadosModel):
+class RecipeKeywordModel(MixologyTechModel):
     __tablename__ = 'ZRECIPEKEYWORD'
 
     id = Column(Integer, name='Z_PK', primary_key=True, doc='Table primary key ID.')
