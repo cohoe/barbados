@@ -1,36 +1,21 @@
-from barbados.caches import IngredientTreeCache
+from barbados.text import DisplayName
+from barbados.serializers import ObjectSerializer
 
 
 class SpecComponent:
     """
     Someday the direct name part might be able to go away.
     """
-
-    # This defines nodes in the IngredientTree that should be excluded
-    # from the count.
-    # @TODO move this to zookeeper config
-    ingredient_count_excludes = ['bitters']
-
-    def __init__(self, slug, display_name, quantity=None, unit=None, parents=None):
+    def __init__(self, slug, display_name=None, quantity=None, unit=None, notes=None):
+        if not display_name:
+            display_name = DisplayName(slug)
+        if not notes:
+            notes = []
         self.slug = slug
         self.display_name = display_name
         self.quantity = quantity
         self.unit = unit
-        self.countable = True
-        self.parents = parents
-
-        # @TODO don't store this in the database? Or have some facility for refresh.
-        if self.parents is None:
-            ingredient_tree = IngredientTreeCache.retrieve()
-            self.parents = ingredient_tree.parents(self.slug)
-
-        if self.slug in self.ingredient_count_excludes:
-            self.countable = False
-        else:
-            for parent in self.parents:
-                if parent in self.ingredient_count_excludes:
-                    self.countable = False
-                    break
+        self.notes = notes
 
     def __repr__(self):
         return "Barbados::Objects::SpecComponent[%s]" % self.slug
@@ -38,6 +23,6 @@ class SpecComponent:
     def serialize(self, serializer):
         serializer.add_property('slug', self.slug)
         serializer.add_property('display_name', self.display_name)
-        serializer.add_property('quantity', self.quantity)
-        serializer.add_property('unit', self.unit)
-        serializer.add_property('parents', self.parents)
+        serializer.add_property('quantity', self.quantity, even_if_empty=False)
+        serializer.add_property('unit', self.unit, even_if_empty=False)
+        serializer.add_property('notes', [ObjectSerializer.serialize(note, serializer.format) for note in self.notes], even_if_empty=False)

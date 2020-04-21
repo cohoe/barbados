@@ -2,10 +2,7 @@ from barbados.objects.spec import Spec
 from barbados.objects.origin import Origin
 from barbados.glassware import Glassware
 from barbados.objects.speccomponent import SpecComponent
-from barbados.text import Text
-from barbados.objects.garnish import Garnish
-from barbados.text import Slug
-from barbados.text import DisplayName
+from barbados.text import Text, Slug, DisplayName
 from barbados.objects.construction import Construction
 from .citationfactory import CitationFactory
 
@@ -68,20 +65,13 @@ class SpecFactory:
 
         garnish_obj_list = []
         for raw_garnish in raw_spec['garnish']:
-            if type(raw_garnish) is dict:
-                try:
-                    garnish_slug = Slug(raw_garnish['name'])
-                    garnish_quantity = raw_garnish['quantity']
-                    garnish_notes = []
-                    if 'note' in raw_garnish.keys():
-                        for note in raw_garnish['notes']:
-                            garnish_notes.append(Text(**note))
-                    garnish_obj = Garnish(slug=garnish_slug, quantity=garnish_quantity, notes=garnish_notes)
-                except KeyError:
-                    garnish_obj = Garnish(**raw_garnish)
-            else:
-                garnish_slug = Slug(raw_garnish)
-                garnish_obj = Garnish(slug=garnish_slug)
+            if 'notes' in raw_garnish.keys():
+                notes = []
+                for raw_note in raw_garnish.get('notes'):
+                    notes.append(Text(**raw_note))
+                raw_garnish['notes'] = notes
+
+            garnish_obj = SpecComponent(**raw_garnish)
 
             garnish_obj_list.append(garnish_obj)
         # print(garnish_obj_list)

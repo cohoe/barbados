@@ -1,29 +1,30 @@
 from barbados.serializers import ObjectSerializer
 
 
-class SpecComponentCounts:
-    # @TODO consider ComponentKinds['Primary', 'Accents', 'Garnish']
-    # That may be hard to implement since some drinks like the
-    # Trinidad Sour are based on traditional accents.
-    def __init__(self, components, garnish):
-        self.components = components
-        self.garnish = garnish
-        self.counts = {
-            'all': len(self.components),
-            'primary': self._get_countable_components(),
-            'garnish': len(self.garnish),
-        }
-
-    def _get_countable_components(self):
-        count = 0
-        for component in self.components:
-            if component.countable:
-                count += 1
-        return count
-
-    def serialize(self, serializer):
-        for key in self.counts.keys():
-            serializer.add_property(key, self.counts[key])
+# @TODO this belongs in search
+# class SpecComponentCounts:
+#     # @TODO consider ComponentKinds['Primary', 'Accents', 'Garnish']
+#     # That may be hard to implement since some drinks like the
+#     # Trinidad Sour are based on traditional accents.
+#     def __init__(self, components, garnish):
+#         self.components = components
+#         self.garnish = garnish
+#         self.counts = {
+#             'all': len(self.components),
+#             'primary': self._get_countable_components(),
+#             'garnish': len(self.garnish),
+#         }
+#
+#     def _get_countable_components(self):
+#         count = 0
+#         for component in self.components:
+#             if component.countable:
+#                 count += 1
+#         return count
+#
+#     def serialize(self, serializer):
+#         for key in self.counts.keys():
+#             serializer.add_property(key, self.counts[key])
 
 
 class Spec:
@@ -39,7 +40,7 @@ class Spec:
         self.garnish = garnish
         self.instructions = instructions
         self.construction = construction
-        self.component_counts = SpecComponentCounts(components, garnish)
+        # self.component_counts = SpecComponentCounts(components, garnish)
 
     def __repr__(self):
         return "Barbados::Objects::Spec[%s]" % self.slug
@@ -52,7 +53,7 @@ class Spec:
         serializer.add_property('glassware', [ObjectSerializer.serialize(glassware, serializer.format) for glassware in self.glassware])
         serializer.add_property('construction', ObjectSerializer.serialize(self.construction, serializer.format))
         serializer.add_property('components', [ObjectSerializer.serialize(component, serializer.format) for component in self.components])
-        serializer.add_property('component_counts', ObjectSerializer.serialize(self.component_counts, serializer.format))
+        # serializer.add_property('component_counts', ObjectSerializer.serialize(self.component_counts, serializer.format))
         serializer.add_property('garnish', [ObjectSerializer.serialize(garnish, serializer.format) for garnish in self.garnish])
         serializer.add_property('straw', self.straw)
         serializer.add_property('citations', [ObjectSerializer.serialize(citation, serializer.format) for citation in self.citations])

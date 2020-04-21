@@ -109,4 +109,17 @@ class CocktailFactory(BaseFactory):
             searchable_id = '%s::%s' % (searchable['slug'], spec['slug'])
             searchable_recipes[searchable_id] = searchable
 
+            # @TODO countable
+            # if self.slug in self.ingredient_count_excludes:
+            #     self.countable = False
+            # else:
+            # for parent in self.parents:
+            #     if parent in self.ingredient_count_excludes:
+            #         self.countable = False
+            #         break
+
+            # This defines nodes in the IngredientTree that should be excluded
+            # from the count.
+            # @TODO move this to zookeeper config
+            # ingredient_count_excludes = ['bitters']
         return [index_class(meta={'id': key}, **value) for key, value in searchable_recipes.items()]

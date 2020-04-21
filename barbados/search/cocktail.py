@@ -12,3 +12,4 @@ class CocktailSearch(SearchBase):
         self.add_query_parameter(parameter='name', query_class=MultiMatch, query_key='query', type='phrase_prefix',
                                  fields=['spec.name', 'display_name'])
         self.add_query_parameter(parameter='alpha', query_class=Prefix, query_key='alpha')
+        self.add_query_parameter(parameter='construction', query_class=Prefix, query_key='spec.construction.slug')
