@@ -29,6 +29,14 @@ class IndexFactory:
                 pass
             self._indexes[name].init()
 
+    def rebuild(self, index_class):
+        try:
+            index_class._index.delete()
+            index_class.init()
+            logging.info("Successfully rebuilt index %s" % index_class.Index.name)
+        except NotFoundError:
+            logging.warning("Index %s did not exist." % index_class.Index.name)
+
 
 index_factory = IndexFactory()
 index_factory.register_index(RecipeIndex)
