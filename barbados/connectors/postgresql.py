@@ -13,6 +13,9 @@ class PostgresqlConnector:
     def create_all(self):
         BarbadosModel.metadata.create_all(self.engine)
 
+    def drop_all(self):
+        BarbadosModel.metadata.drop_all(self.engine)
+
     @staticmethod
     def commit():
         session.commit()

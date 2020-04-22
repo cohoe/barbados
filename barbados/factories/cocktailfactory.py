@@ -1,4 +1,4 @@
-from barbados.objects.cocktail import Cocktail, Status
+from barbados.objects.cocktail import Cocktail
 from barbados.objects.origin import Origin
 from barbados.text import Text
 from .specfactory import SpecFactory
@@ -19,8 +19,6 @@ class CocktailFactory(BaseFactory):
 
         if raw_recipe.get('display_name') is None:
             raise Exception("display_name cannot be none")
-
-        status_obj = Status(color=raw_recipe['status'])
 
         if raw_recipe['origin'] is not None:
             origin_obj = Origin(**raw_recipe['origin'])
@@ -43,7 +41,6 @@ class CocktailFactory(BaseFactory):
             tag_obj_list.append(Text(text=tag))
 
         c_obj = Cocktail(display_name=raw_recipe['display_name'],
-                         status=status_obj,
                          origin=origin_obj,
                          specs=s_obj_list,
                          citations=citation_obj_list,
@@ -57,7 +54,6 @@ class CocktailFactory(BaseFactory):
     def sanitize_raw(raw_recipe):
         required_keys = {
             'name': None,
-            'status': None,
             'origin': None,
             'spec': list(),
             'citations': list(),
@@ -85,7 +81,6 @@ class CocktailFactory(BaseFactory):
             'display_name': model.display_name,
             'notes': model.notes,
             'specs': model.specs,
-            'status': model.status,
         }
 
         return CocktailFactory.raw_to_obj(raw_recipe=raw_data, slug=model.slug)
