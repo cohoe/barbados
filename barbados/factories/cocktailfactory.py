@@ -6,6 +6,7 @@ from .citationfactory import CitationFactory
 from barbados.serializers import ObjectSerializer
 from .base import BaseFactory
 import copy
+from barbados.caches import IngredientTreeCache
 
 
 class CocktailFactory(BaseFactory):
@@ -93,6 +94,8 @@ class CocktailFactory(BaseFactory):
     def obj_to_index(obj, index_class, format='dict'):
         base_recipe = ObjectSerializer.serialize(obj, format)
         alpha = base_recipe['slug'][0]
+
+        tree = IngredientTreeCache.retrieve()
         try:
             alpha = int(alpha)
             base_recipe['alpha'] = '#'
@@ -109,17 +112,20 @@ class CocktailFactory(BaseFactory):
             searchable_id = '%s::%s' % (searchable['slug'], spec['slug'])
             searchable_recipes[searchable_id] = searchable
 
-            # @TODO countable
-            # if self.slug in self.ingredient_count_excludes:
-            #     self.countable = False
-            # else:
-            # for parent in self.parents:
-            #     if parent in self.ingredient_count_excludes:
-            #         self.countable = False
-            #         break
+            # This count is achievable with a filter query in ES.
+            # https://stackoverflow.com/questions/58659527/elastic-search-update-specific-nested-object
+            # { filter: { script: { script: { source: "doc['spec.components.slug'].value.length() == 3" } } }
+            # But it seemed to return some weird results too. Also required fielddata enabled on
+            # the index. Also need to refactor the searchquer builder to deal with a deep parameter. This is
+            # just easier.
+            #
+            # Maybe someday this will also bring back the notion of "countable" ingredients (ie, exclude bitters).
+            # Given the complexity around that (requires parent to lookup, also ZK list of slugs to exclude)
+            # it's not quite worth it right now.
+            searchable['spec']['component_count'] = len(spec['components'])
 
-            # This defines nodes in the IngredientTree that should be excluded
-            # from the count.
-            # @TODO move this to zookeeper config
-            # ingredient_count_excludes = ['bitters']
+            # https://stackoverflow.com/questions/14071038/add-an-element-in-each-dictionary-of-a-list-list-comprehension
+            for component in spec['components']:
+                component.update({'parents': tree.parents(component['slug'])})
+
         return [index_class(meta={'id': key}, **value) for key, value in searchable_recipes.items()]

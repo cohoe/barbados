@@ -1,7 +1,8 @@
-from elasticsearch_dsl import Document, InnerDoc, Text, Integer, Object
+from elasticsearch_dsl import Document, InnerDoc, Text, Integer, Object, Keyword
 from .base import BaseIndex
 
 # https://github.com/elastic/elasticsearch-dsl-py/blob/master/examples/parent_child.py
+# https://github.com/elastic/elasticsearch-dsl-py/issues/637
 
 
 class NoteIndex(InnerDoc):

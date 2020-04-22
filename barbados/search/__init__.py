@@ -109,6 +109,7 @@ class SearchBase:
     def _build_search_query(self):
         """
         Construct the ElasticSearch query object containing all conditions.
+        @TODO this can't deal with Script queries too good. At all.
         :return: ElasticSearch Bool() query object.
         """
         musts = []
@@ -119,13 +120,13 @@ class SearchBase:
                 continue
 
             expected_value_type = self.query_parameters[parameter].get('parameter_type')
-            if expected_value_type is str:
-                self._validate_query_parameter(parameter=parameter, value=raw_value, type_=str)
-                musts.append(self.get_query_condition(parameter=parameter, value=raw_value))
-            elif expected_value_type is list:
+            if expected_value_type is list:
                 self._validate_query_parameter(parameter=parameter, value=raw_value, type_=list)
                 for value in raw_value:
                     musts.append(self.get_query_condition(parameter=parameter, value=value))
+            else:
+                self._validate_query_parameter(parameter=parameter, value=raw_value, type_=expected_value_type)
+                musts.append(self.get_query_condition(parameter=parameter, value=raw_value))
 
         logging.info("Search Conditions are %s" % musts)
         return Bool(must=musts)
