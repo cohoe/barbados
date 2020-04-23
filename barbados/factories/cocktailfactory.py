@@ -77,13 +77,7 @@ class CocktailFactory(BaseFactory):
         if model is None:
             raise KeyError('empty object')
 
-        raw_data = {
-            'display_name': model.display_name,
-            'notes': model.notes,
-            'specs': model.specs,
-        }
-
-        return CocktailFactory.raw_to_obj(raw_recipe=raw_data, slug=model.slug)
+        return CocktailFactory.raw_to_obj(slug=model.slug, raw_recipe=model.__dict__)
 
     @staticmethod
     def obj_to_index(obj, index_class, format='dict'):
