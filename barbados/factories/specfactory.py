@@ -5,6 +5,7 @@ from barbados.objects.speccomponent import SpecComponent
 from barbados.text import Text, Slug, DisplayName
 from barbados.objects.construction import Construction
 from .citationfactory import CitationFactory
+from barbados.objects.image import Image
 
 
 class SpecFactory:
@@ -89,6 +90,10 @@ class SpecFactory:
         else:
             construction_obj = Construction(slug=raw_spec['construction'])
 
+        image_obj_list = []
+        for image in raw_spec['images']:
+            image_obj_list.append(Image(**image))
+
         s_obj = Spec(slug=spec_slug,
                      display_name=spec_display_name,
                      origin=origin_obj,
@@ -100,6 +105,7 @@ class SpecFactory:
                      garnish=garnish_obj_list,
                      instructions=instr_obj_list,
                      construction=construction_obj,
+                     images=image_obj_list,
                      )
 
         return s_obj
@@ -117,13 +123,14 @@ class SpecFactory:
             'garnish': list(),
             'instructions': list(),
             'construction': None,
+            'images': list(),
         }
 
         for key in required_keys.keys():
             if key not in raw_spec.keys():
                 raw_spec[key] = required_keys[key]
 
-        lists = ['components', 'citations', 'notes', 'garnish', 'instructions', 'glassware']
+        lists = ['components', 'citations', 'notes', 'garnish', 'instructions', 'glassware', 'images']
         for key in lists:
             if raw_spec[key] is None:
                 raw_spec[key] = required_keys[key]

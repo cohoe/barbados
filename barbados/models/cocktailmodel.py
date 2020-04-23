@@ -12,7 +12,7 @@ class CocktailModel(BarbadosModel):
     notes = Column(JSON, nullable=True)
     origin = Column(JSON, nullable=False)
     spec_count = Column(Integer, nullable=False)
-
+    images = Column(JSON, nullable=False)
 
     @staticmethod
     def get_all():

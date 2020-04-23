@@ -7,6 +7,7 @@ from barbados.serializers import ObjectSerializer
 from .base import BaseFactory
 import copy
 from barbados.caches import IngredientTreeCache
+from barbados.objects.image import Image
 
 
 class CocktailFactory(BaseFactory):
@@ -40,13 +41,18 @@ class CocktailFactory(BaseFactory):
         for tag in raw_recipe['tags']:
             tag_obj_list.append(Text(text=tag))
 
+        image_obj_list = []
+        for image in raw_recipe['images']:
+            image_obj_list.append(Image(**image))
+
         c_obj = Cocktail(display_name=raw_recipe['display_name'],
                          origin=origin_obj,
                          specs=s_obj_list,
                          citations=citation_obj_list,
                          notes=n_obj_list,
                          tags=tag_obj_list,
-                         slug=slug)
+                         slug=slug,
+                         images=image_obj_list)
 
         return c_obj
 
@@ -59,13 +65,14 @@ class CocktailFactory(BaseFactory):
             'citations': list(),
             'notes': list(),
             'tags': list(),
+            'images': list(),
         }
 
         for key in required_keys.keys():
             if key not in raw_recipe.keys():
                 raw_recipe[key] = required_keys[key]
 
-        lists = ['spec', 'citations', 'notes', 'tags']
+        lists = ['spec', 'citations', 'notes', 'tags', 'images']
         for key in lists:
             if raw_recipe[key] is None:
                 raw_recipe[key] = required_keys[key]

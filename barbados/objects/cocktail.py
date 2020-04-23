@@ -2,7 +2,7 @@ from barbados.serializers import ObjectSerializer
 
 
 class Cocktail:
-    def __init__(self, display_name, origin, specs, citations, notes, tags, slug):
+    def __init__(self, display_name, origin, specs, citations, notes, tags, slug, images):
         self.display_name = display_name
         self.origin = origin
         self.specs = specs
@@ -10,6 +10,7 @@ class Cocktail:
         self.notes = notes
         self.tags = tags
         self.slug = slug
+        self.images = images
 
     @property
     def spec_count(self):
@@ -26,3 +27,4 @@ class Cocktail:
         serializer.add_property('spec_count', self.spec_count)
         serializer.add_property('citations', [ObjectSerializer.serialize(citation, serializer.format) for citation in self.citations])
         serializer.add_property('notes', [ObjectSerializer.serialize(note, serializer.format) for note in self.notes])
+        serializer.add_property('images', [ObjectSerializer.serialize(image, serializer.format) for image in self.images])
