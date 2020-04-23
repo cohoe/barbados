@@ -13,8 +13,13 @@ class BaseSerializer:
         self._current_object = {}
 
     def add_property(self, name, value, even_if_empty=True):
+        """
+        :param name:
+        :param value:
+        :param even_if_empty: Store if false-y ([], {}, None). Don't do this for lists.
+        :return:
+        """
         if not even_if_empty:
-            # [], {}, None are all False-y.
             if not value:
                 return
         self._current_object[name] = value

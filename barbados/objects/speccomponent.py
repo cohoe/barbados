@@ -25,4 +25,4 @@ class SpecComponent:
         serializer.add_property('display_name', self.display_name)
         serializer.add_property('quantity', self.quantity, even_if_empty=False)
         serializer.add_property('unit', self.unit, even_if_empty=False)
-        serializer.add_property('notes', [ObjectSerializer.serialize(note, serializer.format) for note in self.notes], even_if_empty=False)
+        serializer.add_property('notes', [ObjectSerializer.serialize(note, serializer.format) for note in self.notes])
