@@ -8,16 +8,7 @@ class IngredientFactory(BaseFactory):
 
     @staticmethod
     def to_obj(input_object):
-        # @TODO make this more generic, other than just model.
-        mapping = {
-            'slug': input_object.slug,
-            'display_name': input_object.display_name,
-            'kind': input_object.kind,
-            'parent': input_object.parent,
-            'aliases': input_object.aliases,
-            'elements': input_object.elements,
-        }
-        return Ingredient(**mapping)
+        return Ingredient(**input_object)
 
     @staticmethod
     def model_to_obj(model):
@@ -26,4 +17,7 @@ class IngredientFactory(BaseFactory):
         :param model:
         :return:
         """
-        return IngredientFactory.to_obj(model)
+        model_dict = model.__dict__
+        model_dict.pop('_sa_instance_state')
+
+        return IngredientFactory.to_obj(model_dict)
