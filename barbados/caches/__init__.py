@@ -2,7 +2,7 @@ import json
 import pickle
 import logging
 from barbados.models import IngredientModel, CocktailModel
-from barbados.services import Cache
+from barbados.services import Cache, Registry
 from barbados.objects.ingredienttree import IngredientTree
 
 
@@ -79,15 +79,18 @@ class UsableIngredientCache(CacheBase):
     @classmethod
     def populate(cls):
         # This is still returning all values, just not populating them
-        scan_results = IngredientModel.get_usable_ingredients()
+        pgconn = Registry.get_database_connection()
 
         index = []
-        for result in scan_results:
-            index.append({
-                'slug': result.slug,
-                'display_name': result.display_name,
-                'aliases': result.aliases,
-            })
+        with pgconn.get_session() as session:
+            scan_results = IngredientModel.get_usable_ingredients(session)
+
+            for result in scan_results:
+                index.append({
+                    'slug': result.slug,
+                    'display_name': result.display_name,
+                    'aliases': result.aliases,
+                })
 
         Cache.set(cls.cache_key, json.dumps(index))
 

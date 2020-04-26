@@ -3,6 +3,7 @@ from treelib.exceptions import NodeIDAbsentError
 from barbados.models import IngredientModel
 from barbados.objects.ingredientkinds import CategoryKind, FamilyKind
 import logging
+from barbados.services.registry import Registry
 
 
 class IngredientTree:
@@ -15,31 +16,34 @@ class IngredientTree:
     def _build_tree(self, passes, root=root_node):
         tree = Tree()
 
-        tree.create_node(root, root)
-        for item in IngredientModel.get_by_kind(CategoryKind):
-            tree.create_node(item.slug, item.slug, parent=root, data=self._create_tree_data(item))
+        pgconn = Registry.get_database_connection()
+        with pgconn.get_session() as session:
 
-        for item in IngredientModel.get_by_kind(FamilyKind):
-            tree.create_node(item.slug, item.slug, parent=item.parent, data=self._create_tree_data(item))
+            tree.create_node(root, root)
+            for item in IngredientModel.get_by_kind(session, CategoryKind):
+                tree.create_node(item.slug, item.slug, parent=root, data=self._create_tree_data(item))
 
-        ingredients_to_place = list(IngredientModel.get_usable_ingredients())
-        for i in range(1, passes + 1):
-            logging.debug("Pass %i/%i" % (i, passes))
+            for item in IngredientModel.get_by_kind(session, FamilyKind):
+                tree.create_node(item.slug, item.slug, parent=item.parent, data=self._create_tree_data(item))
 
-            for item in ingredients_to_place[:]:
-                if item.kind == FamilyKind.value:
-                    ingredients_to_place.remove(item)
-                    logging.debug("Skipping %s because it is a family." % item.slug)
-                    continue
-                try:
-                    tree.create_node(item.slug, item.slug, parent=item.parent, data=self._create_tree_data(item))
-                    ingredients_to_place.remove(item)
-                except NodeIDAbsentError:
-                    logging.debug("skipping %s (Attempt %i/%s)" % (item.slug, i, passes))
+            ingredients_to_place = list(IngredientModel.get_usable_ingredients(session))
+            for i in range(1, passes + 1):
+                logging.debug("Pass %i/%i" % (i, passes))
 
-            if len(ingredients_to_place) == 0:
-                logging.info("All done after pass %i" % i)
-                break
+                for item in ingredients_to_place[:]:
+                    if item.kind == FamilyKind.value:
+                        ingredients_to_place.remove(item)
+                        logging.debug("Skipping %s because it is a family." % item.slug)
+                        continue
+                    try:
+                        tree.create_node(item.slug, item.slug, parent=item.parent, data=self._create_tree_data(item))
+                        ingredients_to_place.remove(item)
+                    except NodeIDAbsentError:
+                        logging.debug("skipping %s (Attempt %i/%s)" % (item.slug, i, passes))
+
+                if len(ingredients_to_place) == 0:
+                    logging.info("All done after pass %i" % i)
+                    break
 
         return tree
 

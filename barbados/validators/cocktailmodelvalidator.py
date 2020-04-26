@@ -1,16 +1,18 @@
 from barbados.text import Slug
-from barbados.models import IngredientModel
+from barbados.models import IngredientModel, CocktailModel
 from .basevalidator import BaseValidator
 
 
 class CocktailModelValidator(BaseValidator):
-    for_class = 'CocktailModel'
+    for_class = CocktailModel
 
     def __init__(self, model, fatal=True):
         self.model = model
         self.fatal = fatal
+        self.session = None
 
-    def validate(self):
+    def validate(self, session):
+        self.session = session
         self._check_slug()
         self._check_spec()
 
@@ -25,6 +27,6 @@ class CocktailModelValidator(BaseValidator):
         for spec in self.model.specs:
             for component in spec['components']:
                 # It's been serialized at this point
-                i = IngredientModel.get_by_slug(component['slug'])
+                i = self.session.query(IngredientModel).get(component['slug'])
                 if not i:
                     self.fail("Ingredient %s does not exist." % component['slug'])

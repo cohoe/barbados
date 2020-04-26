@@ -1,14 +1,15 @@
 import sqlalchemy
-from barbados.models.base import BarbadosModel, session
+from sqlalchemy.orm import sessionmaker
+from barbados.models.base import BarbadosModel
 
 
 class PostgresqlConnector:
 
-    def __init__(self, username, password, database, host='127.0.0.1', port=5432):
+    def __init__(self, username, password, database, host='127.0.0.1', port=5432, debug_sql=False):
         connection_string = "postgres://%s:%s@%s:%i/%s" % (username, password, host, port, database)
 
-        self.engine = sqlalchemy.create_engine(connection_string)
-        session.configure(bind=self.engine)
+        self.engine = sqlalchemy.create_engine(connection_string, echo=debug_sql)
+        self.Session = sessionmaker(bind=self.engine)
 
     def create_all(self):
         BarbadosModel.metadata.create_all(self.engine)
@@ -16,6 +17,20 @@ class PostgresqlConnector:
     def drop_all(self):
         BarbadosModel.metadata.drop_all(self.engine)
 
-    @staticmethod
-    def commit():
-        session.commit()
+    # @staticmethod
+    # def commit():
+    #     session.commit()
+    from contextlib import contextmanager
+
+    @contextmanager
+    def get_session(self):
+        # return self.Session()
+        session = self.Session()
+        try:
+            yield session
+            session.commit()
+        except:
+            session.rollback()
+            raise
+        finally:
+            session.close()
