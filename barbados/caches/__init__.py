@@ -4,9 +4,11 @@ import logging
 from barbados.models import IngredientModel, CocktailModel
 from barbados.services import Cache, Registry
 from barbados.objects.ingredienttree import IngredientTree
+from barbados.serializers import ObjectSerializer
+from barbados.factories import CocktailFactory
 
 
-class Caches(object):
+class Caches:
     """
     Holder for all data caches. This enables simple lookup by cache_key
     such as Caches('ingredient_name_index').
@@ -34,7 +36,7 @@ class Caches(object):
         cls.caches[cache_class.cache_key] = cache_class
 
 
-class CacheBase(object):
+class CacheBase:
     """
     Base Cache class. Implements basic functions.
     """
@@ -72,12 +74,16 @@ class CacheBase(object):
         logging.info("Invalidating cache key %s" % cls.cache_key)
         return Cache.delete(cls.cache_key)
 
+    @property
+    def cache_key(self):
+        raise NotImplementedError
+
 
 class UsableIngredientCache(CacheBase):
     cache_key = 'ingredient_name_index'
 
     @classmethod
-    def populate(cls):
+    def populate(cls, **kwargs):
         # This is still returning all values, just not populating them
         pgconn = Registry.get_database_connection()
 
@@ -95,27 +101,34 @@ class UsableIngredientCache(CacheBase):
         Cache.set(cls.cache_key, json.dumps(index))
 
 
-class CocktailNameCache(CacheBase):
-    cache_key = 'cocktail_name_index'
+class TableScanCache(CacheBase):
+
+    @property
+    def model_class(self):
+        raise NotImplementedError
+
+    @property
+    def factory_class(self):
+        raise NotImplementedError
 
     @classmethod
     def populate(cls):
         # This is still returning all values, just not populating them
-        scan_results = CocktailModel.get_all()
+        pgconn = Registry.get_database_connection()
+        cache_objects = []
+        with pgconn.get_session() as session:
+            results = session.query(cls.model_class).all()
+            for result in results:
+                result_object = cls.factory_class.model_to_obj(model=result)
+                cache_objects.append(ObjectSerializer.serialize(result_object, 'dict'))
 
-        index = {}
-        for result in scan_results:
-            key_alpha = result.slug[0].upper()
-            key_entry = {
-                'slug': result.slug,
-                'display_name': result.display_name
-            }
-            if key_alpha not in index.keys():
-                index[key_alpha] = [key_entry]
-            else:
-                index[key_alpha].append(key_entry)
+        Cache.set(cls.cache_key, json.dumps(cache_objects))
 
-        Cache.set(cls.cache_key, json.dumps(index))
+
+class CocktailScanCache(TableScanCache):
+    cache_key = 'cocktail_scan_cache'
+    model_class = CocktailModel
+    factory_class = CocktailFactory
 
 
 class IngredientTreeCache(CacheBase):
@@ -140,5 +153,5 @@ class IngredientTreeCache(CacheBase):
 
 
 Caches.register_cache(UsableIngredientCache)
-Caches.register_cache(CocktailNameCache)
+Caches.register_cache(CocktailScanCache)
 Caches.register_cache(IngredientTreeCache)

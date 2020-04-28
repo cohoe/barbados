@@ -6,7 +6,6 @@ from .citationfactory import CitationFactory
 from barbados.serializers import ObjectSerializer
 from .base import BaseFactory
 import copy
-from barbados.caches import IngredientTreeCache
 from barbados.objects.image import Image
 
 
@@ -91,6 +90,7 @@ class CocktailFactory(BaseFactory):
         base_recipe = ObjectSerializer.serialize(obj, format)
         alpha = base_recipe['slug'][0]
 
+        from barbados.caches import IngredientTreeCache
         tree = IngredientTreeCache.retrieve()
         try:
             alpha = int(alpha)
