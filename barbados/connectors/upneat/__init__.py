@@ -2,13 +2,15 @@ import requests
 import json
 import yaml
 from slugify import slugify
+from barbados.connectors.upneat.recipe import UpneatRecipeParser
 
 url_base = 'http://www.upneat.rocks'
 
 endpoints = {
     'categories': 'ingredient/categories',
     'families': 'ingredient/categories/%i/families',
-    'ingredients': 'ingredient/families/%i/ingredient_tree'
+    'ingredients': 'ingredient/families/%i/ingredient_tree',
+    'recipe': 'recipes/%s',
 }
 
 
@@ -96,3 +98,11 @@ class UpneatConnector:
             cat_dicts.append(category)
 
         return cat_dicts
+
+    @staticmethod
+    def scrape_recipe(recipe):
+        url = "%s/%s" % (url_base, endpoints.get('recipe') % recipe)
+        parser = UpneatRecipeParser(slug=recipe, url=url)
+        raw_recipe = parser.parse()
+
+        return raw_recipe
