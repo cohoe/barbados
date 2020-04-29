@@ -1,7 +1,7 @@
 from barbados.models.base import BarbadosModel
 from barbados.objects.ingredientkinds import IngredientKinds
 from barbados.exceptions import ValidationException
-from sqlalchemy import Column, String, or_, ARRAY
+from sqlalchemy import Column, String, or_, ARRAY, ForeignKey
 from barbados.text import Slug
 
 
@@ -11,6 +11,9 @@ class IngredientModel(BarbadosModel):
     slug = Column(String, primary_key=True)
     display_name = Column(String, nullable=False)
     kind = Column(String, nullable=False)
+    # At some point, we can turn on ForeignKey('ingredients.slug'). But the import
+    # is not smart enough to do creation in order (it just searches for files in
+    # the repo).
     parent = Column(String, nullable=True)
     aliases = Column(ARRAY(String), nullable=True)
     elements = Column(ARRAY(String), nullable=True)
