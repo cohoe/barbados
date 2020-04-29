@@ -5,7 +5,7 @@ from barbados.models import IngredientModel, CocktailModel
 from barbados.services import Cache, Registry
 from barbados.objects.ingredienttree import IngredientTree
 from barbados.serializers import ObjectSerializer
-from barbados.factories import CocktailFactory
+from barbados.factories import CocktailFactory, IngredientFactory
 
 
 class Caches:
@@ -40,8 +40,9 @@ class CacheBase:
     """
     Base Cache class. Implements basic functions.
     """
+
     @staticmethod
-    def populate(cls):
+    def populate():
         """
         Code that populates the cache should go here. It could take in
         parameters if you want, but you have to implement it in the
@@ -104,6 +105,10 @@ class UsableIngredientCache(CacheBase):
 class TableScanCache(CacheBase):
 
     @property
+    def cache_key(self):
+        raise NotImplementedError
+
+    @property
     def model_class(self):
         raise NotImplementedError
 
@@ -131,6 +136,12 @@ class CocktailScanCache(TableScanCache):
     factory_class = CocktailFactory
 
 
+class IngredientScanCache(TableScanCache):
+    cache_key = 'ingredient_scan_cache'
+    model_class = IngredientModel
+    factory_class = IngredientFactory
+
+
 class IngredientTreeCache(CacheBase):
     """
     Serializing and cacheing objects is dangerous. But the Treelib
@@ -155,3 +166,4 @@ class IngredientTreeCache(CacheBase):
 Caches.register_cache(UsableIngredientCache)
 Caches.register_cache(CocktailScanCache)
 Caches.register_cache(IngredientTreeCache)
+Caches.register_cache(IngredientScanCache)

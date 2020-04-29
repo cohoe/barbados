@@ -7,7 +7,7 @@ class IngredientFactory(BaseFactory):
         pass
 
     @staticmethod
-    def to_obj(input_object):
+    def raw_to_obj(input_object):
         return Ingredient(**input_object)
 
     @staticmethod
@@ -20,4 +20,4 @@ class IngredientFactory(BaseFactory):
         model_dict = model.__dict__
         model_dict.pop('_sa_instance_state')
 
-        return IngredientFactory.to_obj(model_dict)
+        return IngredientFactory.raw_to_obj(model_dict)
