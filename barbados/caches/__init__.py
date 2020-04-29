@@ -80,28 +80,6 @@ class CacheBase:
         raise NotImplementedError
 
 
-class UsableIngredientCache(CacheBase):
-    cache_key = 'ingredient_name_index'
-
-    @classmethod
-    def populate(cls, **kwargs):
-        # This is still returning all values, just not populating them
-        pgconn = Registry.get_database_connection()
-
-        index = []
-        with pgconn.get_session() as session:
-            scan_results = IngredientModel.get_usable_ingredients(session)
-
-            for result in scan_results:
-                index.append({
-                    'slug': result.slug,
-                    'display_name': result.display_name,
-                    'aliases': result.aliases,
-                })
-
-        Cache.set(cls.cache_key, json.dumps(index))
-
-
 class TableScanCache(CacheBase):
 
     @property
@@ -163,7 +141,6 @@ class IngredientTreeCache(CacheBase):
             return pickle.loads(Cache.get(cls.cache_key))
 
 
-Caches.register_cache(UsableIngredientCache)
 Caches.register_cache(CocktailScanCache)
 Caches.register_cache(IngredientTreeCache)
 Caches.register_cache(IngredientScanCache)
