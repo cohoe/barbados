@@ -8,34 +8,6 @@ from barbados.serializers import ObjectSerializer
 from barbados.factories import CocktailFactory, IngredientFactory
 
 
-class Caches:
-    """
-    Holder for all data caches. This enables simple lookup by cache_key
-    such as Caches('ingredient_name_index').
-    """
-    caches = {}
-
-    # Apparently __call__() didn't work?
-    # https://stackoverflow.com/questions/34777773/typeerror-object-takes-no-parameters-after-defining-new
-    def __new__(cls, cache_key):
-        """
-        Act kinda like an enum in that this will return the class for a given
-        cache key
-        :param cache_key: String of the cache key.
-        :return class or KeyError.
-        """
-        return cls.caches[cache_key]
-
-    @classmethod
-    def register_cache(cls, cache_class):
-        """
-        Register a cache class for use and lookup by this class.
-        :param cache_class: Class (the class, not a string) to register
-        :return: None
-        """
-        cls.caches[cache_class.cache_key] = cache_class
-
-
 class CacheBase:
     """
     Base Cache class. Implements basic functions.
@@ -139,8 +111,3 @@ class IngredientTreeCache(CacheBase):
             logging.warning("Attempted to retrieve '%s' but it was empty. Repopulating..." % cls.cache_key)
             cls.populate()
             return pickle.loads(Cache.get(cls.cache_key))
-
-
-Caches.register_cache(CocktailScanCache)
-Caches.register_cache(IngredientTreeCache)
-Caches.register_cache(IngredientScanCache)
