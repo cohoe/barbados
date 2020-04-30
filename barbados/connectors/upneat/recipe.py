@@ -1,5 +1,6 @@
 import requests
 import re
+import logging
 from bs4 import BeautifulSoup
 from barbados.text import DisplayName, Slug
 from barbados.factories import CocktailFactory
@@ -12,7 +13,9 @@ class UpneatRecipeParser:
         self.content = self._get_content(self.url)
 
     def parse(self):
-        return CocktailFactory.raw_to_obj(raw_recipe=self._content_to_dict(), slug=self.slug)
+        logging.info("Parsing slug %s" % self.slug)
+        raw_recipe = self._content_to_dict()
+        return CocktailFactory.raw_to_obj(raw_recipe=raw_recipe, slug=self.slug)
 
     def _get_content(self, url):
         response = requests.get(url)
@@ -80,6 +83,8 @@ class UpneatRecipeParser:
             if term in search_string:
                 return term
 
+        return 'unknown'
+
     def _get_components(self):
         raw_strings = [element.text.strip() for element in self.content.ul.find_all('li')]
         components = []
@@ -87,16 +92,25 @@ class UpneatRecipeParser:
         for raw_string in raw_strings:
             if 'garnish' in raw_string.lower():
                 continue
+
+            if raw_string.startswith('dash'):
+                raw_string = "1 %s" % raw_string
+
             tokens = re.split(r"([\.\d+]+) ([\w\.]+) (.*)$", raw_string)
             for token in tokens:
                 if not token:
                     tokens.remove(token)
 
-            component = {
-                'quantity': tokens[0],
-                'unit': tokens[1].replace('.', ''),
-                'name': tokens[2],
-            }
+            try:
+                component = {
+                    'quantity': tokens[0],
+                    'unit': tokens[1].replace('.', ''),
+                    'name': tokens[2],
+                }
+            except IndexError:
+                component = {
+                    'name': tokens[0]
+                }
 
             components.append(component)
 

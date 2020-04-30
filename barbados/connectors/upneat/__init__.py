@@ -1,8 +1,12 @@
 import requests
 import json
 import yaml
+import string
+import re
+import logging
 from slugify import slugify
 from barbados.connectors.upneat.recipe import UpneatRecipeParser
+from bs4 import BeautifulSoup
 
 url_base = 'http://www.upneat.rocks'
 
@@ -11,6 +15,7 @@ endpoints = {
     'families': 'ingredient/categories/%i/families',
     'ingredients': 'ingredient/families/%i/ingredient_tree',
     'recipe': 'recipes/%s',
+    'recipe_alpha': 'recipes/alpha_recipes?letter=%s',
 }
 
 
@@ -102,7 +107,50 @@ class UpneatConnector:
     @staticmethod
     def scrape_recipe(recipe):
         url = "%s/%s" % (url_base, endpoints.get('recipe') % recipe)
+        logging.info("scraping %s" % url)
         parser = UpneatRecipeParser(slug=recipe, url=url)
         raw_recipe = parser.parse()
 
         return raw_recipe
+
+    @staticmethod
+    def get_recipes():
+        # character_list = list(range(0, 10)) + list(string.ascii_uppercase)
+        character_list = [1, 'A']
+
+        raw_recipes = []
+
+        for char in character_list:
+            # print(UpneatConnector._get_recipes_alpha(char))
+            slugs = UpneatConnector._get_recipes_alpha(char)
+            for slug in slugs:
+                raw_recipes.append(UpneatConnector.scrape_recipe(slug))
+
+        return raw_recipes
+
+    @staticmethod
+    def _get_recipes_alpha(char):
+        baseurl = "%s/%s" % (url_base, endpoints.get('recipe_alpha') % char)
+
+        headers = {
+            'X-Requested-With': 'XMLHttpRequest'
+        }
+
+        content = requests.get(baseurl, headers=headers).content.decode('UTF-8')
+
+        # Cleanup
+        content = content.replace("$('#alpha_recipes_partial').html(\"", '')
+        content = content.replace("\");", '')
+        content = BeautifulSoup(content, features='html.parser')
+
+        recipes = []
+        links = content.find_all('a')
+        for link in links:
+            slug = link.attrs.get('href')
+            # slug = re.sub(r"[\"]+]", r'', slug)
+            slug = slug.replace('\\"/recipes/', '')
+            slug = slug.replace('\\"', '')
+            recipes.append(slug)
+
+        return recipes
+        # return content
