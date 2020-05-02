@@ -116,7 +116,7 @@ class UpneatConnector:
     @staticmethod
     def get_recipes():
         # character_list = list(range(0, 10)) + list(string.ascii_uppercase)
-        character_list = [1, 'A']
+        character_list = string.ascii_uppercase[2:3]
 
         raw_recipes = []
 
@@ -124,7 +124,10 @@ class UpneatConnector:
             # print(UpneatConnector._get_recipes_alpha(char))
             slugs = UpneatConnector._get_recipes_alpha(char)
             for slug in slugs:
-                raw_recipes.append(UpneatConnector.scrape_recipe(slug))
+                try:
+                    raw_recipes.append(UpneatConnector.scrape_recipe(slug))
+                except:
+                    logging.error("ERROR WITH %s " % slug)
 
         return raw_recipes
 

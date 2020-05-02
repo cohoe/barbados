@@ -13,7 +13,7 @@ class UpneatRecipeParser:
         self.content = self._get_content(self.url)
 
     def parse(self):
-        logging.info("Parsing slug %s" % self.slug)
+        # logging.info("Parsing slug %s" % self.slug)
         raw_recipe = self._content_to_dict()
         return CocktailFactory.raw_to_obj(raw_recipe=raw_recipe, slug=self.slug)
 
@@ -58,13 +58,32 @@ class UpneatRecipeParser:
 
     def _get_spec_origin(self):
         story_element = self.content.find('p', attrs={'style': 'font-style:italic'})
-        origin = {
-            'story': story_element.text.strip().split(' —')[0] if story_element else None
-        }
+
+        origin = {}
+
+        if story_element:
+            # print(story_element.text.strip())
+            # story = story_element.text.strip().split(' —')[0]
+            story_string = story_element.text.strip()
+            if re.search(r"^([A-Z ]+), (\d{4})", story_string):
+                origin['creator'] = re.search(r"([A-Z ]+), (\d{4})", story_string).group(1).title()
+            else:
+                chunks = re.split(r"(â€”|—)", story_string)
+                origin['story'] = chunks[0].strip()
+                if len(chunks) > 1:
+                    # chunks[1] is the weird character
+                    origin['creator'] = chunks[2].split(',')[0].strip()
+
+            if re.search(r"(\d{4})", story_element.text.strip()):
+                origin['year'] = int(re.search(r"(\d{4})", story_string).group(0))
+
+        # print(origin)
         return origin
 
     def _get_instructions(self):
         text = self.content.ul.find_next_sibling('p').text.strip()
+
+        text = text.replace('oz.', 'oz')
 
         accepted_instructions = []
         for line in text.split('.')[:-1]:
@@ -102,8 +121,15 @@ class UpneatRecipeParser:
                     tokens.remove(token)
 
             try:
+                try:
+                    quantity = float(tokens[0])
+                    if quantity.is_integer():
+                        quantity = int(quantity)
+                except ValueError:
+                    quantity = tokens[0]
+
                 component = {
-                    'quantity': tokens[0],
+                    'quantity': quantity,
                     'unit': tokens[1].replace('.', ''),
                     'name': tokens[2],
                 }

@@ -30,7 +30,7 @@ class ZookeeperConnector:
 
     def _connect(self):
         if not hasattr(self, 'zk'):
-            self.zk = KazooClient(hosts=self.hosts, read_only=self.read_only)
+            self.zk = KazooClient(hosts=self.hosts, read_only=self.read_only, timeout=10)
             return self.zk.start()
         elif self.zk.state != KazooState.CONNECTED:
             return self.zk.start()
