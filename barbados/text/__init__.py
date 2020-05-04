@@ -1,4 +1,5 @@
 import slugify
+from datetime import datetime as DateTime
 
 
 class DisplayName:
@@ -20,14 +21,21 @@ class DisplayName:
 
 
 class Text:
-    def __init__(self, text):
+    def __init__(self, text, author=None, datetime=None):
+        if not datetime:
+            datetime = DateTime.utcnow().isoformat()
+
         self.text = text
+        self.author = author
+        self.datetime = datetime
 
     def __repr__(self):
-        return "Barbados::Object::Text[]"
+        return "Barbados::Objects::Text[]"
 
     def serialize(self, serializer):
         serializer.add_property('text', self.text)
+        serializer.add_property('author', self.author)
+        serializer.add_property('datetime', self.datetime)
 
 
 class Slug:

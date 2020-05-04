@@ -1,5 +1,6 @@
 from barbados.connectors import ZookeeperConnector
 from barbados.connectors import PostgresqlConnector
+from barbados.exceptions import FatalException
 
 
 class Registry:
@@ -40,8 +41,11 @@ class Registry:
         presents itself its good enough.
         :return:
         """
-        db_database = Registry.get('/database/postgres/database')
-        db_username = Registry.get('/database/postgres/username')
-        db_password = Registry.get('/database/postgres/password')
+        try:
+            db_database = Registry.get('/database/postgres/database')
+            db_username = Registry.get('/database/postgres/username')
+            db_password = Registry.get('/database/postgres/password')
 
-        return PostgresqlConnector(database=db_database, username=db_username, password=db_password)
+            return PostgresqlConnector(database=db_database, username=db_username, password=db_password)
+        except KeyError as e:
+            raise FatalException("Failure to get database connection (%s)" % e)

@@ -14,7 +14,7 @@ class CitationFactory:
         notes = []
         if 'notes' in raw_citation.keys():
             for note in raw_citation['notes']:
-                notes.append(Text(text=note))
+                notes.append(Text(**note))
             del(raw_citation['notes'])
 
         if 'date' in raw_citation.keys():
