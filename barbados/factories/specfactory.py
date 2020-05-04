@@ -14,12 +14,13 @@ class SpecFactory:
 
     @staticmethod
     def raw_to_obj(raw_spec):
-        if 'name' not in raw_spec.keys():
-            spec_slug = raw_spec['slug']
+        # Tortuga Data Format v3 replaced all names with slugs, but it means that
+        # the slugs for specs are not accurate. Same problem for ingredients.
+        spec_slug = Slug(raw_spec['slug'])
+        try:
             spec_display_name = raw_spec['display_name']
-        else:
-            spec_slug = Slug(raw_spec['name'])
-            spec_display_name = raw_spec['name']
+        except KeyError:
+            spec_display_name = DisplayName(spec_slug)
 
         raw_spec = SpecFactory.sanitize_raw(raw_spec)
 

@@ -17,6 +17,9 @@ class DisplayName:
         for replacement in cls.replacements:
             text = text.replace(replacement[0], replacement[1])
 
+        if text.isupper():
+            return text
+
         return text.title()
 
 
