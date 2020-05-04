@@ -1,6 +1,9 @@
 import logging
 from kazoo.client import KazooClient, KazooState
 from kazoo.exceptions import NoNodeError
+from kazoo.retry import KazooRetry
+from kazoo.handlers.threading import KazooTimeoutError
+from barbados.exceptions import FatalException
 
 
 class ZookeeperConnector:
@@ -30,11 +33,19 @@ class ZookeeperConnector:
 
     def _connect(self):
         if not hasattr(self, 'zk'):
-            self.zk = KazooClient(hosts=self.hosts, read_only=self.read_only, timeout=10)
-            return self.zk.start()
+            self.zk = KazooClient(hosts=self.hosts, read_only=self.read_only, timeout=5, connection_retry=self._get_retry())
         elif self.zk.state != KazooState.CONNECTED:
-            return self.zk.start()
+            pass
         elif self.zk.state == KazooState.CONNECTED:
             return
         else:
             raise Exception("We in a weird state. %s" % self.zk.state)
+
+        try:
+            return self.zk.start()
+        except KazooTimeoutError as e:
+            raise FatalException("Timeout connecting to ZooKeeper (%s)" % e)
+
+    @staticmethod
+    def _get_retry():
+        return KazooRetry(max_tries=5, backoff=2)
