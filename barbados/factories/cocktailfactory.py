@@ -7,6 +7,7 @@ from barbados.serializers import ObjectSerializer
 from .base import BaseFactory
 import copy
 from barbados.objects.image import Image
+from barbados.text import Slug
 
 
 class CocktailFactory(BaseFactory):
@@ -122,6 +123,7 @@ class CocktailFactory(BaseFactory):
 
             # https://stackoverflow.com/questions/14071038/add-an-element-in-each-dictionary-of-a-list-list-comprehension
             for component in spec['components']:
-                component.update({'parents': tree.parents(component['slug'])})
+                # the Slug() is needed for the TDFv3 name->slug conversion.
+                component.update({'parents': tree.parents(Slug(component['slug']))})
 
         return [index_class(meta={'id': key}, **value) for key, value in searchable_recipes.items()]
