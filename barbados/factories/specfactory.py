@@ -45,9 +45,18 @@ class SpecFactory:
                 component_slug = Slug(raw_ingredient['name'])
                 component_display_name = DisplayName(component_slug)
                 del (raw_ingredient['name'])
-                spec_ing_obj = SpecComponent(slug=component_slug, display_name=component_display_name, **raw_ingredient)
+
+                notes = []
+                if 'notes' in raw_ingredient.keys():
+                    notes = [Text(**note) for note in raw_ingredient['notes']]
+                    del (raw_ingredient['notes'])
+                spec_ing_obj = SpecComponent(slug=component_slug, display_name=component_display_name, notes=notes, **raw_ingredient)
             except KeyError:
-                spec_ing_obj = SpecComponent(**raw_ingredient)
+                notes = []
+                if 'notes' in raw_ingredient.keys():
+                    notes = [Text(**note) for note in raw_ingredient['notes']]
+                    del (raw_ingredient['notes'])
+                spec_ing_obj = SpecComponent(notes=notes, **raw_ingredient)
             components.append(spec_ing_obj)
         # print(ingredient_obj_list)
 
