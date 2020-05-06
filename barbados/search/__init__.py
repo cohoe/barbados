@@ -1,4 +1,4 @@
-import logging
+from barbados.services.logging import Log
 from elasticsearch_dsl.query import Bool
 from barbados.exceptions import ValidationException
 
@@ -70,7 +70,7 @@ class SearchBase:
         :return: SearchResults child class.
         """
         results = self.index_class.search()[0:1000].query(self.q).sort(sort).execute()
-        logging.info("Got %s results." % results.hits.total.value)
+        Log.info("Got %s results." % results.hits.total.value)
         return SearchResults(hits=results)
 
     def add_query_parameter(self, parameter, query_class, query_key, parameter_type=str, invert=False, **attributes):
@@ -137,7 +137,7 @@ class SearchBase:
                 else:
                     musts.append(self.get_query_condition(parameter=parameter, value=raw_value))
 
-        logging.info("Search Conditions are %s" % musts)
+        Log.info("Search Conditions are %s" % musts)
         return Bool(must=musts, must_not=must_nots)
 
     @staticmethod

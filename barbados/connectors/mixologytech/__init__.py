@@ -1,4 +1,4 @@
-from barbados.services.logging import logging
+from barbados.services.logging import Log
 from barbados.connectors.sqlite import SqliteConnector
 from barbados.objects.ingredientkinds import IngredientKind, ProductKind
 from barbados.text import Slug, DisplayName
@@ -12,12 +12,12 @@ class MixologyTechConnector:
 
     def get_ingredients(self):
         all_ingredients = IngredientModel.query.all()
-        # logging.info("Total ingredient count is %i" % len(all_ingredients))
+        # Log.info("Total ingredient count is %i" % len(all_ingredients))
 
         standardized_ingredients = []
         orphan_count = 0
         for ingredient in all_ingredients:
-            # logging.info("Parsing %s" % ingredient.canonical_name)
+            # Log.info("Parsing %s" % ingredient.canonical_name)
 
             parent = self._get_parent_name(ingredient)
             if parent:
@@ -25,7 +25,7 @@ class MixologyTechConnector:
             else:
                 kind = IngredientKind.value
                 orphan_count += 1
-            # logging.info("Parent is %s" % parent)
+            # Log.info("Parent is %s" % parent)
 
             standardized_ingredient = {
                 'display_name': ingredient.canonical_name,
@@ -36,14 +36,14 @@ class MixologyTechConnector:
             }
 
             standardized_ingredients.append(standardized_ingredient)
-            logging.info(standardized_ingredient) if not standardized_ingredient['parent'] else None
+            Log.info(standardized_ingredient) if not standardized_ingredient['parent'] else None
 
         # print(len(IngredientModel.query.all()))
         # for ingredient in IngredientModel.query.all():
             # print(ingredient.canonical_name)
         # for altname in IngredientAlternateSpellingModel.query.all():
             # print(altname.ingredient_id)
-        logging.info("Orphans at %i" % orphan_count)
+        Log.info("Orphans at %i" % orphan_count)
         return standardized_ingredients
 
     @staticmethod
@@ -51,7 +51,7 @@ class MixologyTechConnector:
         spellings = IngredientAlternateSpellingModel.query.filter(IngredientAlternateSpellingModel.ingredient_id == ingredient.id)
         synonyms = IngredientSynonymModel.query.filter(IngredientSynonymModel.ingredient_id == ingredient.id)
         aliases = [spelling.alternative_spelling for spelling in spellings] + [synonym.synonym for synonym in synonyms]
-        # logging.info("Ingredient %s as %i alias(es)." % (ingredient.canonical_name, len(aliases)))
+        # Log.info("Ingredient %s as %i alias(es)." % (ingredient.canonical_name, len(aliases)))
         return aliases
 
     @staticmethod
@@ -71,4 +71,4 @@ class MixologyTechConnector:
             if category.position and category.position >= 5:
                 return category.display_name
 
-        logging.error("Could not find category for %s" % ingredient.canonical_name)
+        Log.error("Could not find category for %s" % ingredient.canonical_name)

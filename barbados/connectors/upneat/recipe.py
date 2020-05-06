@@ -1,9 +1,9 @@
 import requests
 import re
-import logging
 from bs4 import BeautifulSoup
 from barbados.text import DisplayName, Slug
 from barbados.factories import CocktailFactory
+from barbados.services.logging import Log
 
 
 class UpneatRecipeParser:
@@ -13,7 +13,6 @@ class UpneatRecipeParser:
         self.content = self._get_content(self.url)
 
     def parse(self):
-        # logging.info("Parsing slug %s" % self.slug)
         raw_recipe = self._content_to_dict()
         return CocktailFactory.raw_to_obj(raw_recipe=raw_recipe, slug=self.slug)
 

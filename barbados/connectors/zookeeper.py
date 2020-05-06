@@ -1,9 +1,9 @@
-import logging
 from kazoo.client import KazooClient, KazooState
 from kazoo.exceptions import NoNodeError
 from kazoo.retry import KazooRetry
 from kazoo.handlers.threading import KazooTimeoutError
 from barbados.exceptions import FatalException
+from barbados.services.logging import Log
 
 
 class ZookeeperConnector:
@@ -28,8 +28,8 @@ class ZookeeperConnector:
         except NoNodeError:
             raise KeyError("%s does not exist." % path)
         except Exception as e:
-            logging.error(e.__class__)
-            logging.error(e)
+            Log.error(e.__class__)
+            Log.error(e)
 
     def _connect(self):
         if not hasattr(self, 'zk'):

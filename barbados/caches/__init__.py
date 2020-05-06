@@ -1,8 +1,8 @@
 import json
 import pickle
-import logging
 from barbados.models import IngredientModel, CocktailModel
 from barbados.services import Cache, Registry
+from barbados.services.logging import Log
 from barbados.objects.ingredienttree import IngredientTree
 from barbados.serializers import ObjectSerializer
 from barbados.factories import CocktailFactory, IngredientFactory
@@ -34,7 +34,7 @@ class CacheBase:
         try:
             return Cache.get(cls.cache_key)
         except KeyError:
-            logging.warning("Attempted to retrieve '%s' but it was empty. Repopulating..." % cls.cache_key)
+            Log.warning("Attempted to retrieve '%s' but it was empty. Repopulating..." % cls.cache_key)
             cls.populate()
             return Cache.get(cls.cache_key)
 
@@ -44,7 +44,7 @@ class CacheBase:
         Invalidate (delete) the cache value and key.
         :return: None
         """
-        logging.info("Invalidating cache key %s" % cls.cache_key)
+        Log.info("Invalidating cache key %s" % cls.cache_key)
         return Cache.delete(cls.cache_key)
 
     @property
@@ -108,6 +108,6 @@ class IngredientTreeCache(CacheBase):
         try:
             return pickle.loads(Cache.get(cls.cache_key))
         except KeyError:
-            logging.warning("Attempted to retrieve '%s' but it was empty. Repopulating..." % cls.cache_key)
+            Log.warning("Attempted to retrieve '%s' but it was empty. Repopulating..." % cls.cache_key)
             cls.populate()
             return pickle.loads(Cache.get(cls.cache_key))

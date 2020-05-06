@@ -55,8 +55,10 @@ class SpecFactory:
                 notes = []
                 if 'notes' in raw_ingredient.keys():
                     notes = [Text(**note) for note in raw_ingredient['notes']]
-                    del (raw_ingredient['notes'])
-                spec_ing_obj = SpecComponent(notes=notes, **raw_ingredient)
+                    raw_ingredient.update({'notes': notes})
+                raw_ingredient.update({'slug': Slug(raw_ingredient.get('slug'))})
+                spec_ing_obj = SpecComponent(**raw_ingredient)
+
             components.append(spec_ing_obj)
         # print(ingredient_obj_list)
 

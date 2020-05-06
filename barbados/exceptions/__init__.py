@@ -1,6 +1,5 @@
-import logging
 import os
-
+import logging
 
 class ValidationException(Exception):
     pass

@@ -1,4 +1,4 @@
-import logging
+from barbados.services.logging import Log
 from .recipe import RecipeIndex
 from .ingredient import IngredientIndex
 from barbados.connectors.elasticsearch import ElasticsearchConnector
@@ -22,7 +22,7 @@ class IndexFactory:
 
     def init(self):
         for name in self._indexes.keys():
-            logging.debug("Init on %s" % name)
+            Log.debug("Init on %s" % name)
             try:
                 self._indexes[name]._index.delete()
             except NotFoundError:
@@ -33,9 +33,9 @@ class IndexFactory:
         try:
             index_class._index.delete()
             index_class.init()
-            logging.info("Successfully rebuilt index %s" % index_class.Index.name)
+            Log.info("Successfully rebuilt index %s" % index_class.Index.name)
         except NotFoundError:
-            logging.warning("Index %s did not exist." % index_class.Index.name)
+            Log.warning("Index %s did not exist." % index_class.Index.name)
 
 
 index_factory = IndexFactory()
