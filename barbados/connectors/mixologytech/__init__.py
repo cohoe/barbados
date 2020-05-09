@@ -1,9 +1,13 @@
 from barbados.services.logging import Log
 from barbados.connectors.sqlite import SqliteConnector
 from barbados.objects.ingredientkinds import IngredientKind, ProductKind
-from barbados.text import Slug, DisplayName
+from barbados.text import Slug, DisplayName, Text
 from barbados.models.mixologytech import IngredientModel, IngredientAlternateSpellingModel, IngredientSynonymModel
 from barbados.models.mixologytech import IngredientCategoryMappingModel, IngredientCategoryModel
+from barbados.models.mixologytech import RecipeModel
+from barbados.factories import CocktailFactory
+from barbados.serializers import ObjectSerializer
+import re
 
 
 class MixologyTechConnector:
@@ -40,9 +44,9 @@ class MixologyTechConnector:
 
         # print(len(IngredientModel.query.all()))
         # for ingredient in IngredientModel.query.all():
-            # print(ingredient.canonical_name)
+        # print(ingredient.canonical_name)
         # for altname in IngredientAlternateSpellingModel.query.all():
-            # print(altname.ingredient_id)
+        # print(altname.ingredient_id)
         Log.info("Orphans at %i" % orphan_count)
         return standardized_ingredients
 
@@ -72,3 +76,131 @@ class MixologyTechConnector:
                 return category.display_name
 
         Log.error("Could not find category for %s" % ingredient.canonical_name)
+
+    def get_recipes(self):
+        with self.dbconn.get_session() as session:
+            raw_recipes = session.query(RecipeModel).all()
+
+            objs = []
+
+            for recipe in raw_recipes:
+                if not recipe.is_ingredient:
+                    objs.append(MixologyTechConnector._model_to_obj(recipe))
+
+            # return [MixologyTechConnector._model_to_obj(raw_recipe) for raw_recipe in raw_recipes]
+            return objs
+
+    @staticmethod
+    def _model_to_obj(raw_recipe):
+        slug = Slug(raw_recipe.title)
+        recipe_dict = {
+            'display_name': raw_recipe.title,
+            'specs': [{
+                # 'slug': raw_recipe.presentation,
+                'slug': 'pdt',
+                'display_name': 'PDT',
+                'origin': MixologyTechConnector._get_origin(raw_recipe)
+            }]
+        }
+
+        recipe_dict['specs'][0].update(MixologyTechConnector._detail_to_spec(raw_recipe.detail_json))
+
+        print(recipe_dict)
+
+        return CocktailFactory.raw_to_obj(raw_recipe=recipe_dict, slug=slug)
+
+    @staticmethod
+    def _detail_to_spec(details):
+        spec = {
+            'notes': [],
+            'images': []
+        }
+        for detail in details:
+            if detail.get('kind') == 'measures':
+                spec['components'] = MixologyTechConnector._get_components(detail.get('text'))
+            elif detail.get('kind') == 'instructions':
+                spec['instructions'] = MixologyTechConnector._get_instructions(detail)
+                spec['construction'] = MixologyTechConnector._get_construction(spec.get('instructions'))
+            elif detail.get('kind') == 'notes':
+                spec['notes'].append(MixologyTechConnector._parse_note(detail.get('text')))
+            elif detail.get('kind') == 'graphic':
+                pass
+            elif detail.get('kind') == 'art':
+                pass
+            else:
+                raise Exception("Unknown detail kind %s" % detail.get('kind'))
+
+        return spec
+
+    @staticmethod
+    def _get_instructions(detail):
+        instructions = []
+        lines = detail.get('text').split('\n')
+        for line in lines:
+            if line.lower().startswith('garnish'):
+                pass
+            else:
+                instructions.append(Text(text=line))
+
+        return instructions
+
+    @staticmethod
+    def _get_construction(texts):
+        for text in texts:
+            terms = ['shake', 'stir']
+            for term in terms:
+                if term in text.text.lower():
+                    return term
+
+        return 'unknown'
+
+    @staticmethod
+    def _parse_note(text):
+        text = text.replace('—', '')
+
+        return Text(text=text)
+
+    @staticmethod
+    def _get_components(text):
+        components = []
+
+        lines = text.split('\n')
+        for line in lines:
+            tokens = re.split(r"([\.\d+]+) ([\w\.]+) (.*)$", line)
+            for token in tokens:
+                if not token:
+                    tokens.remove(token)
+
+            if len(tokens) == 3:
+                # quantity, unit, ingredient
+                try:
+                    quantity = float(tokens[0])
+                    if quantity.is_integer():
+                        quantity = int(quantity)
+                except ValueError:
+                    quantity = tokens[0]
+                components.append({
+                    'slug': tokens[2],
+                    'quantity': quantity,
+                    'unit': tokens[1]
+                })
+            elif len(tokens) == 2:
+                components.append({
+                    'quantity': tokens[0],
+                    'slug': tokens[1],
+                })
+            else:
+                components.append({
+                    'slug': ' '.join(tokens)
+                })
+
+        return components
+
+    @staticmethod
+    def _get_origin(raw_recipe):
+        if '?' in raw_recipe.citation_year:
+            return {}
+        else:
+            return {
+                'year': int(raw_recipe.citation_year)
+            }

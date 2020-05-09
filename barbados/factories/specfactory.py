@@ -69,6 +69,8 @@ class SpecFactory:
         for note in raw_spec['notes']:
             if type(note) is dict:
                 n_obj_list.append(Text(**note))
+            if type(note) is Text:
+                n_obj_list.append(note)
             else:
                 n_obj_list.append(Text(text=note))
         # print(n_obj_list)
@@ -93,12 +95,16 @@ class SpecFactory:
         for instruction in raw_spec['instructions']:
             if type(instruction) is dict:
                 instr_obj_list.append(Text(**instruction))
+            if type(instruction) is Text:
+                instr_obj_list.append(instruction)
             else:
                 instr_obj_list.append(Text(text=instruction))
         # print(instr_obj_list)
 
         if type(raw_spec['construction']) is dict:
             construction_obj = Construction(**raw_spec['construction'])
+        elif type(raw_spec['construction']) is None:
+            construction_obj = Construction(slug='unknown')
         else:
             construction_obj = Construction(slug=raw_spec['construction'])
 

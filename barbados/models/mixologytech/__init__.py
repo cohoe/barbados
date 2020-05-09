@@ -93,6 +93,7 @@ class RecipeModel(MixologyTechModel):
     ingredient_dependencies_json = Column(JSON, name='ZINGREDIENTDEPENDENCIESJSON', doc='List of Lists of ingredent remote IDs that this recipe needs')
     original_title = Column(String, name='ZORIGTITLE')
     # zpresentation == 'pdt2', wonder if thats different per-app?
+    presentation = Column(String, name='ZPRESENTATION')
     remote_id = Column(String, name='ZREMOTEID')
     sort_key = Column(String, name='ZSORTKEY')
     sort_key_initial = Column(String, name='ZSORTKEYINITIAL')
