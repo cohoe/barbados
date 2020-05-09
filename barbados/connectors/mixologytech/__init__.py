@@ -1,7 +1,7 @@
 from barbados.services.logging import Log
 from barbados.connectors.sqlite import SqliteConnector
 from barbados.objects.ingredientkinds import IngredientKind, ProductKind
-from barbados.text import Slug, DisplayName, Text
+from barbados.text import Slug, DisplayName
 from barbados.models.mixologytech import IngredientModel, IngredientAlternateSpellingModel, IngredientSynonymModel
 from barbados.models.mixologytech import IngredientCategoryMappingModel, IngredientCategoryModel
 from barbados.models.mixologytech import RecipeModel
@@ -140,7 +140,7 @@ class MixologyTechConnector:
             if line.lower().startswith('garnish'):
                 pass
             else:
-                instructions.append(Text(text=line))
+                instructions.append({'text': line})
 
         return instructions
 
@@ -149,7 +149,7 @@ class MixologyTechConnector:
         for text in texts:
             terms = ['shake', 'stir']
             for term in terms:
-                if term in text.text.lower():
+                if term in text.get('text').lower():
                     return term
 
         return 'unknown'
@@ -158,7 +158,7 @@ class MixologyTechConnector:
     def _parse_note(text):
         text = text.replace('—', '')
 
-        return Text(text=text)
+        return {'text': text}
 
     @staticmethod
     def _get_components(text):
