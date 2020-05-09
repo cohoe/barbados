@@ -113,7 +113,7 @@ class MixologyTechConnector:
     def _detail_to_spec(details):
         spec = {
             'notes': [],
-            'images': []
+            'images': [],
         }
         for detail in details:
             if detail.get('kind') == 'measures':
@@ -121,6 +121,8 @@ class MixologyTechConnector:
             elif detail.get('kind') == 'instructions':
                 spec['instructions'] = MixologyTechConnector._get_instructions(detail)
                 spec['construction'] = MixologyTechConnector._get_construction(spec.get('instructions'))
+                spec['glassware'] = MixologyTechConnector._get_glassware(spec.get('instructions'))
+                spec['straw'] = MixologyTechConnector._get_straw(spec.get('instructions'))
             elif detail.get('kind') == 'notes':
                 spec['notes'].append(MixologyTechConnector._parse_note(detail.get('text')))
             elif detail.get('kind') == 'graphic':
@@ -204,3 +206,20 @@ class MixologyTechConnector:
             return {
                 'year': int(raw_recipe.citation_year)
             }
+
+    @staticmethod
+    def _get_glassware(instructions):
+
+        for instruction in instructions:
+            if 'glass' in instruction.get('text').lower():
+                glass = re.sub(r"^(.*) (\w+) glass(.*)$", r'\2', instruction.get('text').lower())
+                return [{'slug': Slug(glass)}]
+
+    @staticmethod
+    def _get_straw(instructions):
+
+        for instruction in instructions:
+            if 'straw' in instruction.get('text').lower():
+                return True
+
+        return False
