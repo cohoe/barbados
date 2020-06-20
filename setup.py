@@ -24,6 +24,7 @@ setup(
         'psycopg2-binary',
         'python-slugify',
         'kazoo',
-        'treelib'
+        'treelib',
+        'elasticsearch'
     ]
 )
