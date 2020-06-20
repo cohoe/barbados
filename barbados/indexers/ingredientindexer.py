@@ -12,3 +12,8 @@ class IngredientIndexer(BaseIndexer):
     def index(ingredient_object):
         index = IngredientFactory.obj_to_index(ingredient_object, IngredientIndex)
         index.save()
+
+    @staticmethod
+    def delete(ingredient_object):
+        index = IngredientFactory.obj_to_index(ingredient_object, IngredientIndex)
+        IngredientIndex.delete(index)
