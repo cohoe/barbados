@@ -1,4 +1,5 @@
 from redis import Redis
+from barbados.services.logging import Log
 
 # @TODO implement global connection pooling somewhere
 
@@ -7,6 +8,7 @@ class RedisConnector:
     def __init__(self, host='127.0.0.1', port=6379, username=None, password=None, ssl=False):
         self.host = host
         self.port = port
+        # Log.info("Using Redis host: \"%s%i\"" % (host, port))
         self.username = username
         self.password = password
         self.ssl = ssl

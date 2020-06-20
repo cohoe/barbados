@@ -1,3 +1,4 @@
+import os
 from kazoo.client import KazooClient, KazooState
 from kazoo.exceptions import NoNodeError
 from kazoo.retry import KazooRetry
@@ -7,9 +8,11 @@ from barbados.services.logging import Log
 
 
 class ZookeeperConnector:
-    def __init__(self, hosts='127.0.0.1:2181', read_only=False):
+    def __init__(self, hosts=os.getenv('ZOOKEEPER_HOSTS', '127.0.0.1:2181'), read_only=False):
         self.hosts = hosts
         self.read_only = read_only
+
+        Log.info("Using Zookeeper hosts: \"%s\"" % hosts)
 
     def set(self, path, value):
         self._connect()
