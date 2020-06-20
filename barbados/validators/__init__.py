@@ -1,5 +1,6 @@
 from .cocktailmodelvalidator import CocktailModelValidator
 from .ingredientmodelvalidator import IngredientModelValidator
+from .menumodelvalidator import MenuModelValidator
 
 
 class ValidatorFactory:
@@ -23,6 +24,7 @@ class ValidatorFactory:
 validator_factory = ValidatorFactory()
 validator_factory.register_class(CocktailModelValidator)
 validator_factory.register_class(IngredientModelValidator)
+validator_factory.register_class(MenuModelValidator)
 
 
 class ObjectValidator:
