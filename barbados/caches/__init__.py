@@ -1,7 +1,8 @@
 import json
 import pickle
 from barbados.models import IngredientModel, CocktailModel, MenuModel
-from barbados.services import Cache, Registry
+from barbados.services.cache import Cache
+from barbados.services.registry import Registry
 from barbados.services.logging import Log
 from barbados.objects.ingredienttree import IngredientTree
 from barbados.serializers import ObjectSerializer

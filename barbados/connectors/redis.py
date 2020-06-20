@@ -1,25 +1,34 @@
-from redis import Redis
+import os
+from barbados.exceptions import ServiceUnavailableException
+from redis import Redis, exceptions
 from barbados.services.logging import Log
+
 
 # @TODO implement global connection pooling somewhere
 
 
 class RedisConnector:
-    def __init__(self, host='127.0.0.1', port=6379, username=None, password=None, ssl=False):
+    def __init__(self, host=os.getenv('REDIS_HOST', default='127.0.0.1'),
+                 port=int(os.getenv('REDIS_PORT', default=6379)),
+                 username=None, password=None, ssl=False):
         self.host = host
         self.port = port
-        # Log.info("Using Redis host: \"%s%i\"" % (host, port))
         self.username = username
         self.password = password
         self.ssl = ssl
+
+        Log.info("Using Redis host: \"%s:%i\"" % (host, port))
 
     def set(self, key, value):
         self._connect()
         return self.client.set(name=key, value=value)
 
     def get(self, key):
-        self._connect()
-        value = self.client.get(name=key)
+        try:
+            self._connect()
+            value = self.client.get(name=key)
+        except exceptions.ConnectionError as e:
+            raise ServiceUnavailableException("Cache error: %s" % str(e))
 
         if not value:
             raise KeyError
