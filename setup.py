@@ -25,6 +25,8 @@ setup(
         'python-slugify',
         'kazoo',
         'treelib',
-        'elasticsearch'
+        'elasticsearch',
+        'elasticsearch_dsl',
+        'bs4',
     ]
 )
