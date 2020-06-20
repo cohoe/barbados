@@ -1,6 +1,7 @@
 from barbados.services.logging import Log
 from .recipe import RecipeIndex
 from .ingredient import IngredientIndex
+from .menu import MenuIndex
 from barbados.connectors.elasticsearch import ElasticsearchConnector
 from elasticsearch.exceptions import NotFoundError
 
@@ -41,3 +42,4 @@ class IndexFactory:
 index_factory = IndexFactory()
 index_factory.register_index(RecipeIndex)
 index_factory.register_index(IngredientIndex)
+index_factory.register_index(MenuIndex)

@@ -1,11 +1,11 @@
 import json
 import pickle
-from barbados.models import IngredientModel, CocktailModel
+from barbados.models import IngredientModel, CocktailModel, MenuModel
 from barbados.services import Cache, Registry
 from barbados.services.logging import Log
 from barbados.objects.ingredienttree import IngredientTree
 from barbados.serializers import ObjectSerializer
-from barbados.factories import CocktailFactory, IngredientFactory
+from barbados.factories import CocktailFactory, IngredientFactory, MenuFactory
 
 
 class CacheBase:
@@ -80,6 +80,7 @@ class TableScanCache(CacheBase):
         Cache.set(cls.cache_key, json.dumps(cache_objects))
 
 
+# @TODO make these all some generic thing that can be called
 class CocktailScanCache(TableScanCache):
     cache_key = 'cocktail_scan_cache'
     model_class = CocktailModel
@@ -90,6 +91,12 @@ class IngredientScanCache(TableScanCache):
     cache_key = 'ingredient_scan_cache'
     model_class = IngredientModel
     factory_class = IngredientFactory
+
+
+class MenuScanCache(TableScanCache):
+    cache_key = 'menu_scan_cache'
+    model_class = MenuModel
+    factory_class = MenuFactory
 
 
 class IngredientTreeCache(CacheBase):

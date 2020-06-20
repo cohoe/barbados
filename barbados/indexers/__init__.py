@@ -1,5 +1,6 @@
 from .recipeindexer import RecipeIndexer
 from .ingredientindexer import IngredientIndexer
+from .menuindexer import MenuIndexer
 
 
 class IndexerFactory:
@@ -21,3 +22,4 @@ class IndexerFactory:
 indexer_factory = IndexerFactory()
 indexer_factory.register_class(RecipeIndexer)
 indexer_factory.register_class(IngredientIndexer)
+indexer_factory.register_class(MenuIndexer)
