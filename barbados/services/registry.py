@@ -45,7 +45,9 @@ class Registry:
             db_database = Registry.get('/database/postgres/database')
             db_username = Registry.get('/database/postgres/username')
             db_password = Registry.get('/database/postgres/password')
+            db_hostname = Registry.get('/database/postgres/hostname')
 
-            return PostgresqlConnector(database=db_database, username=db_username, password=db_password)
+            return PostgresqlConnector(host=db_hostname, database=db_database,
+                                       username=db_username, password=db_password)
         except KeyError as e:
             raise FatalException("Failure to get database connection (%s)" % e)
