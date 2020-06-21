@@ -1,35 +1,13 @@
-from elasticsearch import Elasticsearch
+import os
 from elasticsearch_dsl import connections
+from barbados.services.logging import Log
 
 
 class ElasticsearchConnector:
-    # def __init__(self, scheme='http', hosts=None, port=9200):
-    #     if hosts is None:
-    #         hosts = ['localhost']
-    #     self.scheme = scheme
-    #     self.hosts = hosts
-    #     self.port = port
-    #
-    # def _connect(self):
-    #     if not hasattr(self, 'client'):
-    #         self.client = Elasticsearch(hosts=self.hosts, scheme=self.scheme, port=self.port)
-    #
-    # def insert(self, index, id, body):
-    #     self._connect()
-    #     result = self.client.index(index=index, id=id, body=body)
-    #     return result['result']
-    #
-    # def get(self, index, id):
-    #     self._connect()
-    #     result = self.client.get(index=index, id=id)
-    #     return result
-    #
-    # def search(self, index, body):
-    #     self._connect()
-    #     results = self.client.search(index=index, body=body)
-    #     return results
-
     @staticmethod
     def connect():
-        # @TODO this can take all the same args as ElasticSearch()
-        connections.create_connection()
+        scheme = os.getenv('AMARI_ELASTICSEARCH_SCHEME', default='http')
+        hosts = os.getenv('AMARI_ELASTICSEARCH_HOSTS', default=['localhost'])
+        port = int(os.getenv('AMARI_ELASTICSEARCH_PORT', default=9200))
+        Log.info("Using ElasticSearch hosts: %s via %s/%i" % (hosts, scheme, port))
+        connections.create_connection(scheme=scheme, hosts=hosts, port=port)

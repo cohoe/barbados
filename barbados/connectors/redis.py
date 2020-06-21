@@ -8,8 +8,8 @@ from barbados.services.logging import Log
 
 
 class RedisConnector:
-    def __init__(self, host=os.getenv('REDIS_HOST', default='127.0.0.1'),
-                 port=int(os.getenv('REDIS_PORT', default=6379)),
+    def __init__(self, host=os.getenv('AMARI_REDIS_HOST', default='127.0.0.1'),
+                 port=int(os.getenv('AMARI_REDIS_PORT', default=6379)),
                  username=None, password=None, ssl=False):
         self.host = host
         self.port = port

@@ -8,7 +8,7 @@ from barbados.services.logging import Log
 
 
 class ZookeeperConnector:
-    def __init__(self, hosts=os.getenv('ZOOKEEPER_HOSTS', '127.0.0.1:2181'), read_only=False):
+    def __init__(self, hosts=os.getenv('AMARI_ZOOKEEPER_HOSTS', '127.0.0.1:2181'), read_only=False):
         self.hosts = hosts
         self.read_only = read_only
 
