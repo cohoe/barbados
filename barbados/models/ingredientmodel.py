@@ -1,8 +1,6 @@
 from barbados.models.base import BarbadosModel
 from barbados.objects.ingredientkinds import IngredientKinds
-from barbados.exceptions import ValidationException
-from sqlalchemy import Column, String, or_, ARRAY, ForeignKey
-from barbados.text import Slug
+from sqlalchemy import Column, String, or_, ARRAY
 
 
 class IngredientModel(BarbadosModel):

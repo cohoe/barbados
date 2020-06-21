@@ -35,7 +35,12 @@ class CocktailFactory(BaseFactory):
 
         n_obj_list = []
         for note in raw_recipe['notes']:
-            n_obj_list.append(Text(text=note))
+            if type(note) is dict:
+                n_obj_list.append(Text(**note))
+            elif type(note) is Text:
+                n_obj_list.append(note)
+            else:
+                n_obj_list.append(Text(text=note))
 
         tag_obj_list = []
         for tag in raw_recipe['tags']:
