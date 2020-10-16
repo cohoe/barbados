@@ -105,7 +105,14 @@ class SearchBase:
         if not settings:
             raise KeyError("Parameter %s has no query parameters defined." % parameter)
 
+        # The resultant query_class_parameters dictionary looks something like:
+        # {
+        #   'query_key': 'value',
+        #   'fields': ['foo', 'bar', 'baz'],
+        # }
+        # Attributes is the leftover **kwargs from the original function call.
         query_class_parameters = {**{settings.get('query_key'): value}, **settings.get('attributes')}
+
         return settings.get('query_class')(**query_class_parameters)
 
     def _build_search_query(self):
