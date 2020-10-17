@@ -1,6 +1,7 @@
 from barbados.services.logging import Log
-from elasticsearch_dsl.query import Bool
+from elasticsearch_dsl.query import Bool, Wildcard, MatchPhrase, Prefix, Match
 from barbados.exceptions import ValidationException
+
 
 
 class SearchResults:
@@ -73,37 +74,31 @@ class SearchBase:
         Log.info("Got %s results." % results.hits.total.value)
         return SearchResults(hits=results)
 
-    def add_query_parameter(self, parameter, query_class, query_key, parameter_type=str, invert=False, **attributes):
+    def add_query_parameter(self, url_parameter, query_class, fields, url_parameter_type=str, invert=False, **attributes):
         """
         Define a queriable parameter for this search index.
-        :param parameter: URL/input parameter to key from.
-        :param parameter_type: Python type class of this parameter from the URL.
+        :param url_parameter: URL/input parameter to key from.
+        :param url_parameter_type: Python type class of this parameter from the URL.
         :param query_class: ElasticSearch DSL query class.
-        :param query_key: ElasticSearch query key field (usually not the same as an input parameter)
         :param invert: Turn this from Must to MustNot
         :param attributes: Dictionary of extra params to pass to the query_class consturctor
         :return: None
         """
-        self.query_parameters[parameter] = {
-            'parameter': parameter,
-            'parameter_type': parameter_type,
+        self.query_parameters[url_parameter] = {
+            'url_parameter': url_parameter,
+            'url_parameter_type': url_parameter_type,
             'query_class': query_class,
-            'query_key': query_key,
             'attributes': attributes,
             'invert': invert,
+            'fields': fields
         }
 
-    def get_query_condition(self, parameter, value):
+    def get_query_condition(self, url_parameter, field, value):
         """
-        Build an ElasticSearch query object by looking up the parameter settings
-        and assigning an input value for the condition.
-        :param parameter: URL query parameter.
-        :param value: The value to look for in the index.
-        :return: Query() child object.
         """
-        settings = self.query_parameters.get(parameter)
+        settings = self.query_parameters.get(url_parameter)
         if not settings:
-            raise KeyError("Parameter %s has no query parameters defined." % parameter)
+            raise KeyError("Parameter %s has no query parameters defined." % url_parameter)
 
         # The resultant query_class_parameters dictionary looks something like:
         # {
@@ -111,40 +106,58 @@ class SearchBase:
         #   'fields': ['foo', 'bar', 'baz'],
         # }
         # Attributes is the leftover **kwargs from the original function call.
-        query_class_parameters = {**{settings.get('query_key'): value}, **settings.get('attributes')}
+        #query_class_parameters = {**{settings.get('query_key'): value}, **settings.get('attributes')}
 
-        return settings.get('query_class')(**query_class_parameters)
+        if settings.get('query_class') is Wildcard:
+            search_value = "*%s*" % value
+            return Wildcard(**{field: {'value': search_value}})
+        elif settings.get('query_class') is MatchPhrase:
+            return MatchPhrase(**{field: value})
+        elif settings.get('query_class') is Prefix:
+            return Prefix(**{field: value})
+        elif settings.get('query_class') is Match:
+            return Match(**{field: {'query': value}})
+        else:
+            raise KeyError("Unsupported query class")
 
     def _build_search_query(self):
         """
-        Construct the ElasticSearch query object containing all conditions.
-        @TODO this can't deal with Script queries too good. At all.
-        :return: ElasticSearch Bool() query object.
+        "filter" = "must" without scoring. Better for caching.
+        
+        This function is built for Bool() queries only.
         """
         musts = []
         must_nots = []
-        for parameter in self.supported_parameters:
 
-            raw_value = getattr(self, parameter, None)
+        for url_parameter in self.supported_parameters:
+
+            shoulds = []
+
+            raw_value = getattr(self, url_parameter, None)
             if not raw_value:
                 continue
+            
+            expected_value_type = self.query_parameters.get(url_parameter).get('url_parameter_type')
+            self._validate_query_parameter(parameter=url_parameter, value=raw_value, type_=expected_value_type)
 
-            expected_value_type = self.query_parameters[parameter].get('parameter_type')
+            fields = self.query_parameters.get(url_parameter).get('fields')
+
             if expected_value_type is list:
-                self._validate_query_parameter(parameter=parameter, value=raw_value, type_=list)
                 for value in raw_value:
-                    if self.query_parameters[parameter].get('invert'):
-                        must_nots.append(self.get_query_condition(parameter=parameter, value=value))
-                    else:
-                        musts.append(self.get_query_condition(parameter=parameter, value=value))
+                    for field in fields:
+                        shoulds.append(self.get_query_condition(url_parameter=url_parameter, field=field, value=value))
+            elif expected_value_type is str:
+                for field in fields:
+                    shoulds.append(self.get_query_condition(url_parameter=url_parameter, field=field, value=raw_value))
             else:
-                self._validate_query_parameter(parameter=parameter, value=raw_value, type_=expected_value_type)
-                if self.query_parameters[parameter].get('invert'):
-                    must_nots.append(self.get_query_condition(parameter=parameter, value=raw_value))
-                else:
-                    musts.append(self.get_query_condition(parameter=parameter, value=raw_value))
+                pass
 
-        Log.info("Search Conditions are %s" % musts)
+            if self.query_parameters.get(url_parameter).get('invert'):
+                must_nots.append(Bool(should=shoulds))
+            else:
+                musts.append(Bool(should=shoulds))
+
+        Log.info("Search Conditions are MUST=%s MUST_NOT=%s" % (musts, must_nots))
         return Bool(must=musts, must_not=must_nots)
 
     @staticmethod
