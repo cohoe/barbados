@@ -3,7 +3,6 @@ from elasticsearch_dsl.query import Bool, Wildcard, MatchPhrase, Prefix, Match
 from barbados.exceptions import ValidationException
 
 
-
 class SearchResults:
     """
     Standardized search response object. Provides the ElasticSearch document ID and
@@ -126,36 +125,70 @@ class SearchBase:
         
         This function is built for Bool() queries only.
         """
+        # These lists contain the AND'd queries for each url_parameter.
+        # They are AND because we query like "irish-whiskey AND stirred"
         musts = []
         must_nots = []
 
         for url_parameter in self.supported_parameters:
+            # Each parameter is something like "components" or "construction" and
+            # are keys defined in the barbados.search.whatever.WhateverSearch classes.
 
-            shoulds = []
+            # Should vs Must
+            # https://stackoverflow.com/questions/28768277/elasticsearch-difference-between-must-and-should-bool-query
+            # tldr: Should == OR, Must == AND
+            # For the purposes of multiple values per url_parameter, we have to use
+            # AND (ex: components=irish-whiskey,vermouth should yield irish-whiskey AND vermouth
+            # not irish-whiskey OR vermouth).
+            url_parameter_conditions = []
 
+            # Get the value for the url_parameter as passed in from the URL.
+            # Example: "components=irish-whiskey,vermouth" would mean a raw_value
+            # of ['irish-whiskey', 'vermouth']. Native data types apply as defined
+            # in the barbados.search.whatever.WhateverSearch class.
             raw_value = getattr(self, url_parameter, None)
             if not raw_value:
                 continue
-            
+
+            # Ensure that the value we got matches the expected data type.
             expected_value_type = self.query_parameters.get(url_parameter).get('url_parameter_type')
             self._validate_query_parameter(parameter=url_parameter, value=raw_value, type_=expected_value_type)
 
+            # These are the Elasticsearch document fields to search for
+            # the particular value(s) we were given. These are defined in the
+            # barbados.search.whatever.WhateverSearch class and are generally
+            # a list of fields in Elasticsearch syntax.
             fields = self.query_parameters.get(url_parameter).get('fields')
 
+            # When there are multiple values given in a url_parameter, we interpret
+            # this to mean each value should be present in expected fields.
+            # For example if we say "components=irish-whiskey,vermouth" it is
+            # expected that both "irish-whiskey" and "vermouth" are in the fields.
             if expected_value_type is list:
                 for value in raw_value:
-                    for field in fields:
-                        shoulds.append(self.get_query_condition(url_parameter=url_parameter, field=field, value=value))
+                    # There's a lot going on here...
+                    # Since we want the OR condition between fields (spec.components.slug || spec.components.parents)
+                    # we are using Should. If we specified multiple values, we want the AND condition
+                    # (rum && sherry). This builds a sub-query of Bool() for the former || situation
+                    # and adds it to the list of all conditions for this query for aggregation with
+                    # other url_parameters.
+                    field_conditions = Bool(should=[self.get_query_condition(url_parameter=url_parameter, field=field, value=value) for field in fields])
+                    url_parameter_conditions.append(field_conditions)
+
+            # Single-valued url_parameters are much easier to look for.
             elif expected_value_type is str:
                 for field in fields:
-                    shoulds.append(self.get_query_condition(url_parameter=url_parameter, field=field, value=raw_value))
+                    url_parameter_conditions.append(self.get_query_condition(url_parameter=url_parameter, field=field, value=raw_value))
             else:
-                pass
+                raise ValidationException("Unsupported url_parameter data type: %s" % expected_value_type)
 
+            # Some parameters are inverted, aka MUST NOT appear in the
+            # search results. This can be useful for say allergies or if you
+            # have a pathological hatred of anything pineapple.
             if self.query_parameters.get(url_parameter).get('invert'):
-                must_nots.append(Bool(should=shoulds))
+                must_nots.append(Bool(must=url_parameter_conditions))
             else:
-                musts.append(Bool(should=shoulds))
+                musts.append(Bool(must=url_parameter_conditions))
 
         Log.info("Search Conditions are MUST=%s MUST_NOT=%s" % (musts, must_nots))
         return Bool(must=musts, must_not=must_nots)
