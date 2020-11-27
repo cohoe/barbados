@@ -5,8 +5,23 @@ from barbados.services.cache import Cache
 from barbados.services.registry import Registry
 from barbados.services.logging import Log
 from barbados.objects.ingredienttree import IngredientTree
+from barbados.objects.bibliography import Bibliography
 from barbados.serializers import ObjectSerializer
 from barbados.factories import CocktailFactory, IngredientFactory, MenuFactory
+
+
+class CacheFactory:
+    def __init__(self):
+        self._keys = {}
+
+    def register_cache(self, cache):
+        self._keys[cache.cache_key] = cache
+
+    def cache_keys(self):
+        return self._keys.keys()
+
+    def get_cache(self, key):
+        return self._keys.get(key)
 
 
 class CacheBase:
@@ -119,3 +134,23 @@ class IngredientTreeCache(CacheBase):
             Log.warning("Attempted to retrieve '%s' but it was empty. Repopulating..." % cls.cache_key)
             cls.populate()
             return pickle.loads(Cache.get(cls.cache_key))
+
+
+class RecipeBibliographyCache(CacheBase):
+    """
+    Cache a list of all Citations.
+    """
+    cache_key = 'recipe_bibliography_cache'
+
+    @classmethod
+    def populate(cls):
+        serialized_citations = [ObjectSerializer.serialize(citation, 'dict') for citation in Bibliography().citations]
+        Cache.set(cls.cache_key, json.dumps(serialized_citations))
+
+
+cache_factory = CacheFactory()
+cache_factory.register_cache(CocktailScanCache)
+cache_factory.register_cache(IngredientScanCache)
+cache_factory.register_cache(MenuScanCache)
+cache_factory.register_cache(IngredientTreeCache)
+cache_factory.register_cache(RecipeBibliographyCache)
