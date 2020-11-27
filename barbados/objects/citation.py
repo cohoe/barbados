@@ -30,13 +30,8 @@ class Citation:
 
         location = self.location + ': ' if hasattr(self, 'location') else ''
         publisher = self.publisher + ', ' if hasattr(self, 'publisher') else ''
-        if hasattr(self, 'date'):
-            if isinstance(self.date, int):
-                date = str(self.date)
-            else:
-                date = self.date.strftime('%Y')
-
-            date += ', '
+        if self.date:
+            date = "%i, " % self.date
         else:
             date = ''
         page = 'pp. ' + str(self.page) if hasattr(self, 'page') else ''
@@ -53,10 +48,7 @@ class Citation:
         serializer.add_property('notes', [ObjectSerializer.serialize(note, serializer.format) for note in self.notes])
         serializer.add_property('title', self.title, even_if_empty=False)
         serializer.add_property('author', self.author, even_if_empty=False)
-        if self.date:
-            serializer.add_property('date', self.date.isoformat())
-        else:
-            serializer.add_property('date', self.date, even_if_empty=False)
+        serializer.add_property('date', self.date, even_if_empty=False)
         serializer.add_property('publisher', self.publisher, even_if_empty=False)
         serializer.add_property('page', self.page, even_if_empty=False)
         serializer.add_property('href', self.href, even_if_empty=False)

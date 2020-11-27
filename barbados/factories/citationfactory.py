@@ -18,26 +18,30 @@ class CitationFactory:
                 notes.append(Text(**note))
             del(raw_citation['notes'])
 
+        # Frak the specific date, just go with year. Not all books make the
+        # full publishing date easily available.
         if 'date' in raw_citation.keys():
             raw_date = raw_citation['date']
             del(raw_citation['date'])
 
-            if type(raw_date) != Date:
-                try:
-                    # @TODO de-sketchify this.
-                    # raw_date is not a Date() when it comes from YAML but
-                    # is a Str() when it comes from database or other sources.
-                    # There is a way of disabling the auto-casting in the yaml
-                    # loader, it may be a good idea to revisit that.
-                    raw_date = Date(*[int(i) for i in raw_date.split('-')])
-                except Exception as e:
-                    print(e)
-                    raise ValidationException("Date is invalid '%s'" % raw_date)
+            # raw_date is not a Date() when it comes from YAML but
+            # is a Str() when it comes from database or other sources.
+            # There is a way of disabling the auto-casting in the yaml
+            # loader, it may be a good idea to revisit that.
+
+            if type(raw_date) is Date:
+                new_date = raw_date.year
+            elif type(raw_date) is str:
+                new_date = Date(*[int(i) for i in raw_date.split('-')]).year
+            elif type(raw_date) is int:
+                new_date = raw_date
+            else:
+                raise ValidationException("Date is invalid '%s'" % raw_date)
         else:
-            raw_date = None
+            new_date = None
 
-        c_obj = Citation(notes=notes, date=raw_date, **raw_citation)
-
+        # Build and return the Citation object
+        c_obj = Citation(notes=notes, date=new_date, **raw_citation)
         return c_obj
 
     @staticmethod
