@@ -1,6 +1,7 @@
 from barbados.objects.citation import Citation
 from barbados.text import Text
 from datetime import date as Date
+from barbados.exceptions import ValidationException
 
 
 class CitationFactory:
@@ -31,7 +32,7 @@ class CitationFactory:
                     raw_date = Date(*[int(i) for i in raw_date.split('-')])
                 except Exception as e:
                     print(e)
-                    raise Exception("Date is invalid '%s'" % raw_date)
+                    raise ValidationException("Date is invalid '%s'" % raw_date)
         else:
             raw_date = None
 
