@@ -1,6 +1,7 @@
 from barbados.search import SearchBase
-from elasticsearch_dsl.query import MultiMatch, Match, MatchPhrase
+from elasticsearch_dsl.query import MatchPhrase, Wildcard
 from barbados.indexes import MenuIndex
+from barbados.search.occurrences import ShouldOccurrence
 
 
 class MenuSearch(SearchBase):
@@ -10,5 +11,9 @@ class MenuSearch(SearchBase):
         self.add_query_parameter(url_parameter='cocktail_slug',
                                  query_class=MatchPhrase,
                                  query_key='query',
-                                 # type='phrase_prefix',
                                  fields=['items.cocktail_slug'])
+
+        self.add_query_parameter(url_parameter='name',
+                                 query_class=Wildcard,
+                                 occurrence=ShouldOccurrence,
+                                 fields=['slug', 'display_name'])

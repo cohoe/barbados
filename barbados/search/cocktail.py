@@ -1,6 +1,7 @@
 from barbados.search import SearchBase
 from elasticsearch_dsl.query import MatchPhrase, Wildcard, Prefix, Match
 from barbados.indexes import RecipeIndex
+from barbados.search.occurrences import ShouldOccurrence
 
 
 class CocktailSearch(SearchBase):
@@ -13,8 +14,8 @@ class CocktailSearch(SearchBase):
                                  fields=['spec.components.slug', 'spec.components.parents'])
         self.add_query_parameter(url_parameter='name',
                                  query_class=Wildcard,
-                                 type='phrase_prefix',
-                                 fields=['spec.name', 'display_name'])
+                                 occurrence=ShouldOccurrence,
+                                 fields=['spec.slug', 'spec.display_name', 'display_name', 'slug'])
         self.add_query_parameter(url_parameter='alpha',
                                  query_class=Prefix,
                                  fields=['alpha'])

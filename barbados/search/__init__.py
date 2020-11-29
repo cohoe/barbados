@@ -1,6 +1,7 @@
 from barbados.services.logging import Log
 from elasticsearch_dsl.query import Bool, Wildcard, MatchPhrase, Prefix, Match
 from barbados.exceptions import ValidationException
+from barbados.search.occurrences import occurrence_factory, MustOccurrence
 
 
 class SearchResults:
@@ -73,23 +74,34 @@ class SearchBase:
         Log.info("Got %s results." % results.hits.total.value)
         return SearchResults(hits=results)
 
-    def add_query_parameter(self, url_parameter, query_class, fields, url_parameter_type=str, invert=False, **attributes):
+    def add_query_parameter(self, url_parameter, query_class, fields, url_parameter_type=str,
+                            invert=False, occurrence=MustOccurrence, **attributes):
         """
         Define a queriable parameter for this search index.
         :param url_parameter: URL/input parameter to key from.
         :param url_parameter_type: Python type class of this parameter from the URL.
+        :param invert: Turn this from Must to MustNot at the overall level.
+        :param occurrence: Occurrence object.
         :param query_class: ElasticSearch DSL query class.
-        :param invert: Turn this from Must to MustNot
         :param attributes: Dictionary of extra params to pass to the query_class consturctor
         :return: None
         """
+
+        # Ensure that we were given a proper occurrence.
+        try:
+            occurrence_factory.get_occurrence(occurrence.occur)
+        except Exception as e:
+            raise ValidationException("Invalid occurrence: %s" % e)
+
+        # Setup the settings for this URL parameter.
         self.query_parameters[url_parameter] = {
             'url_parameter': url_parameter,
             'url_parameter_type': url_parameter_type,
             'query_class': query_class,
             'attributes': attributes,
-            'invert': invert,
-            'fields': fields
+            'fields': fields,
+            'occurrence': occurrence,
+            'invert': invert
         }
 
     def get_query_condition(self, url_parameter, field, value):
@@ -105,7 +117,7 @@ class SearchBase:
         #   'fields': ['foo', 'bar', 'baz'],
         # }
         # Attributes is the leftover **kwargs from the original function call.
-        #query_class_parameters = {**{settings.get('query_key'): value}, **settings.get('attributes')}
+        # query_class_parameters = {**{settings.get('query_key'): value}, **settings.get('attributes')}
 
         if settings.get('query_class') is Wildcard:
             search_value = "*%s*" % value
@@ -172,7 +184,8 @@ class SearchBase:
                     # (rum && sherry). This builds a sub-query of Bool() for the former || situation
                     # and adds it to the list of all conditions for this query for aggregation with
                     # other url_parameters.
-                    field_conditions = Bool(should=[self.get_query_condition(url_parameter=url_parameter, field=field, value=value) for field in fields])
+                    field_conditions = Bool(
+                        should=[self.get_query_condition(url_parameter=url_parameter, field=field, value=value) for field in fields])
                     url_parameter_conditions.append(field_conditions)
 
             # Single-valued url_parameters are much easier to look for.
@@ -182,16 +195,25 @@ class SearchBase:
             else:
                 raise ValidationException("Unsupported url_parameter data type: %s" % expected_value_type)
 
+            # The occurrence is used to determine which method to use for
+            # searching the index for this particular condition. There are
+            # times when we want Should (OR) like matching slugs and display_names,
+            # others that we want Must (AND) like matching `rum && sherry`.
+            occurrence = self.query_parameters.get(url_parameter).get('occurrence')
+            url_parameter_query = Bool(**{occurrence.occur: url_parameter_conditions})
+
             # Some parameters are inverted, aka MUST NOT appear in the
             # search results. This can be useful for say allergies or if you
             # have a pathological hatred of anything pineapple.
             if self.query_parameters.get(url_parameter).get('invert'):
-                must_nots.append(Bool(must=url_parameter_conditions))
+                must_nots.append(url_parameter_query)
             else:
-                musts.append(Bool(must=url_parameter_conditions))
+                musts.append(url_parameter_query)
 
-        Log.info("Search Conditions are MUST=%s MUST_NOT=%s" % (musts, must_nots))
-        return Bool(must=musts, must_not=must_nots)
+        # Build the overall query.
+        query = Bool(must=musts, must_not=must_nots)
+        Log.info("Search Conditions are %s" % query)
+        return query
 
     @staticmethod
     def _validate_query_parameter(parameter, value, type_):
