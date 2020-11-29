@@ -7,7 +7,6 @@ from barbados.services.registry import Registry
 
 
 class IngredientTree:
-
     root_node = 'ingredients'
 
     def __init__(self, passes=5):
@@ -96,14 +95,14 @@ class IngredientTree:
         children = node.fpointer
         siblings = parent.fpointer
         siblings.remove(node.identifier)
-        elements = node.data['elements']
 
         return ({
             'self': node.identifier,
             'parent': parent.identifier,
             'parents': parents,
-            'children': children + elements,
+            'children': children + node.data.get('elements'),
             'siblings': siblings,
+            'kind': node.data.get('kind')
         })
 
     def parents(self, node_id):
