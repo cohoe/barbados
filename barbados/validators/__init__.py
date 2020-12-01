@@ -1,6 +1,7 @@
 from .cocktailmodelvalidator import CocktailModelValidator
 from .ingredientmodelvalidator import IngredientModelValidator
 from .menumodelvalidator import MenuModelValidator
+from .inventorymodelvalidator import InventoryModelValidator
 
 
 class ValidatorFactory:
@@ -16,15 +17,15 @@ class ValidatorFactory:
         class_name = validatable.__class__
         validator = self._validators.get(class_name)
         if not validator:
-            raise ValueError(class_name)
+            raise ValueError("No validator found for %s." % class_name)
         return validator(validatable, fatal)
 
 
-# @TODO can these go back to their individual classes?
 validator_factory = ValidatorFactory()
 validator_factory.register_class(CocktailModelValidator)
 validator_factory.register_class(IngredientModelValidator)
 validator_factory.register_class(MenuModelValidator)
+validator_factory.register_class(InventoryModelValidator)
 
 
 class ObjectValidator:
@@ -33,5 +34,13 @@ class ObjectValidator:
     """
     @staticmethod
     def validate(input_object, session, fatal=True):
+        """
+        This provides a generic method to call with any object and magically
+        find its validator and run the validate() method.
+        :param input_object: Object to validate.
+        :param session: Database session.
+        :param fatal: Whether validation should trigger a fatal exception or not.
+        :return: None
+        """
         validator = validator_factory.get_validator(input_object, fatal)
         validator.validate(session)

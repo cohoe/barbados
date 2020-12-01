@@ -10,6 +10,7 @@ from barbados.objects.image import Image
 from barbados.text import Slug
 
 
+# @TODO this needs to standardize into modern constructs!
 class CocktailFactory(BaseFactory):
     def __init__(self):
         pass

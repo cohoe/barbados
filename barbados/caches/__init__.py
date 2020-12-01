@@ -1,13 +1,13 @@
 import json
 import pickle
-from barbados.models import IngredientModel, CocktailModel, MenuModel
+from barbados.models import IngredientModel, CocktailModel, MenuModel, InventoryModel
 from barbados.services.cache import Cache
 from barbados.services.registry import Registry
 from barbados.services.logging import Log
 from barbados.objects.ingredienttree import IngredientTree
 from barbados.objects.bibliography import Bibliography
 from barbados.serializers import ObjectSerializer
-from barbados.factories import CocktailFactory, IngredientFactory, MenuFactory
+from barbados.factories import CocktailFactory, IngredientFactory, MenuFactory, InventoryFactory
 
 
 class CacheFactory:
@@ -114,6 +114,11 @@ class MenuScanCache(TableScanCache):
     model_class = MenuModel
     factory_class = MenuFactory
 
+class InventoryScanCache(TableScanCache):
+    cache_key = 'inventory_scan_cache'
+    model_class = InventoryModel
+    factory_class = InventoryFactory
+
 
 class IngredientTreeCache(CacheBase):
     """
@@ -154,3 +159,4 @@ cache_factory.register_cache(IngredientScanCache)
 cache_factory.register_cache(MenuScanCache)
 cache_factory.register_cache(IngredientTreeCache)
 cache_factory.register_cache(RecipeBibliographyCache)
+cache_factory.register_cache(InventoryScanCache)
