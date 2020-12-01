@@ -6,6 +6,7 @@ class IngredientKinds(object):
     top = None
     index = None
     usables = []
+    implicits = []
 
     # Apparently __call__() didn't work?
     # https://stackoverflow.com/questions/34777773/typeerror-object-takes-no-parameters-after-defining-new
@@ -21,6 +22,8 @@ class IngredientKinds(object):
             cls.usables.append(kind_class)
         if kind_class.index:
             cls.index = kind_class
+        if kind_class.implicit:
+            cls.implicits.append(kind_class)
 
 
 class Kind(object):
@@ -36,6 +39,10 @@ class Kind(object):
     # as a way to provide alternative collections of ingredients.
     index = False
 
+    # Implicit means that this kind of ingredient qualifies as "implicitly
+    # available" if you have one of its children.
+    implicit = True
+
 
 class CategoryKind(Kind):
     """
@@ -49,6 +56,7 @@ class CategoryKind(Kind):
     value = 'category'
     allowed_parents = [None]
     top = True
+    implicit = False
 
 
 class FamilyKind(Kind):
@@ -63,6 +71,7 @@ class FamilyKind(Kind):
     value = 'family'
     allowed_parents = [CategoryKind.value]
     usable = True
+    implicit = False
 
 
 class IngredientKind(Kind):

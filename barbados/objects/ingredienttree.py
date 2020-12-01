@@ -1,7 +1,7 @@
 from treelib import Node, Tree
 from treelib.exceptions import NodeIDAbsentError
 from barbados.models import IngredientModel
-from barbados.objects.ingredientkinds import CategoryKind, FamilyKind
+from barbados.objects.ingredientkinds import IngredientKinds, CategoryKind, FamilyKind
 from barbados.services.logging import Log
 from barbados.services.registry import Registry
 
@@ -63,6 +63,11 @@ class IngredientTree:
             raise KeyError("%s has no parent." % node_id)
 
     def node(self, node_id):
+        """
+        Get a single node from the tree by tag (id, aka slug).
+        :param node_id: ID to get.
+        :return: The node object.
+        """
         node = self.tree.get_node(node_id)
         if not node:
             raise KeyError("Node %s could not be found." % node_id)
@@ -106,6 +111,11 @@ class IngredientTree:
         })
 
     def parents(self, node_id):
+        """
+        Return a list of all parent nodes of this node going up to the root.
+        :param node_id: ID of the node to investigate.
+        :return: List of node tags.
+        """
         parents = []
 
         node = self.node(node_id)
@@ -123,3 +133,35 @@ class IngredientTree:
             'aliases': item.aliases,
             'elements': item.elements,
         })
+
+    def implies(self, node_id):
+        """
+        Return a list of all ingredients that this node implies.
+        This is done by looking at all parent ingredients up
+        to the family.
+        Examples:
+          * the-dead-rabbit-irish-whiskey -> [irish-whiskey]
+          * el-dorado-12-year-rum -> [aged-blended-rum, aged-rum, rum]
+        :param node_id: ID of the node to investigate.
+        :return: List of node tags (slugs).
+        """
+        parents = self.parents(node_id)
+        Log.info("All parents of %s are: %s" % (node_id, parents))
+
+        # Figure out which IngredientKinds we allow for implicit substitution.
+        implicit_kind_values = [kind.value for kind in IngredientKinds.implicits]
+        Log.info("Allowed implicit kinds are: %s" % implicit_kind_values)
+
+        # Create a list of allowed parents based on whether the parent is
+        # of an approved type.
+        allowed_parents = []
+        for parent in parents:
+            parent_node = self.node(node_id=parent)
+            parent_kind = parent_node.data.get('kind')
+            Log.info("Kind of parent %s is %s" % (parent, parent_kind))
+
+            if parent_kind in implicit_kind_values:
+                allowed_parents.append(parent)
+
+        Log.info("Allowed implicit parents for %s are: %s" % (node_id, allowed_parents))
+        return allowed_parents
