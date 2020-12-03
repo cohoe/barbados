@@ -18,6 +18,9 @@ class IndexerFactory:
             raise ValueError(class_name)
         return indexer
 
+    def get_indexes(self):
+        return self._indexers
+
 
 indexer_factory = IndexerFactory()
 indexer_factory.register_class(RecipeIndexer)
