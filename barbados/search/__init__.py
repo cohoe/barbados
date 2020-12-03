@@ -69,6 +69,7 @@ class SearchBase:
         Actually talk to ElasticSearch and run the query.
         :param sort: ElasticSearch attribute on which to sort the results.
         :return: SearchResults child class.
+        # @TODO address the search range hacks here.
         """
         results = self.index_class.search()[0:1000].query(self.q).sort(sort).execute()
         Log.info("Got %s results." % results.hits.total.value)

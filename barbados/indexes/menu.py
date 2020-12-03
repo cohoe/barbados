@@ -1,5 +1,5 @@
 from elasticsearch_dsl import Document, Text, InnerDoc, Object
-from .base import BaseIndex
+from .base import BaseIndex, BarbadosIndex
 
 
 class MenuItemIndex(InnerDoc):
@@ -7,7 +7,7 @@ class MenuItemIndex(InnerDoc):
     spec_slug = Text()
 
 
-class MenuIndex(Document):
+class MenuIndex(Document, BarbadosIndex):
     slug = Text()
     display_name = Text()
     items = Object(MenuItemIndex, multi=True)

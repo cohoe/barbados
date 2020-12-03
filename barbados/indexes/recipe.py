@@ -1,5 +1,5 @@
 from elasticsearch_dsl import Document, InnerDoc, Text, Integer, Object, Keyword
-from .base import BaseIndex
+from .base import BaseIndex, BarbadosIndex
 
 # https://github.com/elastic/elasticsearch-dsl-py/blob/master/examples/parent_child.py
 # https://github.com/elastic/elasticsearch-dsl-py/issues/637
@@ -28,7 +28,7 @@ class SpecIndex(InnerDoc):
     components = Object(ComponentIndex)
 
 
-class RecipeIndex(Document):
+class RecipeIndex(Document, BarbadosIndex):
     slug = Text()
     # The whitespace analyzer is needed because alpha can contain '#' which indicates a number
     # and we want to search on that character.
