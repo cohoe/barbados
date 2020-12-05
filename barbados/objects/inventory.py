@@ -10,6 +10,7 @@ class Inventory:
         self.display_name = display_name
         self.items = items
         self.implicit_items = []
+        self.slug = id # Backwards Compatibility. This is not in the serializer.
 
     def __repr__(self):
         return "Barbados::Objects::Inventory[%s]" % self.id

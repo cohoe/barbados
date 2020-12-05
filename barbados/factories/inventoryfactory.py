@@ -5,9 +5,11 @@ from barbados.objects.inventoryitem import InventoryItem
 from barbados.exceptions import ValidationException
 from barbados.services.logging import Log
 from uuid import uuid4
+from barbados.models.inventorymodel import InventoryModel
 
 
 class InventoryFactory(BaseFactory):
+    _model = InventoryModel
 
     required_keys = {
         'id': uuid4(),
