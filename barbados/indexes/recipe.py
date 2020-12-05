@@ -1,5 +1,7 @@
 from elasticsearch_dsl import Document, InnerDoc, Text, Integer, Object, Keyword
 from .base import BaseIndex, BarbadosIndex
+from barbados.objects.cocktail import Cocktail
+
 
 # https://github.com/elastic/elasticsearch-dsl-py/blob/master/examples/parent_child.py
 # https://github.com/elastic/elasticsearch-dsl-py/issues/637

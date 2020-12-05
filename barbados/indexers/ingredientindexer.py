@@ -9,15 +9,17 @@ from elasticsearch.exceptions import NotFoundError
 class IngredientIndexer(BaseIndexer):
 
     for_class = Ingredient
+    for_index = IngredientIndex
+    factory = IngredientFactory
 
-    @staticmethod
-    def index(ingredient_object):
-        index = IngredientFactory.obj_to_index(ingredient_object, IngredientIndex)
+    @classmethod
+    def index(cls, ingredient_object):
+        index = IngredientFactory.obj_to_index(ingredient_object, cls.for_index)
         index.save()
 
-    @staticmethod
-    def delete(ingredient_object):
-        index = IngredientFactory.obj_to_index(ingredient_object, IngredientIndex)
+    @classmethod
+    def delete(cls, ingredient_object):
+        index = IngredientFactory.obj_to_index(ingredient_object, cls.for_index)
         try:
             IngredientIndex.delete(index)
         except NotFoundError:

@@ -3,6 +3,11 @@ from barbados.serializers import ObjectSerializer
 
 
 class BaseFactory:
+
+    @property
+    def _model(self):
+        raise NotImplementedError()
+
     @staticmethod
     def obj_to_index(obj, index_class, format='dict'):
         """
@@ -64,3 +69,33 @@ class BaseFactory:
                     raw_input[key] = required_keys[key]
 
         return raw_input
+
+    @classmethod
+    def produce_obj(cls, session, slug):
+        """
+        Produce an appropriate object from the factory.
+        :param session: Database Session context.
+        :param slug: String of the slug to look up.
+        :return: Object from the Model.
+        """
+        result = session.query(cls._model).get(slug)
+        if not result:
+            raise KeyError('Not found')
+        obj = cls.model_to_obj(result)
+        return obj
+
+    @classmethod
+    def produce_all_objs(cls, session):
+        """
+        Produce a list of appropriate objects from this factory.
+        :param session: Database Session context.
+        :return:
+        """
+        results = session.query(cls._model).all()
+
+        objects = []
+        for result in results:
+            obj = cls.model_to_obj(result)
+            objects.append(obj)
+
+        return objects

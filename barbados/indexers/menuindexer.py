@@ -7,6 +7,8 @@ from barbados.objects.menu import Menu
 class MenuIndexer(BaseIndexer):
 
     for_class = Menu
+    for_index = MenuIndex
+    factory = MenuFactory
 
     @staticmethod
     def index(menu_object):

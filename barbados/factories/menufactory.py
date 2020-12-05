@@ -2,9 +2,12 @@ from barbados.factories.base import BaseFactory
 from barbados.text import DisplayName
 from barbados.objects.menu import Menu
 from barbados.objects.menuitem import MenuItem
+from barbados.models.menumodel import MenuModel
 
 
 class MenuFactory(BaseFactory):
+    _model = MenuModel
+
     @staticmethod
     def model_to_obj(model):
         if model is None:

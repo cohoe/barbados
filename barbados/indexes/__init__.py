@@ -29,7 +29,7 @@ class IndexFactory:
         """
         index = self._indexes.get(name)
         if not index:
-            raise ValueError(index)
+            raise ValueError("Index '%s' not found." % name)
         return index
 
     def init(self):

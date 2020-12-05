@@ -8,12 +8,12 @@ from .base import BaseFactory
 import copy
 from barbados.objects.image import Image
 from barbados.text import Slug
+from barbados.models.cocktailmodel import CocktailModel
 
 
 # @TODO this needs to standardize into modern constructs!
 class CocktailFactory(BaseFactory):
-    def __init__(self):
-        pass
+    _model = CocktailModel
 
     @staticmethod
     def raw_to_obj(raw_recipe, slug):

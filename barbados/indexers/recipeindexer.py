@@ -9,6 +9,8 @@ from barbados.services.logging import Log
 class RecipeIndexer(BaseIndexer):
 
     for_class = Cocktail
+    for_index = RecipeIndex
+    factory = CocktailFactory
 
     @staticmethod
     def index(cocktail_object):

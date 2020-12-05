@@ -88,9 +88,12 @@ class TableScanCache(CacheBase):
         pgconn = Registry.get_database_connection()
         cache_objects = []
         with pgconn.get_session() as session:
-            results = session.query(cls.model_class).all()
-            for result in results:
-                result_object = cls.factory_class.model_to_obj(model=result)
+            # results = session.query(cls.model_class).all()
+            # for result in results:
+            #     result_object = cls.factory_class.model_to_obj(model=result)
+            #     cache_objects.append(ObjectSerializer.serialize(result_object, 'dict'))
+            objects = cls.factory_class.produce_all_objs(session=session)
+            for result_object in objects:
                 cache_objects.append(ObjectSerializer.serialize(result_object, 'dict'))
 
         Cache.set(cls.cache_key, json.dumps(cache_objects))
