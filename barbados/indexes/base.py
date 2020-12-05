@@ -40,6 +40,9 @@ class BarbadosIndex:
         counter = 0
 
         # Iterate through the hits and delete them.
+        # I wish there was a better way that didn't involve one
+        # request per document, but other than dropping the index and
+        # rebuilding it, I don't think I have a choice.
         for hit in hits:
             hit.delete()
             counter += 1

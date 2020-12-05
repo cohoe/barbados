@@ -23,7 +23,7 @@ class BaseIndexer:
         :return: Number of objects indexed.
         """
         # Delete all data in the index.
-        cls.for_index.delete_all()
+        cls.empty()
 
         # Re-populate the index based on the data from the database.
         objects = cls.factory.produce_all_objs(session=session)
@@ -31,3 +31,11 @@ class BaseIndexer:
             cls.index(obj)
 
         return len(objects)
+
+    @classmethod
+    def empty(cls):
+        """
+        Delete all records within an index.
+        :return: None
+        """
+        cls.for_index.delete_all()

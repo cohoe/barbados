@@ -1,9 +1,12 @@
 import copy
 from barbados.serializers import ObjectSerializer
+from barbados.validators import ObjectValidator
 
 
 class BaseFactory:
 
+    # @TODO I'm pretty sure this isn't manifesting how I expected it to.
+    # It still shits an error so that's good.
     @property
     def _model(self):
         raise NotImplementedError()
@@ -71,14 +74,14 @@ class BaseFactory:
         return raw_input
 
     @classmethod
-    def produce_obj(cls, session, slug):
+    def produce_obj(cls, session, **kwargs):
         """
         Produce an appropriate object from the factory.
         :param session: Database Session context.
-        :param slug: String of the slug to look up.
+        :param kwargs: ID parameters of the record to lookup
         :return: Object from the Model.
         """
-        result = session.query(cls._model).get(slug)
+        result = session.query(cls._model).get(**kwargs)
         if not result:
             raise KeyError('Not found')
         obj = cls.model_to_obj(result)
@@ -99,3 +102,45 @@ class BaseFactory:
             objects.append(obj)
 
         return objects
+
+    @classmethod
+    def store_obj(cls, session, obj):
+        """
+        Store an object in the database.
+        :param session: Database Session context.
+        :param obj: The object to store.
+        :return: Model corresponding to the object.
+        """
+        model = cls._model(**ObjectSerializer.serialize(obj, 'dict'))
+
+        # Validate it.
+        ObjectValidator.validate(model, session=session)
+
+        # Save it to the database.
+        session.add(model)
+        session.commit()
+
+        # I'm not sure if it's gonna be useful to return the model,
+        # but I'll make it available just in case.
+        return model
+
+    @classmethod
+    def delete_obj(cls, session, obj, commit=True):
+        """
+        Delete an object from the datbase.
+        :param session: Database Session context.
+        :param obj: The object to delete.
+        :param commit: Whether to commit this transaction now or deal with it yourself. Useful for batches.
+        :return: Model corresponding to the object that was deleted.
+        """
+        model = session.query(cls._model).get(obj.slug)
+
+        if not model:
+            raise KeyError("Model for %s not found" % obj.slug)
+
+        # Delete it from the database.
+        session.delete(model)
+        if commit:
+            session.commit()
+
+        return model
