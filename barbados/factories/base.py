@@ -74,14 +74,15 @@ class BaseFactory:
         return raw_input
 
     @classmethod
-    def produce_obj(cls, session, **kwargs):
+    def produce_obj(cls, session, id):
         """
         Produce an appropriate object from the factory.
         :param session: Database Session context.
-        :param kwargs: ID parameters of the record to lookup
+        :param id: ID parameter of the record to lookup
         :return: Object from the Model.
         """
-        result = session.query(cls._model).get(**kwargs)
+        # @TODO make this support multiple conditions to .get()
+        result = session.query(cls._model).get(id)
         if not result:
             raise KeyError('Not found')
         obj = cls.model_to_obj(result)
