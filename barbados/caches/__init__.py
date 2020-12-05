@@ -18,10 +18,19 @@ class CacheFactory:
         self._keys[cache.cache_key] = cache
 
     def cache_keys(self):
-        return self._keys.keys()
+        return list(self._keys.keys())
 
     def get_cache(self, key):
-        return self._keys.get(key)
+        """
+        Return the Cache class matching a particular key.
+        :param key: string of the redis cache key.
+        :raises KeyError: The key was not found.
+        :return: CacheBase child object.
+        """
+        cache = self._keys.get(key)
+        if cache is None:
+            raise KeyError("Cache '%s' not found." % key)
+        return cache
 
 
 class CacheBase:
