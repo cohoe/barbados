@@ -33,7 +33,7 @@ class InventoryFactory(BaseFactory):
         value_key = 'display_name'
         old_value = raw_input.get(value_key)
 
-        Log.info("Old value for %s is %s" % (value_key, old_value))
+        # Log.info("Old value for %s is %s" % (value_key, old_value))
         if not raw_input:
             new_value = DisplayName('Unnamed Inventory')
         elif type(old_value) is str:
@@ -41,7 +41,7 @@ class InventoryFactory(BaseFactory):
         else:
             raise ValidationException("Bad display name given for inventory (%s)" % old_value)
 
-        Log.info("New value for %s is %s" % (value_key, new_value))
+        # Log.info("New value for %s is %s" % (value_key, new_value))
         raw_input.update({value_key: new_value})
         return raw_input
 
@@ -50,12 +50,12 @@ class InventoryFactory(BaseFactory):
         value_key = 'items'
         old_value = raw_input.get(value_key)
 
-        Log.info("Old value for %s is %s" % (value_key, old_value))
+        # Log.info("Old value for %s is %s" % (value_key, old_value))
         new_value = []
         for raw_item in raw_input.get(value_key):
             ii = InventoryItem(**raw_item)
             new_value.append(ii)
 
-        Log.info("New value for %s is %s" % (value_key, new_value))
+        # Log.info("New value for %s is %s" % (value_key, new_value))
         raw_input.update({value_key: new_value})
         return raw_input

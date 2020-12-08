@@ -125,6 +125,30 @@ class IngredientTree:
 
         return parents
 
+    def children(self, node_id, extended=False):
+        """
+        Return a list of all children nodes of this node.
+        :param node_id: ID of the node to investigate.
+        :param extended: Include more than just the direct decendents of this node (ie, all)
+        :return: List of node tags.
+        """
+        if extended:
+            # Subtree returns all nodes including this one.
+            # We need to remove ourselves so we're not our own
+            # child and then grab the Node() objects from the hash
+            # that the subtree call gave us. Also because Python3
+            # we have to turn the dict_values() object into a list
+            # so that other things don't barf.
+            subtree = self.subtree(node_id).nodes
+            subtree.pop(node_id, None)
+            children = [node.tag for node in list(subtree.values())]
+        else:
+            # Single-generation children are much easier to deal with.
+            # #GeneologyGeoke
+            children = [node.tag for node in self.tree.children(node_id)]
+
+        return children
+
     @staticmethod
     def _create_tree_data(item):
         return ({
@@ -145,23 +169,25 @@ class IngredientTree:
         :param node_id: ID of the node to investigate.
         :return: List of node tags (slugs).
         """
-        parents = self.parents(node_id)
-        Log.info("All parents of %s are: %s" % (node_id, parents))
+        implied_nodes = self.parents(node_id)  # + self.children(node_id, extended=True)
+        # print(node_id) if 'gin' in node_id else None
+        # print(implied_nodes) if 'gin' in node_id else None
+        # Log.info("All parents of %s are: %s" % (node_id, parents))
 
         # Figure out which IngredientKinds we allow for implicit substitution.
         implicit_kind_values = [kind.value for kind in IngredientKinds.implicits]
-        Log.info("Allowed implicit kinds are: %s" % implicit_kind_values)
+        # Log.info("Allowed implicit kinds are: %s" % implicit_kind_values)
 
         # Create a list of allowed parents based on whether the parent is
         # of an approved type.
-        allowed_parents = []
-        for parent in parents:
-            parent_node = self.node(node_id=parent)
-            parent_kind = parent_node.data.get('kind')
-            Log.info("Kind of parent %s is %s" % (parent, parent_kind))
+        allowed_implicit_nodes = []
+        for node_id in implied_nodes:
+            implied_node = self.node(node_id=node_id)
+            implied_node_kind = implied_node.data.get('kind')
+            # Log.info("Kind of parent %s is %s" % (parent, parent_kind))
 
-            if parent_kind in implicit_kind_values:
-                allowed_parents.append(parent)
+            if implied_node_kind in implicit_kind_values:
+                allowed_implicit_nodes.append(node_id)
 
-        Log.info("Allowed implicit parents for %s are: %s" % (node_id, allowed_parents))
-        return allowed_parents
+        # Log.info("Allowed implicit parents for %s are: %s" % (node_id, allowed_parents))
+        return allowed_implicit_nodes
