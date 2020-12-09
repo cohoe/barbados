@@ -162,7 +162,9 @@ class IngredientTree:
         """
         Return a list of all ingredients that this node implies.
         This is done by looking at all parent ingredients up
-        to the family.
+        to the family. Because this goes up the tree in order,
+        we can safely assume that the returned list is ordered
+        most to least specific.
         Examples:
           * the-dead-rabbit-irish-whiskey -> [irish-whiskey]
           * el-dorado-12-year-rum -> [aged-blended-rum, aged-rum, rum]

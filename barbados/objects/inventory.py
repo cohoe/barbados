@@ -27,21 +27,25 @@ class Inventory:
         for item in self.items:
             implicit_items = tree.implies(item.slug)
             # Log.info("Implicit items for %s are: %s" % (item, implicit_items))
-            [full_items.append(InventoryItem(implicit_item)) for implicit_item in implicit_items]
+            [full_items.append(InventoryItem(slug=implicit_item, implied_by=item.slug)) for implicit_item in implicit_items]
 
         self.implicit_items = full_items
 
     def contains(self, ingredient, implicit=False):
         """
         Determine if a particular ingredient is in this inventory.
+        Can't go and recommend something you have explicitly because there
+        could be multiple things. Example: implcitly having maraschino-liqueur
+        could be true if you have maraska or luxardo. This function shouldn't
+        recommend both. Use another endpoint for that.
         :param ingredient: slug of the ingredient to look for.
         :param implicit: Search the implicit list instead (must be populated first).
-        :return: Boolean
+        :return: Slug of the providing ingredient, otherwise False
         """
         if ingredient in [item.slug for item in self.items]:
-            return True
+            return ingredient
 
         if implicit and ingredient in [item.slug for item in self.implicit_items]:
-            return True
+            return ingredient
 
         return False

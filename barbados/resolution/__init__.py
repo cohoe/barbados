@@ -20,10 +20,11 @@ class MissingResolution(BaseResolution):
 
 
 class Resolution:
-    def __init__(self, slug, status):
+    def __init__(self, slug, status, substitutes=[]):
         self.slug = slug
         # @TODO enforcement without isinstance() since its not an instance.
         self.status = status
+        self.substitutes = substitutes
 
     def __repr__(self):
         return "Barbados::Resolution[%s]" % self.slug
@@ -31,6 +32,7 @@ class Resolution:
     def serialize(self, serializer):
         serializer.add_property('slug', self.slug)
         serializer.add_property('status', self.status.status)
+        serializer.add_property('substitutes', self.substitutes)
 
 
 class SpecResolutionSummary:
