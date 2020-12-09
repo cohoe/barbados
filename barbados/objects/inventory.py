@@ -22,6 +22,7 @@ class Inventory:
         serializer.add_property('implicit_items', [ObjectSerializer.serialize(item, serializer.format) for item in self.implicit_items])
 
     def populate_implicit_items(self, tree):
+        # @TODO refactor items to be a dict
         Log.info("Generating implicit items for inventory %s" % self.id)
         full_items = []
         for item in self.items:
@@ -41,11 +42,13 @@ class Inventory:
         :param ingredient: slug of the ingredient to look for.
         :param implicit: Search the implicit list instead (must be populated first).
         :return: Slug of the providing ingredient, otherwise False
+        # @TODO refactor this and populate_implicit to bake a list
+        # @TODO provide alternatives in the event of direct
         """
         if ingredient in [item.slug for item in self.items]:
-            return ingredient
+            return [ingredient]
 
         if implicit and ingredient in [item.slug for item in self.implicit_items]:
-            return ingredient
+            return [ingredient]
 
         return False
