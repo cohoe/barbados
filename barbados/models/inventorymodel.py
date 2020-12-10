@@ -10,6 +10,7 @@ class InventoryModel(BarbadosModel):
     id = Column(UUID(as_uuid=True), primary_key=True)
     display_name = Column(String, nullable=False)
     items = Column(JSON, nullable=False)
+    implicit_items = Column(JSON, nullable=False)
 
     def __repr__(self):
         return "<Barbados::Models::InventoryModel[%s]>" % self.id

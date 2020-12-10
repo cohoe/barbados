@@ -13,7 +13,8 @@ class InventoryFactory(BaseFactory):
 
     required_keys = {
         'id': uuid4(),
-        'items': list(),
+        'items': dict(),
+        'implicit_items': dict(),
     }
 
     @staticmethod
@@ -48,14 +49,15 @@ class InventoryFactory(BaseFactory):
     @staticmethod
     def _parse_items(raw_input):
         value_key = 'items'
-        old_value = raw_input.get(value_key)
+        items = raw_input.get(value_key)
 
         # Log.info("Old value for %s is %s" % (value_key, old_value))
-        new_value = []
-        for raw_item in raw_input.get(value_key):
-            ii = InventoryItem(**raw_item)
-            new_value.append(ii)
+        # new_value = []
+        for raw_item in items.keys():
+            ii = InventoryItem(slug=raw_item)
+            # new_value.append(ii)
+            items.update({raw_item: ii})
 
         # Log.info("New value for %s is %s" % (value_key, new_value))
-        raw_input.update({value_key: new_value})
+        raw_input.update({value_key: items})
         return raw_input

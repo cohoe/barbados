@@ -128,7 +128,7 @@ class BaseFactory:
     @classmethod
     def delete_obj(cls, session, obj, commit=True):
         """
-        Delete an object from the datbase.
+        Delete an object from the database.
         :param session: Database Session context.
         :param obj: The object to delete.
         :param commit: Whether to commit this transaction now or deal with it yourself. Useful for batches.
