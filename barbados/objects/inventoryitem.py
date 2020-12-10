@@ -1,9 +1,15 @@
 class InventoryItem:
-    def __init__(self, slug, implied_by=None):
+    def __init__(self, slug):
         self.slug = slug
-        self.implied_by = None
-        if implied_by and implied_by != slug:
-            self.implied_by = implied_by
+        # @TODO should IngredientItems be implied my themselves?
+        # self.implied_by = [slug]
+        self.implied_by = []
+
+    def add_implied_by(self, slug):
+        if slug not in self.implied_by:
+            self.implied_by.append(slug)
+
+        return self.implied_by
 
     def __repr__(self):
         return "Barbados::Objects::InventoryItem[%s]" % self.slug

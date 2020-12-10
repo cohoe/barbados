@@ -19,19 +19,27 @@ class Inventory:
         serializer.add_property('id', str(self.id))
         serializer.add_property('display_name', self.display_name)
         serializer.add_property('items', {slug: ObjectSerializer.serialize(ii, serializer.format) for slug, ii in self.items.items()})
-        # serializer.add_property('implicit_items', {slug: ObjectSerializer.serialize(ii, serializer.format) for slug, ii in self.implicit_items.items()})
+        serializer.add_property('implicit_items', {slug: ObjectSerializer.serialize(ii, serializer.format) for slug, ii in self.implicit_items.items()})
 
     def populate_implicit_items(self, tree):
-        # # @TODO refactor items to be a dict
-        # Log.info("Generating implicit items for inventory %s" % self.id)
-        # full_items = []
-        # for item in self.items:
-        #     implicit_items = tree.implies(item.slug)
-        #     # Log.info("Implicit items for %s are: %s" % (item, implicit_items))
-        #     [full_items.append(InventoryItem(slug=implicit_item, implied_by=item.slug)) for implicit_item in implicit_items]
-        #
-        # self.implicit_items = full_items
-        pass
+        for slug in self.items.keys():
+            tree_implicit_slugs = tree.implies(slug)
+            for implicit_slug in tree_implicit_slugs:
+                try:
+                    # We've already created an implied item based on this explicit
+                    # item.
+                    ii = self.implicit_items[implicit_slug]
+                    # self.implicit_items.update({implicit_slug: ii})
+                except KeyError:
+                    # This explicit ingredient is adding a new implied ingreident to the
+                    # inventory. Cool!
+                    ii = InventoryItem(slug=implicit_slug)
+                    ii.add_implied_by(slug)
+
+                # Add the explicit item slug to the list of slugs that this implicit
+                # item is implied by. Always >=1.
+                ii.add_implied_by(slug)
+                self.implicit_items.update({implicit_slug: ii})
 
     def contains(self, ingredient, implicit=False):
         """
