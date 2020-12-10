@@ -1,7 +1,6 @@
 class InventoryItem:
     def __init__(self, slug):
         self.slug = slug
-        # @TODO should IngredientItems be implied my themselves?
         # self.implied_by = [slug]
         self.implied_by = []
 

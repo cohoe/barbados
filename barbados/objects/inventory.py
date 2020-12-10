@@ -22,6 +22,7 @@ class Inventory:
         serializer.add_property('implicit_items', {slug: ObjectSerializer.serialize(ii, serializer.format) for slug, ii in self.implicit_items.items()})
 
     def populate_implicit_items(self, tree):
+        # @TODO populate substitutes for direct as well using common parent.
         for slug in self.items.keys():
             tree_implicit_slugs = tree.implies(slug)
             for implicit_slug in tree_implicit_slugs:
@@ -34,30 +35,40 @@ class Inventory:
                     # This explicit ingredient is adding a new implied ingreident to the
                     # inventory. Cool!
                     ii = InventoryItem(slug=implicit_slug)
-                    ii.add_implied_by(slug)
+                    # ii.add_implied_by(slug)
 
                 # Add the explicit item slug to the list of slugs that this implicit
                 # item is implied by. Always >=1.
+                # if implicit_slug in self.items.keys():
+                # print("%s is DIRECT" % implicit_slug) if implicit_slug in self.items.keys() else None
+                # print("%s is IMPLIOED" % implicit_slug) if implicit_slug not in self.items.keys() else None
                 ii.add_implied_by(slug)
                 self.implicit_items.update({implicit_slug: ii})
+
+        # print(self.implicit_items.get('sweet-vermouth').implied_by)
 
     def contains(self, ingredient, implicit=False):
         """
         Determine if a particular ingredient is in this inventory.
-        Can't go and recommend something you have explicitly because there
-        could be multiple things. Example: implcitly having maraschino-liqueur
-        could be true if you have maraska or luxardo. This function shouldn't
-        recommend both. Use another endpoint for that.
-        :param ingredient: slug of the ingredient to look for.
-        :param implicit: Search the implicit list instead (must be populated first).
-        :return: Slug of the providing ingredient, otherwise False
-        # @TODO refactor this and populate_implicit to bake a list
-        # @TODO provide alternatives in the event of direct
+        :param ingredient: slug of the ingredient to look for in the explicit dict.
+        :param implicit: Search the implicit dict instead (must be populated first).
+        :return: List of all slugs you have in the inventory that are implied by
+                 the given ingredient, otherwise False
+                 # @TODO refactor for contains vs substitutes
         """
-        if ingredient in [item.slug for item in self.items]:
-            return [ingredient]
+        if ingredient in self.items.keys():
+            return True
 
-        if implicit and ingredient in [item.slug for item in self.implicit_items]:
-            return [ingredient]
+        if implicit and ingredient in self.implicit_items.keys():
+            return True
+
+        return False
+
+    def substitutes(self, ingredient, implicit=False):
+        if ingredient in self.items.keys():
+            return self.items.get(ingredient).implied_by
+
+        if implicit and ingredient in self.implicit_items.keys():
+            return self.implicit_items.get(ingredient).implied_by
 
         return False

@@ -36,12 +36,13 @@ class RecipeResolver(BaseResolver):
             r = None
             if inventory.contains(component.slug):
                 # The spec.component.slug is specifically named in the inventory items.
-                r = Resolution(slug=component.slug, status=DirectResolution)
+                substitutes = inventory.substitutes(component.slug)
+                r = Resolution(slug=component.slug, status=DirectResolution, substitutes=substitutes)
             elif inventory.contains(component.slug, implicit=True):
                 # The spec.component.slug is specifically named in the inventory implicit items.
                 # Targets "generic" spec components when there are "specific" or "generic"
                 # implicit items in the inventory.
-                substitutes = inventory.contains(component.slug, implicit=True)
+                substitutes = inventory.substitutes(component.slug, implicit=True)
                 r = Resolution(slug=component.slug, status=ImplicitResolution, substitutes=substitutes)
             else:
                 # Now we're looking at the implied versions of the component. By definition
@@ -53,14 +54,12 @@ class RecipeResolver(BaseResolver):
                     # Stop further processing on this component if it does.
                     if inventory.contains(implied_component):
                         # The inventory explicitly contains this implied component
-                        substitutes = inventory.contains(implied_component)
-                        print("AAAtesting if contains %s and it was %s" % (implied_component, substitutes))
+                        substitutes = inventory.substitutes(implied_component)
                         r = Resolution(slug=component.slug, status=ImplicitResolution, substitutes=substitutes)
                         break
                     elif inventory.contains(implied_component, implicit=True):
                         # The inventory implicitly  contains this implied component
-                        substitutes = inventory.contains(implied_component, implicit=True)
-                        print("testing if contains %s and it was %s" % (implied_component, substitutes))
+                        substitutes = inventory.substitutes(implied_component, implicit=True)
                         r = Resolution(slug=component.slug, status=ImplicitResolution, substitutes=substitutes)
                         break
                 # By this point we haven't found any explicit or implicit matches
