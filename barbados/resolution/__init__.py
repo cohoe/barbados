@@ -1,10 +1,11 @@
-from barbados.serializers import ObjectSerializer
-
-
 class BaseResolution:
     @property
     def status(self):
         raise NotImplementedError()
+
+    # @TODO this doesn't work. But we might not care.
+    def __repr__(self):
+        return "Barbados::Resolution::%s[]" % self.__class__.__name__
 
 
 class DirectResolution(BaseResolution):
@@ -20,7 +21,9 @@ class MissingResolution(BaseResolution):
 
 
 class Resolution:
-    def __init__(self, slug, status, substitutes=[]):
+    def __init__(self, slug, status, substitutes=None):
+        if substitutes is None:
+            substitutes = []
         self.slug = slug
         # @TODO enforcement without isinstance() since its not an instance.
         self.status = status
@@ -33,23 +36,3 @@ class Resolution:
         serializer.add_property('slug', self.slug)
         serializer.add_property('status', self.status.status)
         serializer.add_property('substitutes', self.substitutes)
-
-
-class SpecResolutionSummary:
-    def __init__(self, cocktail_slug, spec_slug='ALL'):
-        self.cocktail_slug = cocktail_slug
-        self.spec_slug = spec_slug
-        self.components = []
-
-    def __repr__(self):
-        return "Barbados::SpecResolutionSummary[%s::%s]" % (self.cocktail_slug, self.spec_slug)
-
-    def add_component(self, resolution):
-        if not isinstance(resolution, Resolution):
-            raise ValueError("Bad resolution type. %s" % Resolution)
-        self.components.append(resolution)
-
-    def serialize(self, serializer):
-        serializer.add_property('cocktail_slug', self.cocktail_slug)
-        serializer.add_property('spec_slug', self.spec_slug)
-        serializer.add_property('components', [ObjectSerializer.serialize(res, serializer.format) for res in self.components])
