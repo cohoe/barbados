@@ -110,15 +110,3 @@ class Inventory:
             return self.implicit_items.get(ingredient).substitutes
 
         return []
-
-    def retrieve(self, slug):
-        # @TODO flesh this out more.
-        try:
-            return self.items[slug]
-        except KeyError:
-            try:
-                return self.implicit_items[slug]
-            except KeyError:
-                print("BAD")
-                # @TODO this is throwing an exception becuase I don't have an InventoryItem for
-                # a specific item if its implied. Gotta find a better way to do this.

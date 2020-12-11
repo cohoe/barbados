@@ -37,14 +37,14 @@ class RecipeResolver(BaseResolver):
             r = None
             if inventory.contains(component.slug):
                 # The spec.component.slug is specifically named in the inventory items.
-                ii = inventory.retrieve(component.slug)
-                r = Resolution(slug=component.slug, status=DirectResolution, substitutes=ii.substitutes, parent=ii.parent)
+                substitutes = inventory.substitutes(component.slug)
+                r = Resolution(slug=component.slug, status=DirectResolution, substitutes=substitutes)
             elif inventory.contains(component.slug, implicit=True):
                 # The spec.component.slug is specifically named in the inventory implicit items.
                 # Targets "generic" spec components when there are "specific" or "generic"
                 # implicit items in the inventory.
-                ii = inventory.retrieve(component.slug)
-                r = Resolution(slug=component.slug, status=ImplicitResolution, substitutes=ii.substitutes, parent=ii.parent)
+                substitutes = inventory.substitutes(component.slug, implicit=True)
+                r = Resolution(slug=component.slug, status=ImplicitResolution, substitutes=substitutes)
             else:
                 # Now we're looking at the implied versions of the component. By definition
                 # all of these will be ImpliedResolution because we've had to change what
@@ -55,19 +55,22 @@ class RecipeResolver(BaseResolver):
                     # Stop further processing on this component if it does.
                     if inventory.contains(implied_component):
                         # The inventory explicitly contains this implied component
-                        ii = inventory.retrieve(component.slug)
-                        r = Resolution(slug=component.slug, status=ImplicitResolution, substitutes=ii.substitutes, parent=ii.parent)
+                        substitutes = inventory.substitutes(implied_component)
+                        r = Resolution(slug=component.slug, status=ImplicitResolution, substitutes=substitutes)
                         break
                     elif inventory.contains(implied_component, implicit=True):
                         # The inventory implicitly  contains this implied component
-                        ii = inventory.retrieve(component.slug)
-                        r = Resolution(slug=component.slug, status=ImplicitResolution, substitutes=ii.substitutes, parent=ii.parent)
+                        substitutes = inventory.substitutes(implied_component, implicit=True)
+                        r = Resolution(slug=component.slug, status=ImplicitResolution, substitutes=substitutes)
                         break
                 # By this point we haven't found any explicit or implicit matches
                 # for either the direct component or any of its implications.
                 # It's missing.
                 if r is None:
                     r = Resolution(slug=component.slug, status=MissingResolution)
+
+            # Fill in the parent of the component.
+            r.parent = tree.parent(r.slug).tag
 
             # Add the resolution to the summary
             rs.add_component(r)
