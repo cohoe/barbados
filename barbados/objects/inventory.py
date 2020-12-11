@@ -44,6 +44,12 @@ class Inventory:
                 # Add the explicit item slug to the list of slugs that this implicit
                 # item is implied by.
                 ii.add_substitute(slug)
+
+                # Fill in the parent if it hasn't already. See below for more.
+                if not ii.parent:
+                    ii.parent = tree.parent(slug).tag
+
+                # Update the object in the implicit_items dictionary.
                 self.implicit_items.update({implicit_slug: ii})
 
             # Explicit Parsing
@@ -65,6 +71,10 @@ class Inventory:
                 # item is a pointer/reference thing to the object in the self.items
                 # dictionary so we don't need to explicitly call update().
                 # Unlike those times I'm swearing at deepcopy this is actually convenient.
+
+            # Fill in the parent, regardless of if it's something we have or not.
+            # Will give the user a pointer.
+            item.parent = tree.parent(slug).tag
 
     def contains(self, ingredient, implicit=False):
         """
@@ -100,3 +110,15 @@ class Inventory:
             return self.implicit_items.get(ingredient).substitutes
 
         return []
+
+    def retrieve(self, slug):
+        # @TODO flesh this out more.
+        try:
+            return self.items[slug]
+        except KeyError:
+            try:
+                return self.implicit_items[slug]
+            except KeyError:
+                print("BAD")
+                # @TODO this is throwing an exception becuase I don't have an InventoryItem for
+                # a specific item if its implied. Gotta find a better way to do this.
