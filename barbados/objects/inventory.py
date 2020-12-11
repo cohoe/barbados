@@ -1,6 +1,4 @@
-import copy
 from barbados.serializers import ObjectSerializer
-from barbados.services.logging import Log
 from barbados.objects.inventoryitem import InventoryItem
 
 
@@ -19,42 +17,61 @@ class Inventory:
         serializer.add_property('id', str(self.id))
         serializer.add_property('display_name', self.display_name)
         serializer.add_property('items', {slug: ObjectSerializer.serialize(ii, serializer.format) for slug, ii in self.items.items()})
-        serializer.add_property('implicit_items', {slug: ObjectSerializer.serialize(ii, serializer.format) for slug, ii in self.implicit_items.items()})
+        serializer.add_property('implicit_items',
+                                {slug: ObjectSerializer.serialize(ii, serializer.format) for slug, ii in self.implicit_items.items()})
 
-    def populate_implicit_items(self, tree):
-        # @TODO populate substitutes for direct as well using common parent.
-        for slug in self.items.keys():
+    def expand(self, tree):
+        """
+        Fill in the substitutions and implicit_items for this inventory. Computationally
+        intensive and lots of data that shouldn't be stored in the database so this is
+        a separate function that users needs to call.
+        :param tree: IngredientTree instance.
+        :return: None
+        """
+        for slug, item in self.items.items():
+            # Implicit Parsing
+            # Substitutes are anything that is implied by this item.
             tree_implicit_slugs = tree.implies(slug)
             for implicit_slug in tree_implicit_slugs:
                 try:
-                    # We've already created an implied item based on this explicit
-                    # item.
+                    # We've already created an implied item based on this explicit item.
                     ii = self.implicit_items[implicit_slug]
-                    # self.implicit_items.update({implicit_slug: ii})
                 except KeyError:
-                    # This explicit ingredient is adding a new implied ingreident to the
+                    # This explicit ingredient is adding a new implied ingredient to the
                     # inventory. Cool!
                     ii = InventoryItem(slug=implicit_slug)
-                    # ii.add_implied_by(slug)
 
                 # Add the explicit item slug to the list of slugs that this implicit
-                # item is implied by. Always >=1.
-                # if implicit_slug in self.items.keys():
-                # print("%s is DIRECT" % implicit_slug) if implicit_slug in self.items.keys() else None
-                # print("%s is IMPLIOED" % implicit_slug) if implicit_slug not in self.items.keys() else None
-                ii.add_implied_by(slug)
+                # item is implied by.
+                ii.add_substitute(slug)
                 self.implicit_items.update({implicit_slug: ii})
 
-        # print(self.implicit_items.get('sweet-vermouth').implied_by)
+            # Explicit Parsing
+            # Substitutes are anything with a parent the same as this one.
+            tree_sibling_slugs = tree.siblings(slug)
+            for tree_slug in tree_sibling_slugs:
+                # If the sibling is in the explicit inventory, then it can be
+                # suggested. Implicit suggestions are handled for other resolution
+                # types so we don't need to go digging around for other things to
+                # use here. I think....
+                #
+                # I'm still not convinced I don't need to go searching through the
+                # implicits once those are populated. Need to make an inventory
+                # based on all generics and compare that to certain generic specs
+                # and see if the results match expectations.
+                if tree_slug in self.items.keys():
+                    item.add_substitute(tree_slug)
+
+                # item is a pointer/reference thing to the object in the self.items
+                # dictionary so we don't need to explicitly call update().
+                # Unlike those times I'm swearing at deepcopy this is actually convenient.
 
     def contains(self, ingredient, implicit=False):
         """
         Determine if a particular ingredient is in this inventory.
-        :param ingredient: slug of the ingredient to look for in the explicit dict.
-        :param implicit: Search the implicit dict instead (must be populated first).
-        :return: List of all slugs you have in the inventory that are implied by
-                 the given ingredient, otherwise False
-                 # @TODO refactor for contains vs substitutes
+        :param ingredient: Slug of the ingredient to look for.
+        :param implicit: Bootlean of whether to be explicit or implicit.
+        :return: Boolean
         """
         if ingredient in self.items.keys():
             return True
@@ -65,10 +82,21 @@ class Inventory:
         return False
 
     def substitutes(self, ingredient, implicit=False):
+        """
+        Return a list of all InventoryItem slugs that are substitutes for
+        this ingredient. User specifies whether they want the implicit items
+        or just the explicit ones.
+        :param ingredient: Slug of the ingredient to look for.
+        :param implicit: Boolean of whether to be explicit or implicit.
+        :return: List
+        """
         if ingredient in self.items.keys():
-            return self.items.get(ingredient).implied_by
+            # We don't pre-calculate inventory-derived substitutes
+            # so we have to go fetch.
+            # print(self.items.get(ingredient).substitutes)
+            return self.items.get(ingredient).substitutes
 
         if implicit and ingredient in self.implicit_items.keys():
-            return self.implicit_items.get(ingredient).implied_by
+            return self.implicit_items.get(ingredient).substitutes
 
-        return False
+        return []

@@ -11,7 +11,7 @@ class RecipeResolver(BaseResolver):
         results = []
 
         tree = IngredientTreeCache.retrieve()
-        inventory.populate_implicit_items(tree=tree)
+        inventory.expand(tree=tree)
 
         Log.info("Cocktail specs: %s" % [spec.slug for spec in cocktail.specs])
         for spec in cocktail.specs:

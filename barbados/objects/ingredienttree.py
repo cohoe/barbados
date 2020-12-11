@@ -1,3 +1,4 @@
+import copy
 from treelib import Node, Tree
 from treelib.exceptions import NodeIDAbsentError
 from barbados.models import IngredientModel
@@ -96,10 +97,9 @@ class IngredientTree:
         node = self.node(node_id)
         parent = self.parent(node_id)
         parents = self.parents(node_id)
+        siblings = self.siblings(node_id)
 
         children = node.fpointer
-        siblings = parent.fpointer
-        siblings.remove(node.identifier)
 
         return ({
             'self': node.identifier,
@@ -109,6 +109,24 @@ class IngredientTree:
             'siblings': siblings,
             'kind': node.data.get('kind')
         })
+
+    def siblings(self, node_id):
+        """
+        Return a list of all sibling nodes of this node. Siblings share the
+        same parent. Note that siblings does NOT include children of this
+        node.
+        :param node_id: ID of the node to investigate.
+        :return: List of node tags.
+        """
+        node = self.node(node_id)
+        parent = self.parent(node_id)
+
+        # I don't know how long this bug was there, but my gods...
+        # Apparently I was deleting a bunch of stuff from the tree!
+        siblings = copy.deepcopy(parent.fpointer)
+        siblings.remove(node.identifier)
+
+        return siblings
 
     def parents(self, node_id):
         """
