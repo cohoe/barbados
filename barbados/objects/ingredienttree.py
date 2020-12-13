@@ -54,6 +54,11 @@ class IngredientTree:
             raise KeyError("Node %s could not be found." % node_id)
 
     def parent(self, node_id):
+        """
+        @TODO this should return a string like the rest of my functions.
+        :param node_id:
+        :return:
+        """
         try:
             # bpointer was deprecated somewhere between 1.5.5 and 1.6.1, but they
             # broke is_root() which is used later on in this class. Freezing to
@@ -123,6 +128,7 @@ class IngredientTree:
 
         # I don't know how long this bug was there, but my gods...
         # Apparently I was deleting a bunch of stuff from the tree!
+        # Remove this node from the list of siblings.
         siblings = copy.deepcopy(parent.fpointer)
         siblings.remove(node.identifier)
 
@@ -147,7 +153,8 @@ class IngredientTree:
         """
         Return a list of all children nodes of this node.
         :param node_id: ID of the node to investigate.
-        :param extended: Include more than just the direct decendents of this node (ie, all)
+        :param extended: Include more than just the direct descendants of this
+                         node (ie, all levels following.)
         :return: List of node tags.
         """
         if extended:
@@ -180,16 +187,15 @@ class IngredientTree:
         """
         Return a list of all ingredients that this node implies.
         This is done by looking at all parent ingredients up
-        to the family. Because this goes up the tree in order,
-        we can safely assume that the returned list is ordered
-        most to least specific.
+        to the family, children, and siblings.
         Examples:
-          * the-dead-rabbit-irish-whiskey -> [irish-whiskey]
+          * the-dead-rabbit-irish-whiskey -> [irish-whiskey, jameson-irish-whiskey]
           * el-dorado-12-year-rum -> [aged-blended-rum, aged-rum, rum]
+          * orange-bitters -> [citrus-bitters, angostura-orange-bitters, regans-orange-bitters, grapefruit-bitters]
         :param node_id: ID of the node to investigate.
         :return: List of node tags (slugs).
         """
-        implied_nodes = self.parents(node_id)  # + self.children(node_id, extended=True)
+        implied_nodes = self.parents(node_id) + self.children(node_id, extended=True) + self.siblings(node_id)
         # print(node_id) if 'gin' in node_id else None
         # print(implied_nodes) if 'gin' in node_id else None
         # Log.info("All parents of %s are: %s" % (node_id, parents))
@@ -201,13 +207,13 @@ class IngredientTree:
         # Create a list of allowed parents based on whether the parent is
         # of an approved type.
         allowed_implicit_nodes = []
-        for node_id in implied_nodes:
-            implied_node = self.node(node_id=node_id)
+        for implied_node_id in implied_nodes:
+            implied_node = self.node(node_id=implied_node_id)
             implied_node_kind = implied_node.data.get('kind')
             # Log.info("Kind of parent %s is %s" % (parent, parent_kind))
 
             if implied_node_kind in implicit_kind_values:
-                allowed_implicit_nodes.append(node_id)
+                allowed_implicit_nodes.append(implied_node_id)
 
-        # Log.info("Allowed implicit parents for %s are: %s" % (node_id, allowed_parents))
+        # Log.info("Allowed implicit nodes for %s are: %s" % (node_id, allowed_implicit_nodes))
         return allowed_implicit_nodes

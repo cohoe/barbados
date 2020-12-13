@@ -29,17 +29,20 @@ class Inventory:
         :return: None
         """
         for slug, item in self.items.items():
-            # Implicit Parsing
             # Substitutes are anything that is implied by this item.
-            tree_implicit_slugs = tree.implies(slug)
-            for implicit_slug in tree_implicit_slugs:
+            # and contained within the explicit inventory items.
+            # If you need guidance beyond that you should use the
+            # ingredients/{slug}/substitution to help you find something
+            # appropriate.
+            tree_implied_slugs = tree.implies(slug)
+            for implied_slug in tree_implied_slugs:
                 try:
                     # We've already created an implied item based on this explicit item.
-                    ii = self.implicit_items[implicit_slug]
+                    ii = self.implicit_items[implied_slug]
                 except KeyError:
                     # This explicit ingredient is adding a new implied ingredient to the
                     # inventory. Cool!
-                    ii = InventoryItem(slug=implicit_slug)
+                    ii = InventoryItem(slug=implied_slug)
 
                 # Add the explicit item slug to the list of slugs that this implicit
                 # item is implied by.
@@ -50,13 +53,9 @@ class Inventory:
                     ii.parent = tree.parent(slug).tag
 
                 # Update the object in the implicit_items dictionary.
-                self.implicit_items.update({implicit_slug: ii})
+                self.implicit_items.update({implied_slug: ii})
 
-            # Explicit Parsing
-            # Substitutes are anything with a parent the same as this one.
-            tree_sibling_slugs = tree.siblings(slug)
-            for tree_slug in tree_sibling_slugs:
-                # If the sibling is in the explicit inventory, then it can be
+                # If the implied item is in the explicit inventory, then it can be
                 # suggested. Implicit suggestions are handled for other resolution
                 # types so we don't need to go digging around for other things to
                 # use here. I think....
@@ -65,12 +64,8 @@ class Inventory:
                 # implicits once those are populated. Need to make an inventory
                 # based on all generics and compare that to certain generic specs
                 # and see if the results match expectations.
-                if tree_slug in self.items.keys():
-                    item.add_substitute(tree_slug)
-
-                # item is a pointer/reference thing to the object in the self.items
-                # dictionary so we don't need to explicitly call update().
-                # Unlike those times I'm swearing at deepcopy this is actually convenient.
+                if implied_slug in self.items.keys():
+                    item.add_substitute(implied_slug)
 
             # Fill in the parent, regardless of if it's something we have or not.
             # Will give the user a pointer.
