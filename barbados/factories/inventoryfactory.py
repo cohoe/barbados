@@ -6,6 +6,7 @@ from barbados.exceptions import ValidationException
 from barbados.services.logging import Log
 from uuid import uuid4
 from barbados.models.inventorymodel import InventoryModel
+from barbados.caches.ingredienttree import IngredientTreeCache
 
 
 class InventoryFactory(BaseFactory):
@@ -61,3 +62,12 @@ class InventoryFactory(BaseFactory):
         # Log.info("New value for %s is %s" % (value_key, new_value))
         raw_input.update({value_key: items})
         return raw_input
+
+    @classmethod
+    def produce_obj(cls, session, id, expand=False):
+        i = super().produce_obj(session=session, id=id)
+        if expand:
+            tree = IngredientTreeCache.retrieve()
+            i.expand(tree)
+
+        return i

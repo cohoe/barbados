@@ -2,7 +2,7 @@ from barbados.resolvers.baseresolver import BaseResolver
 from barbados.services.logging import Log
 from barbados.resolution import Resolution, DirectResolution, ImplicitResolution, MissingResolution
 from barbados.resolution.summary import SpecResolutionSummary
-from barbados.caches import IngredientTreeCache
+from barbados.caches.ingredienttree import IngredientTreeCache
 
 
 class RecipeResolver(BaseResolver):
