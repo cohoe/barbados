@@ -9,7 +9,6 @@ import copy
 from barbados.objects.image import Image
 from barbados.text import Slug
 from barbados.models.cocktailmodel import CocktailModel
-from barbados.caches.ingredienttree import IngredientTreeCache
 
 
 # @TODO this needs to standardize into modern constructs!
@@ -98,6 +97,8 @@ class CocktailFactory(BaseFactory):
         base_recipe = ObjectSerializer.serialize(obj, format)
         alpha = base_recipe['slug'][0]
 
+        # @TODO we got a problem with importing here. Can't do it at the top.
+        from barbados.caches.ingredienttree import IngredientTreeCache
         tree = IngredientTreeCache.retrieve()
         try:
             alpha = int(alpha)
