@@ -227,5 +227,6 @@ class SearchBase:
         :param type_: expected python type class.
         :return: None
         """
+        # @TODO support int-as-str into range bullshit.
         if type(value) is not type_:
             raise ValidationException("Value of parameter '%s' is not a '%s' (got '%s')" % (parameter, type_, value))

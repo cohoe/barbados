@@ -38,3 +38,27 @@ class Resolution:
         serializer.add_property('status', self.status.status)
         serializer.add_property('substitutes', self.substitutes)
         serializer.add_property('parent', self.parent)
+
+
+class ResolutionFactory:
+    def __init__(self):
+        self._resolutions = {}
+
+    def register_resolution(self, resolution):
+        self._resolutions[resolution.status] = resolution
+
+    def get_resolution(self, key):
+        r = self._resolutions.get(key)
+        if not r:
+            raise KeyError("No resolution found for '%s'." % key)
+
+        return r
+
+    def get_resolution_statuses(self):
+        return list(self._resolutions.keys())
+
+
+resolution_factory = ResolutionFactory()
+resolution_factory.register_resolution(DirectResolution)
+resolution_factory.register_resolution(ImplicitResolution)
+resolution_factory.register_resolution(MissingResolution)

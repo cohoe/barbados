@@ -1,7 +1,8 @@
 class BaseIndexer:
-    @staticmethod
-    def index(*args, **kwargs):
-        raise NotImplementedError()
+    @classmethod
+    def index(cls, obj):
+        index = cls.factory.obj_to_index(obj, cls.for_index)
+        index.save()
 
     @property
     def for_class(self):
@@ -39,3 +40,8 @@ class BaseIndexer:
         :return: None
         """
         cls.for_index.delete_all()
+
+    @classmethod
+    def delete(cls, obj):
+        index_obj = cls.factory.obj_to_index(obj, cls.index)
+        cls.index.delete(index_obj)

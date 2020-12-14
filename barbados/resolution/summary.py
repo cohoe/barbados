@@ -1,5 +1,6 @@
 from barbados.resolution import Resolution
 from barbados.serializers import ObjectSerializer
+from barbados.resolution import resolution_factory
 
 
 class SpecResolutionSummary:
@@ -7,7 +8,8 @@ class SpecResolutionSummary:
     Summary of a comparison between an Inventory and a Spec. Figure out
     what this inventory has, both explicitly and implicitly.
     """
-    def __init__(self, cocktail_slug, spec_slug='ALL'):
+    def __init__(self, inventory_id, cocktail_slug, spec_slug):
+        self.inventory_id = inventory_id
         self.cocktail_slug = cocktail_slug
         self.spec_slug = spec_slug
         self.components = []
@@ -35,7 +37,7 @@ class SpecResolutionSummary:
         resolution. Example: {3x direct, 1x implicit, 1x missing}.
         :return: Dict
         """
-        counts = {}
+        counts = {key: 0 for key in resolution_factory.get_resolution_statuses()}
         for r in self.components:
             status_key = r.status.status
             try:
@@ -45,6 +47,7 @@ class SpecResolutionSummary:
         return counts
 
     def serialize(self, serializer):
+        serializer.add_property('inventory_id', self.inventory_id)
         serializer.add_property('cocktail_slug', self.cocktail_slug)
         serializer.add_property('spec_slug', self.spec_slug)
         serializer.add_property('components', [ObjectSerializer.serialize(res, serializer.format) for res in self.components])

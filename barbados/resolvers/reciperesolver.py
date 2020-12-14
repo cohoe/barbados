@@ -3,6 +3,7 @@ from barbados.services.logging import Log
 from barbados.resolution import Resolution, DirectResolution, ImplicitResolution, MissingResolution
 from barbados.resolution.summary import SpecResolutionSummary
 from barbados.caches.ingredienttree import IngredientTreeCache
+from barbados.indexers.inventoryspecresolution import InventorySpecResolutionIndexer
 
 
 class RecipeResolver(BaseResolver):
@@ -31,7 +32,7 @@ class RecipeResolver(BaseResolver):
     def _resolve_spec(inventory, cocktail, spec, tree):
         # Components use the ingredient slug as their slug so we can safely
         # assume a 1:1 mapping between them.
-        rs = SpecResolutionSummary(cocktail_slug=cocktail.slug, spec_slug=spec.slug)
+        rs = SpecResolutionSummary(inventory_id=inventory.id, cocktail_slug=cocktail.slug, spec_slug=spec.slug)
 
         for component in spec.components:
             r = None
@@ -74,5 +75,9 @@ class RecipeResolver(BaseResolver):
 
             # Add the resolution to the summary
             rs.add_component(r)
+
+        # Index
+        # indexer_factory.get_indexer(rs).index(rs)
+        InventorySpecResolutionIndexer.index(rs)
 
         return rs
