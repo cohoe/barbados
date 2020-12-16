@@ -32,7 +32,7 @@ class RecipeResolver(BaseResolver):
     def _resolve_spec(inventory, cocktail, spec, tree):
         # Components use the ingredient slug as their slug so we can safely
         # assume a 1:1 mapping between them.
-        rs = SpecResolutionSummary(inventory_id=inventory.id, cocktail_slug=cocktail.slug, spec_slug=spec.slug)
+        rs = SpecResolutionSummary(inventory_id=inventory.id, cocktail=cocktail, spec=spec)
 
         for component in spec.components:
             r = None

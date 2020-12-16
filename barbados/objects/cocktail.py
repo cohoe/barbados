@@ -16,6 +16,15 @@ class Cocktail:
     def spec_count(self):
         return len(self.specs)
 
+    @property
+    def alpha(self):
+        first_char = self.slug[0]
+        try:
+            int(first_char)
+            return '#'
+        except ValueError:
+            return first_char
+
     def __repr__(self):
         return "Barbados::Objects::Cocktail[%s]>" % self.slug
 

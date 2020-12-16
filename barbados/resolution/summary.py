@@ -8,11 +8,14 @@ class SpecResolutionSummary:
     Summary of a comparison between an Inventory and a Spec. Figure out
     what this inventory has, both explicitly and implicitly.
     """
-    def __init__(self, inventory_id, cocktail_slug, spec_slug):
+    def __init__(self, inventory_id, cocktail, spec):
         self.inventory_id = inventory_id
-        self.cocktail_slug = cocktail_slug
-        self.spec_slug = spec_slug
+        self.cocktail_slug = cocktail.slug
+        self.spec_slug = spec.slug
         self.components = []
+        self.component_count = spec.component_count
+        self.alpha = cocktail.alpha
+        self.construction_slug = spec.construction.slug
 
     def __repr__(self):
         return "Barbados::Resolution::SpecResolutionSummary[%s::%s]" % (self.cocktail_slug, self.spec_slug)
@@ -52,3 +55,6 @@ class SpecResolutionSummary:
         serializer.add_property('spec_slug', self.spec_slug)
         serializer.add_property('components', [ObjectSerializer.serialize(res, serializer.format) for res in self.components])
         serializer.add_property('status_count', self.status_count)
+        serializer.add_property('component_count', self.component_count)
+        serializer.add_property('alpha', self.alpha)
+        serializer.add_property('construction_slug', self.construction_slug)

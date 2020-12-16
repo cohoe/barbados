@@ -1,5 +1,5 @@
 from barbados.search import SearchBase
-from elasticsearch_dsl.query import MatchPhrase, Wildcard, Prefix, Match
+from elasticsearch_dsl.query import MatchPhrase, Wildcard, Prefix, Match, Range
 from barbados.indexes.inventoryspecresolution import InventorySpecResolution
 from barbados.search.occurrences import ShouldOccurrence
 
@@ -8,27 +8,31 @@ class InventorySpecResolutionSearch(SearchBase):
     index_class = InventorySpecResolution
 
     def _build_query_parameters(self):
+        self.add_query_parameter(url_parameter='missing',
+                                 query_class=Range,
+                                 url_parameter_type=dict,
+                                 value_parser=self._parse_range_value,
+                                 fields=['status_count.MISSING'])
+        # These are all the same as the CocktailSearch, just with different fields.
         self.add_query_parameter(url_parameter='components',
                                  url_parameter_type=list,
                                  query_class=MatchPhrase,
                                  fields=['components.slug', 'components.parent'])
-        self.add_query_parameter(url_parameter='missing',
+        self.add_query_parameter(url_parameter='no_components',
+                                 url_parameter_type=list,
+                                 query_class=MatchPhrase,
+                                 invert=True,
+                                 fields=['components.slug', 'components.parent'])
+        self.add_query_parameter(url_parameter='name',
+                                 query_class=Wildcard,
+                                 occurrence=ShouldOccurrence,
+                                 fields=['cocktail_slug', 'spec_slug'])
+        self.add_query_parameter(url_parameter='alpha',
+                                 query_class=Prefix,
+                                 fields=['alpha'])
+        self.add_query_parameter(url_parameter='construction',
                                  query_class=Match,
-                                 url_parameter_type=range,
-                                 # occurrence=ShouldOccurrence,
-                                 fields=['status_count.MISSING'])
-        # self.add_query_parameter(url_parameter='alpha',
-        #                          query_class=Prefix,
-        #                          fields=['alpha'])
-        # self.add_query_parameter(url_parameter='construction',
-        #                          query_class=Match,
-        #                          fields=['spec.construction.slug'])
-        # self.add_query_parameter(url_parameter='component_count',
-        #                          query_class=Match,
-        #                          fields=['spec.component_count'])
-        # self.add_query_parameter(url_parameter='no_components',
-        #                          url_parameter_type=list,
-        #                          query_class=MatchPhrase,
-        #                          invert=True,
-        #                          fields=['spec.components.slug', 'spec.component.display_name', 'spec.components.parents'])
-#
+                                 fields=['construction_slug'])
+        self.add_query_parameter(url_parameter='component_count',
+                                 query_class=Match,
+                                 fields=['component_count'])

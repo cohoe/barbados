@@ -1,5 +1,5 @@
 from barbados.services.logging import Log
-from elasticsearch_dsl.query import Bool, Wildcard, MatchPhrase, Prefix, Match
+from elasticsearch_dsl.query import Bool, Wildcard, MatchPhrase, Prefix, Match, Range
 from barbados.exceptions import ValidationException
 from barbados.search.occurrences import occurrence_factory, MustOccurrence
 
@@ -76,7 +76,7 @@ class SearchBase:
         return SearchResults(hits=results)
 
     def add_query_parameter(self, url_parameter, query_class, fields, url_parameter_type=str,
-                            invert=False, occurrence=MustOccurrence, **attributes):
+                            invert=False, occurrence=MustOccurrence, value_parser=None, **attributes):
         """
         Define a queriable parameter for this search index.
         :param url_parameter: URL/input parameter to key from.
@@ -84,6 +84,7 @@ class SearchBase:
         :param invert: Turn this from Must to MustNot at the overall level.
         :param occurrence: Occurrence object.
         :param query_class: ElasticSearch DSL query class.
+        :param value_parser: Function to parse the value of this parameter if it cannot be done easily in the URL.
         :param attributes: Dictionary of extra params to pass to the query_class consturctor
         :return: None
         """
@@ -102,7 +103,8 @@ class SearchBase:
             'attributes': attributes,
             'fields': fields,
             'occurrence': occurrence,
-            'invert': invert
+            'invert': invert,
+            'value_parser': value_parser
         }
 
     def get_query_condition(self, url_parameter, field, value):
@@ -129,6 +131,14 @@ class SearchBase:
             return Prefix(**{field: value})
         elif settings.get('query_class') is Match:
             return Match(**{field: {'query': value}})
+        elif settings.get('query_class') is Range:
+            # This is some hacks to simplify URL queries. This may be a bad idea.
+            # Range() queries do not support 'eq' (use Match() for that). To cheat
+            # this in my interface if something sets this a key of 'eq' then we
+            # under the hood convert this to a Match query.
+            if 'eq' in value.keys():
+                return Match(**{field: {'query': value.get('eq')}})
+            return Range(**{field: value})
         else:
             raise KeyError("Unsupported query class")
 
@@ -163,6 +173,14 @@ class SearchBase:
             if not raw_value:
                 continue
 
+            # A value parser is a function that is used to munge the raw_value before
+            # further processing. Since we abstracted the shit out of the search stuff
+            # this is how we can transform things from the URL into ElasticSearch-speak
+            # in a bespoke way.
+            value_parser = self.query_parameters.get(url_parameter).get('value_parser')
+            if value_parser:
+                raw_value = value_parser(raw_value)
+
             # Ensure that the value we got matches the expected data type.
             expected_value_type = self.query_parameters.get(url_parameter).get('url_parameter_type')
             self._validate_query_parameter(parameter=url_parameter, value=raw_value, type_=expected_value_type)
@@ -191,6 +209,15 @@ class SearchBase:
 
             # Single-valued url_parameters are much easier to look for.
             elif expected_value_type is str:
+                # This loops through every ElasticSearch document field that we were told to
+                # search in and add that as a condition to this url_parameter's conditions.
+                for field in fields:
+                    url_parameter_conditions.append(self.get_query_condition(url_parameter=url_parameter, field=field, value=raw_value))
+            # Complex queries like implicit ranges take a direct dictionary of values to pass
+            # to the underlying ElasticSearch query.
+            elif expected_value_type is dict:
+                # This loops through every ElasticSearch document field that we were told to
+                # search in and add that as a condition to this url_parameter's conditions.
                 for field in fields:
                     url_parameter_conditions.append(self.get_query_condition(url_parameter=url_parameter, field=field, value=raw_value))
             else:
@@ -227,6 +254,27 @@ class SearchBase:
         :param type_: expected python type class.
         :return: None
         """
-        # @TODO support int-as-str into range bullshit.
         if type(value) is not type_:
             raise ValidationException("Value of parameter '%s' is not a '%s' (got '%s')" % (parameter, type_, value))
+
+    @staticmethod
+    def _parse_range_value(raw_value):
+        """
+        Cheater method for parsing dubious range values. The URL value can be something
+        like: 3, 3+, 4-, 0. This function converts this into something usable in the search
+        abstractions.
+        :param raw_value: String of an integer and optional plus/minus.
+        :return: Dict for Range() construction.
+        """
+        try:
+            if raw_value.endswith('+'):
+                return {'gte': int(raw_value.strip('+'))}
+            elif raw_value.endswith('-'):
+                return {'lte': int(raw_value.strip('-'))}
+            else:
+                # 'eq' is not a value ElasticSearch Range() operator. This
+                # secretly tells the constructor above to make it a Match()
+                # query instead.
+                return {'eq': int(raw_value)}
+        except ValueError:
+            raise ValueError("Bad range value given (%s)" % raw_value)

@@ -100,6 +100,7 @@ class CocktailFactory(BaseFactory):
         # @TODO we got a problem with importing here. Can't do it at the top.
         from barbados.caches.ingredienttree import IngredientTreeCache
         tree = IngredientTreeCache.retrieve()
+        # @TODO this is now part of the object, just not part of the serializer.
         try:
             alpha = int(alpha)
             base_recipe['alpha'] = '#'

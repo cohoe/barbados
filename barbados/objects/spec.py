@@ -46,6 +46,10 @@ class Spec:
     def __repr__(self):
         return "Barbados::Objects::Spec[%s]" % self.slug
 
+    @property
+    def component_count(self):
+        return len(self.components)
+
     def serialize(self, serializer):
         serializer.add_property('slug', self.slug)
         serializer.add_property('display_name', self.display_name)
