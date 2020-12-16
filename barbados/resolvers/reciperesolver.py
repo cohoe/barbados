@@ -70,8 +70,9 @@ class RecipeResolver(BaseResolver):
                 if r is None:
                     r = Resolution(slug=component.slug, status=MissingResolution)
 
-            # Fill in the parent of the component.
-            r.parent = tree.parent(r.slug).tag
+            # Fill in the parent and parents of the component.
+            # r.parent = tree.parent(r.slug).tag # @TODO is this actually needed anymore? I don't think so.
+            r.parents = tree.parents(r.slug)
 
             # Add the resolution to the summary
             rs.add_component(r)

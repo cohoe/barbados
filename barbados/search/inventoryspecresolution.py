@@ -8,6 +8,9 @@ class InventorySpecResolutionSearch(SearchBase):
     index_class = InventorySpecResolution
 
     def _build_query_parameters(self):
+        self.add_query_parameter(url_parameter='inventory_id',
+                                 query_class=Match,
+                                 fields=['inventory_id'])
         self.add_query_parameter(url_parameter='missing',
                                  query_class=Range,
                                  url_parameter_type=dict,
@@ -17,12 +20,12 @@ class InventorySpecResolutionSearch(SearchBase):
         self.add_query_parameter(url_parameter='components',
                                  url_parameter_type=list,
                                  query_class=MatchPhrase,
-                                 fields=['components.slug', 'components.parent'])
+                                 fields=['components.slug', 'components.parents'])
         self.add_query_parameter(url_parameter='no_components',
                                  url_parameter_type=list,
                                  query_class=MatchPhrase,
                                  invert=True,
-                                 fields=['components.slug', 'components.parent'])
+                                 fields=['components.slug', 'components.parents'])
         self.add_query_parameter(url_parameter='name',
                                  query_class=Wildcard,
                                  occurrence=ShouldOccurrence,

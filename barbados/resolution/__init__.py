@@ -21,7 +21,9 @@ class MissingResolution(BaseResolution):
 
 
 class Resolution:
-    def __init__(self, slug, status, substitutes=None, parent=None):
+    def __init__(self, slug, status, substitutes=None, parent=None, parents=None):
+        if parents is None:
+            parents = []
         if substitutes is None:
             substitutes = []
         self.slug = slug
@@ -29,6 +31,7 @@ class Resolution:
         self.status = status
         self.substitutes = substitutes
         self.parent = parent
+        self.parents = parents
 
     def __repr__(self):
         return "Barbados::Resolution[%s]" % self.slug
@@ -38,6 +41,7 @@ class Resolution:
         serializer.add_property('status', self.status.status)
         serializer.add_property('substitutes', self.substitutes)
         serializer.add_property('parent', self.parent)
+        serializer.add_property('parents', self.parents)
 
 
 class ResolutionFactory:
