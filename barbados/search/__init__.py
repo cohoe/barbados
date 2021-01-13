@@ -1,7 +1,7 @@
 from barbados.services.logging import Log
-from elasticsearch_dsl.query import Bool, Wildcard, MatchPhrase, Prefix, Match, Range
+from elasticsearch_dsl.query import Bool, Wildcard, MatchPhrase, Prefix, Match, Range, Exists
 from barbados.exceptions import ValidationException
-from barbados.search.occurrences import occurrence_factory, MustOccurrence
+from barbados.search.occurrences import occurrence_factory, MustOccurrence, MustNotOccurrence
 
 
 class SearchResults:
@@ -109,6 +109,12 @@ class SearchBase:
 
     def get_query_condition(self, url_parameter, field, value):
         """
+        Return an ElasticSearch DSL query object with the appropriate settings
+        for its kind and values from the given url_parameter.
+        :param url_parameter: String of the URL parameter for this query.
+        :param field: String of the ElasticSearch document field to search.
+        :param value: Raw value to look for in this query.
+        :returns: Some kind of Query child class.
         """
         settings = self.query_parameters.get(url_parameter)
         if not settings:
@@ -131,6 +137,8 @@ class SearchBase:
             return Prefix(**{field: value})
         elif settings.get('query_class') is Match:
             return Match(**{field: {'query': value}})
+        elif settings.get('query_class') is Exists:
+            return Exists(**{'field': field})
         elif settings.get('query_class') is Range:
             # This is some hacks to simplify URL queries. This may be a bad idea.
             # Range() queries do not support 'eq' (use Match() for that). To cheat
@@ -170,7 +178,7 @@ class SearchBase:
             # of ['irish-whiskey', 'vermouth']. Native data types apply as defined
             # in the barbados.search.whatever.WhateverSearch class.
             raw_value = getattr(self, url_parameter, None)
-            if not raw_value:
+            if raw_value is None:
                 continue
 
             # A value parser is a function that is used to munge the raw_value before
@@ -215,7 +223,7 @@ class SearchBase:
                     url_parameter_conditions.append(self.get_query_condition(url_parameter=url_parameter, field=field, value=raw_value))
             # Complex queries like implicit ranges take a direct dictionary of values to pass
             # to the underlying ElasticSearch query.
-            elif expected_value_type is dict:
+            elif expected_value_type is dict or expected_value_type is bool:
                 # This loops through every ElasticSearch document field that we were told to
                 # search in and add that as a condition to this url_parameter's conditions.
                 for field in fields:
@@ -228,6 +236,13 @@ class SearchBase:
             # times when we want Should (OR) like matching slugs and display_names,
             # others that we want Must (AND) like matching `rum && sherry`.
             occurrence = self.query_parameters.get(url_parameter).get('occurrence')
+
+            # Boolean-based queries (not to be confused with ElasticSearch Bool queries!)
+            # need to set their occurrence based on the value of the boolean.
+            if expected_value_type is bool:
+                occurrence = MustOccurrence if raw_value else MustNotOccurrence
+
+            # Now construct the Bool() query for this url_parameter.
             url_parameter_query = Bool(**{occurrence.occur: url_parameter_conditions})
 
             # Some parameters are inverted, aka MUST NOT appear in the
