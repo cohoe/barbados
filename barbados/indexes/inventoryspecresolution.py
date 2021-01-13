@@ -14,6 +14,10 @@ class InventorySpecResolution(Document, BarbadosIndex):
     spec_slug = Text()
     components = Object(ComponentIndex)
     status_count = Object()
+    # The whitespace analyzer is needed because alpha can contain '#' which indicates a number
+    # and we want to search on that character.
+    # https://stackoverflow.com/questions/49322009/elasticsearch-does-not-find-characters-other-than-alpha-numeric
+    alpha = Text(analyzer='whitespace', search_analyzer='whitespace')
 
     class Index(BaseIndex):
         name = 'inventoryspecresolution'

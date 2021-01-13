@@ -134,7 +134,9 @@ class SearchBase:
         elif settings.get('query_class') is MatchPhrase:
             return MatchPhrase(**{field: value})
         elif settings.get('query_class') is Prefix:
-            return Prefix(**{field: value})
+            # If you're having problems with Prefix queries, see if the
+            # whitespace analyzer is set! See the RecipeIndex class for more.
+            return Prefix(**{field: {'value': value}})
         elif settings.get('query_class') is Match:
             return Match(**{field: {'query': value}})
         elif settings.get('query_class') is Exists:
