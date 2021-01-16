@@ -1,11 +1,10 @@
-from .baseserializer import BaseSerializer
+from barbados.serializers.base import BaseSerializer
 
 
 class DictSerializer(BaseSerializer):
     """
-    https://realpython.com/factory-method-python/
+    Serialize an object into a dictionary containing all essential data.
     """
-
     format = 'dict'
 
     def serialize(self):

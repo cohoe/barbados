@@ -1,4 +1,4 @@
-from .baseindexer import BaseIndexer
+from barbados.indexers.base import BaseIndexer
 from barbados.factories import CocktailFactory
 from barbados.indexes import RecipeIndex
 from barbados.objects.cocktail import Cocktail

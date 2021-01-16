@@ -1,12 +1,11 @@
 import json
-from .baseserializer import BaseSerializer
+from barbados.serializers.base import BaseSerializer
 
 
 class JsonSerializer(BaseSerializer):
     """
-    https://realpython.com/factory-method-python/
+    Serialize an object into a JSON blob all essential data.
     """
-
     format = 'JSON'
 
     def serialize(self):

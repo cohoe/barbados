@@ -3,7 +3,7 @@ from barbados.services.logging import Log
 from barbados.resolution import Resolution, DirectResolution, ImplicitResolution, MissingResolution
 from barbados.resolution.summary import SpecResolutionSummary
 from barbados.caches.ingredienttree import IngredientTreeCache
-from barbados.indexers.inventoryspecresolution import InventorySpecResolutionIndexer
+from barbados.indexers.inventoryspec import InventorySpecResolutionIndexer
 
 
 class RecipeResolver(BaseResolver):

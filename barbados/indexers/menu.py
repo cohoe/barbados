@@ -1,4 +1,4 @@
-from .baseindexer import BaseIndexer
+from barbados.indexers.base import BaseIndexer
 from barbados.factories import MenuFactory
 from barbados.indexes import MenuIndex
 from barbados.objects.menu import Menu

@@ -1,15 +1,27 @@
-from .recipeindexer import RecipeIndexer
-from .ingredientindexer import IngredientIndexer
-from .menuindexer import MenuIndexer
-from .inventoryspecresolution import InventorySpecResolutionIndexer
+from barbados.indexers.recipe import RecipeIndexer
+from barbados.indexers.ingredient import IngredientIndexer
+from barbados.indexers.menu import MenuIndexer
+from barbados.indexers.inventoryspec import InventorySpecResolutionIndexer
 
 
 class IndexerFactory:
+    """
+    This factory controls loading of all indexers and can provide them to consumers
+    based on a number of factors.
+    """
     def __init__(self):
+        """
+        The internal tracking data should not be exposed publicly.
+        """
         self._indexers = {}
         self._for_indexes = {}
 
     def register_class(self, indexer):
+        """
+        Load an indexer into this system for use.
+        :param indexer: Child class of barbados.indexers.base.BaseIndexer.
+        :return: None
+        """
         for_class = indexer.for_class
         self._indexers[for_class] = indexer
 
@@ -18,9 +30,9 @@ class IndexerFactory:
 
     def get_indexer(self, indexable):
         """
-        Get the Indexer for a particular object
-        :param indexable:
-        :return:
+        Get the Indexer for a particular object.
+        :param indexable: Object of any type that should be indexable.
+        :return: Child class of barbados.indexers.base.BaseIndexer that can be used to index the object.
         """
         class_name = indexable.__class__
         indexer = self._indexers.get(class_name)
@@ -31,8 +43,8 @@ class IndexerFactory:
     def indexer_for(self, index):
         """
         Get the indexer for a particular index.
-        :param index: BarbadosIndex child.
-        :return: Indexer.
+        :param index: barbados.indexes.base.BaseIndex child representing an ElasticSearch index.
+        :return: Child class of barbados.indexers.base.BaseIndexer that can be used to index to the Index.
         """
         indexer = self._for_indexes.get(index)
         if not indexer:
