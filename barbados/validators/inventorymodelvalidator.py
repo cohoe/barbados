@@ -1,4 +1,4 @@
-from barbados.text import Slug
+from barbados.objects.text import Slug
 from barbados.models import InventoryModel
 from .basevalidator import BaseValidator
 

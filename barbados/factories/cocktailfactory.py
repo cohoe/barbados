@@ -1,13 +1,12 @@
 from barbados.objects.cocktail import Cocktail
 from barbados.objects.origin import Origin
-from barbados.text import Text
+from barbados.objects.text import Text, Slug
 from .specfactory import SpecFactory
 from .citationfactory import CitationFactory
 from barbados.serializers import ObjectSerializer
 from .base import BaseFactory
 import copy
 from barbados.objects.image import Image
-from barbados.text import Slug
 from barbados.models.cocktailmodel import CocktailModel
 
 

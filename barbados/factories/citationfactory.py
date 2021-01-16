@@ -1,5 +1,5 @@
 from barbados.objects.citation import Citation
-from barbados.text import Text
+from barbados.objects.text import Text
 from datetime import date as Date
 from barbados.exceptions import ValidationException
 

@@ -1,4 +1,4 @@
-from barbados.text import Slug
+from barbados.objects.text import Slug
 from barbados.models import IngredientModel, CocktailModel
 from .basevalidator import BaseValidator
 

@@ -1,5 +1,5 @@
 from barbados.factories.base import BaseFactory
-from barbados.text import DisplayName
+from barbados.objects.text import DisplayName
 from barbados.objects.inventory import Inventory
 from barbados.objects.inventoryitem import InventoryItem
 from barbados.exceptions import ValidationException

@@ -1,7 +1,7 @@
 from barbados.services.logging import Log
 from barbados.connectors.sqlite import SqliteConnector
 from barbados.objects.ingredientkinds import IngredientKind, ProductKind
-from barbados.text import Slug, DisplayName
+from barbados.objects.text import Slug, DisplayName
 from barbados.models.mixologytech import IngredientModel, IngredientAlternateSpellingModel, IngredientSynonymModel
 from barbados.models.mixologytech import IngredientCategoryMappingModel, IngredientCategoryModel
 from barbados.models.mixologytech import RecipeModel

@@ -1,4 +1,4 @@
-from barbados.text import DisplayName
+from barbados.objects.text import DisplayName
 from barbados.serializers import ObjectSerializer
 
 
