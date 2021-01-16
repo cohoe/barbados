@@ -1,8 +1,9 @@
+from barbados.objects.base import BarbadosObject
 from barbados.serializers import ObjectSerializer
 from barbados.objects.inventoryitem import InventoryItem
 
 
-class Inventory:
+class Inventory(BarbadosObject):
     def __init__(self, id, display_name, items, implicit_items=None):
         self.id = id
         self.display_name = display_name

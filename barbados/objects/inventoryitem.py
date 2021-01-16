@@ -1,4 +1,7 @@
-class InventoryItem:
+from barbados.objects.base import BarbadosObject
+
+
+class InventoryItem(BarbadosObject):
     """
     Single item within the inventory.
     """

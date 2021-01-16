@@ -1,7 +1,8 @@
+from barbados.objects.base import BarbadosObject
 from barbados.objects.text import DisplayName
 
 
-class Glassware:
+class Glassware(BarbadosObject):
     def __init__(self, slug, display_name=None):
         if not display_name:
             display_name = DisplayName(slug)

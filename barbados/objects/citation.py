@@ -1,8 +1,9 @@
 # @TODO Oh gods.... all of this.
+from barbados.objects.base import BarbadosObject
 from barbados.serializers import ObjectSerializer
 
 
-class Citation:
+class Citation(BarbadosObject):
     def __init__(self, title=None, author=None, date=None, publisher=None, page=None, notes=None, href=None, location=None, issue=None):
         self.title = title
         self.author = author

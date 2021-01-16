@@ -1,7 +1,8 @@
+from barbados.objects.base import BarbadosObject
 from barbados.serializers import ObjectSerializer
 
 
-class Cocktail:
+class Cocktail(BarbadosObject):
     def __init__(self, display_name, origin, specs, citations, notes, tags, slug, images):
         self.display_name = display_name
         self.origin = origin

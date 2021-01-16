@@ -1,7 +1,8 @@
+from barbados.objects.base import BarbadosObject
 from barbados.objects.text import DisplayName
 
 
-class Construction:
+class Construction(BarbadosObject):
     def __init__(self, slug, display_name=None):
         self.slug = slug
         self.display_name = display_name

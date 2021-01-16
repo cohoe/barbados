@@ -1,4 +1,4 @@
-from barbados.connectors import RedisConnector
+from barbados.connectors.redis import RedisConnector
 
 
 class CacheService:

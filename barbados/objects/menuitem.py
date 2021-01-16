@@ -1,4 +1,7 @@
-class MenuItem:
+from barbados.objects.base import BarbadosObject
+
+
+class MenuItem(BarbadosObject):
     """
     A MenuItem is a glorified hint/pointer to a specific item
     in a menu. Right now this is only coded for either a "cocktail"

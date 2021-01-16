@@ -1,5 +1,5 @@
 from barbados.connectors.zookeeper import ZookeeperConnector
-from barbados.connectors import PostgresqlConnector
+from barbados.connectors.postgresql import PostgresqlConnector
 from barbados.exceptions import FatalException
 
 

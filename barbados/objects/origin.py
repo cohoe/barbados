@@ -1,4 +1,7 @@
-class Origin:
+from barbados.objects.base import BarbadosObject
+
+
+class Origin(BarbadosObject):
     def __init__(self, creator=None, venue=None, location=None, year=None, story=None, era=None):
         self.creator = creator
         self.venue = venue
