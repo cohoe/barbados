@@ -1,7 +1,7 @@
 from barbados.resolvers.base import BaseResolver
 from barbados.services.logging import LogService
-from barbados.resolution import Resolution, DirectResolution, ImplicitResolution, MissingResolution
-from barbados.resolution.summary import SpecResolutionSummary
+from barbados.objects.resolution import Resolution, DirectResolution, ImplicitResolution, MissingResolution
+from barbados.objects.resolution.summary import SpecResolutionSummary
 from barbados.caches.ingredienttree import IngredientTreeCache
 from barbados.indexers.inventoryspec import InventorySpecResolutionIndexer
 

@@ -1,7 +1,7 @@
 from barbados.indexers.base import BaseIndexer
 from barbados.factories.specresolution import SpecResolutionFactory
 from barbados.indexes import InventorySpecResolution
-from barbados.resolution.summary import SpecResolutionSummary
+from barbados.objects.resolution.summary import SpecResolutionSummary
 
 
 class InventorySpecResolutionIndexer(BaseIndexer):
