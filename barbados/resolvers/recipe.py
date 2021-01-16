@@ -1,4 +1,4 @@
-from barbados.resolvers.baseresolver import BaseResolver
+from barbados.resolvers.base import BaseResolver
 from barbados.services.logging import LogService
 from barbados.resolution import Resolution, DirectResolution, ImplicitResolution, MissingResolution
 from barbados.resolution.summary import SpecResolutionSummary

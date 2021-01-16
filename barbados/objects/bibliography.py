@@ -1,5 +1,5 @@
 from barbados.services.registry import RegistryService
-from barbados.models.cocktailmodel import CocktailModel
+from barbados.models.cocktail import CocktailModel
 from barbados.factories.cocktailfactory import CocktailFactory
 
 

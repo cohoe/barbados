@@ -5,7 +5,7 @@ from barbados.objects.inventoryitem import InventoryItem
 from barbados.exceptions import ValidationException
 from barbados.services.logging import LogService
 from uuid import uuid4
-from barbados.models.inventorymodel import InventoryModel
+from barbados.models.inventory import InventoryModel
 from barbados.caches.ingredienttree import IngredientTreeCache
 
 

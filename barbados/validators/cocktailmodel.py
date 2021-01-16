@@ -1,5 +1,6 @@
 from barbados.objects.text import Slug
-from barbados.models import IngredientModel, CocktailModel
+from barbados.models.ingredient import IngredientModel
+from barbados.models.cocktail import CocktailModel
 from barbados.validators.base import BaseValidator
 
 

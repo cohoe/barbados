@@ -1,8 +1,8 @@
 from barbados.services.logging import LogService
-from .recipe import RecipeIndex
-from .ingredient import IngredientIndex
-from .menu import MenuIndex
-from .inventoryspecresolution import InventorySpecResolution
+from barbados.indexes.recipe import RecipeIndex
+from barbados.indexes.ingredient import IngredientIndex
+from barbados.indexes.menu import MenuIndex
+from barbados.indexes.inventoryspecresolution import InventorySpecResolution
 from barbados.connectors.elasticsearch import ElasticsearchConnector
 from elasticsearch.exceptions import NotFoundError
 

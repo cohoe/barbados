@@ -5,10 +5,10 @@ from barbados.services.registry import RegistryService
 from barbados.services.cache import CacheService
 from barbados.serializers import ObjectSerializer
 
-from barbados.models.cocktailmodel import CocktailModel
-from barbados.models.inventorymodel import InventoryModel
-from barbados.models.ingredientmodel import IngredientModel
-from barbados.models.menumodel import MenuModel
+from barbados.models.cocktail import CocktailModel
+from barbados.models.inventory import InventoryModel
+from barbados.models.ingredient import IngredientModel
+from barbados.models.menu import MenuModel
 
 from barbados.factories.cocktailfactory import CocktailFactory
 from barbados.factories.inventoryfactory import InventoryFactory

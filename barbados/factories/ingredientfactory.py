@@ -1,6 +1,6 @@
 from barbados.objects.ingredient import Ingredient
 from .base import BaseFactory
-from barbados.models.ingredientmodel import IngredientModel
+from barbados.models.ingredient import IngredientModel
 
 
 class IngredientFactory(BaseFactory):

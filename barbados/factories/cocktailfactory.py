@@ -7,7 +7,7 @@ from barbados.serializers import ObjectSerializer
 from .base import BaseFactory
 import copy
 from barbados.objects.image import Image
-from barbados.models.cocktailmodel import CocktailModel
+from barbados.models.cocktail import CocktailModel
 
 
 # @TODO this needs to standardize into modern constructs!

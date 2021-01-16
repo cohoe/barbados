@@ -1,5 +1,5 @@
 from elasticsearch_dsl import Document, InnerDoc, Text, Object
-from .base import BaseIndex, BarbadosIndex
+from barbados.indexes.base import BaseIndex, BarbadosIndex
 
 
 class ComponentIndex(InnerDoc):

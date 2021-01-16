@@ -1,7 +1,7 @@
 import copy
 from treelib import Node, Tree
 from treelib.exceptions import NodeIDAbsentError
-from barbados.models import IngredientModel
+from barbados.models.ingredient import IngredientModel
 from barbados.objects.ingredientkinds import IngredientKinds, CategoryKind, FamilyKind
 from barbados.services.logging import LogService
 from barbados.services.registry import RegistryService
