@@ -1,5 +1,5 @@
 from barbados.resolvers.baseresolver import BaseResolver
-from barbados.services.logging import Log
+from barbados.services.logging import LogService
 from barbados.resolution import Resolution, DirectResolution, ImplicitResolution, MissingResolution
 from barbados.resolution.summary import SpecResolutionSummary
 from barbados.caches.ingredienttree import IngredientTreeCache
@@ -14,12 +14,12 @@ class RecipeResolver(BaseResolver):
         tree = IngredientTreeCache.retrieve()
         inventory.expand(tree=tree)
 
-        Log.info("Cocktail specs: %s" % [spec.slug for spec in cocktail.specs])
+        LogService.info("Cocktail specs: %s" % [spec.slug for spec in cocktail.specs])
         for spec in cocktail.specs:
             # Skip any specs that the user didn't ask for with the spec_slug
             # parameter.
             if spec_slug and spec.slug != spec_slug:
-                Log.info("Skipping slug %s because you didn't want it." % spec.slug)
+                LogService.info("Skipping slug %s because you didn't want it." % spec.slug)
                 continue
 
             # Parse the spec

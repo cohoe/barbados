@@ -3,7 +3,7 @@ from barbados.factories import CocktailFactory
 from barbados.indexes import RecipeIndex
 from barbados.objects.cocktail import Cocktail
 from elasticsearch.exceptions import NotFoundError
-from barbados.services.logging import Log
+from barbados.services.logging import LogService
 
 
 class RecipeIndexer(BaseIndexer):
@@ -25,9 +25,9 @@ class RecipeIndexer(BaseIndexer):
                 try:
                     RecipeIndex.delete(indexable)
                 except NotFoundError:
-                    Log.warning("No cache entry found for %s" % indexable)
+                    LogService.warning("No cache entry found for %s" % indexable)
         except KeyError as e:
             # Since this is a DELETE situation we don't particularly care to correct
             # the problem, but if we're creating or some other thing that could be
             # more problematic.
-            Log.error("Recipe has bad data: %s" % e)
+            LogService.error("Recipe has bad data: %s" % e)

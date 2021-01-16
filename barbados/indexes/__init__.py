@@ -1,4 +1,4 @@
-from barbados.services.logging import Log
+from barbados.services.logging import LogService
 from .recipe import RecipeIndex
 from .ingredient import IngredientIndex
 from .menu import MenuIndex
@@ -40,11 +40,11 @@ class IndexFactory:
         :return: None
         """
         for name in self._indexes.keys():
-            Log.debug("Init on %s" % name)
+            LogService.debug("Init on %s" % name)
             try:
                 self.rebuild(self._indexes.get(name))
             except NotFoundError or KeyError or AttributeError as e:
-                Log.warning("Error re-initing index %s: %s" % (name, e))
+                LogService.warning("Error re-initing index %s: %s" % (name, e))
 
     def rebuild(self, index_class):
         """
@@ -56,9 +56,9 @@ class IndexFactory:
         try:
             index_class._index.delete()
             index_class.init()
-            Log.info("Successfully rebuilt index %s" % index_class.Index.name)
+            LogService.info("Successfully rebuilt index %s" % index_class.Index.name)
         except NotFoundError:
-            Log.warning("Index %s did not exist." % index_class.Index.name)
+            LogService.warning("Index %s did not exist." % index_class.Index.name)
 
     def get_indexes(self):
         """

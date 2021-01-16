@@ -1,8 +1,8 @@
 import json
 from barbados.caches import Caches
 from barbados.caches.base import CacheBase
-from barbados.services.registry import Registry
-from barbados.services.cache import Cache
+from barbados.services.registry import RegistryService
+from barbados.services.cache import CacheService
 from barbados.serializers import ObjectSerializer
 
 from barbados.models.cocktailmodel import CocktailModel
@@ -36,7 +36,7 @@ class TableScanCache(CacheBase):
         Populate the cache with its expected value(s).
         :return: None
         """
-        pgconn = Registry.get_database_connection()
+        pgconn = RegistryService.get_database_connection()
 
         with pgconn.get_session() as session:
             cache_objects = []
@@ -44,7 +44,7 @@ class TableScanCache(CacheBase):
             for result_object in objects:
                 cache_objects.append(ObjectSerializer.serialize(result_object, 'dict'))
 
-        Cache.set(cls.cache_key, json.dumps(cache_objects))
+        CacheService.set(cls.cache_key, json.dumps(cache_objects))
 
 
 class CocktailScanCache(TableScanCache):

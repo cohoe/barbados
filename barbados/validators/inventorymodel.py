@@ -1,6 +1,6 @@
 from barbados.objects.text import Slug
 from barbados.models import InventoryModel
-from .basevalidator import BaseValidator
+from barbados.validators.base import BaseValidator
 
 
 class InventoryModelValidator(BaseValidator):

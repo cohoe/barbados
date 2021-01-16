@@ -3,7 +3,7 @@ import json
 import yaml
 import string
 import re
-from barbados.services.logging import Log
+from barbados.services.logging import LogService
 from slugify import slugify
 from barbados.connectors.upneat.recipe import UpneatRecipeParser
 from bs4 import BeautifulSoup
@@ -107,7 +107,7 @@ class UpneatConnector:
     @staticmethod
     def scrape_recipe(recipe):
         url = "%s/%s" % (url_base, endpoints.get('recipe') % recipe)
-        Log.info("scraping %s" % url)
+        LogService.info("scraping %s" % url)
         parser = UpneatRecipeParser(slug=recipe, url=url)
         raw_recipe = parser.parse()
 
@@ -127,7 +127,7 @@ class UpneatConnector:
                 try:
                     raw_recipes.append(UpneatConnector.scrape_recipe(slug))
                 except:
-                    Log.error("ERROR WITH %s " % slug)
+                    LogService.error("ERROR WITH %s " % slug)
 
         return raw_recipes
 

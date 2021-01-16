@@ -1,7 +1,7 @@
 import os
 from barbados.exceptions import ServiceUnavailableException
 from redis import Redis, exceptions
-from barbados.services.logging import Log
+from barbados.services.logging import LogService
 
 
 # @TODO implement global connection pooling somewhere
@@ -17,7 +17,7 @@ class RedisConnector:
         self.password = password
         self.ssl = ssl
 
-        Log.info("Using Redis host: \"%s:%i\"" % (host, port))
+        LogService.info("Using Redis host: \"%s:%i\"" % (host, port))
 
     def set(self, key, value):
         self._connect()

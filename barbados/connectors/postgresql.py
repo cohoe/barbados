@@ -1,14 +1,14 @@
 import sqlalchemy
 from sqlalchemy.orm import sessionmaker
 from barbados.models.base import BarbadosModel
-from barbados.services.logging import Log
+from barbados.services.logging import LogService
 
 
 class PostgresqlConnector:
 
     def __init__(self, username, password, database, host='127.0.0.1', port=5432, debug_sql=False):
         connection_string = "postgres://%s:%s@%s:%i/%s" % (username, password, host, port, database)
-        Log.info("Using Postgres host: \"%s\"" % host)
+        LogService.info("Using Postgres host: \"%s\"" % host)
 
         self.engine = sqlalchemy.create_engine(connection_string, echo=debug_sql)
         self.Session = sessionmaker(bind=self.engine)

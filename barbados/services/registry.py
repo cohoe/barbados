@@ -3,7 +3,7 @@ from barbados.connectors import PostgresqlConnector
 from barbados.exceptions import FatalException
 
 
-class Registry:
+class RegistryService:
     """
     Generic registry service class. This exists to provide a common interface
     to the connectors. Potential connectors could be:
@@ -21,7 +21,7 @@ class Registry:
         :param path: Normalized path in the hierarchy to the key.
         :return: str or Exception
         """
-        return Registry.registry_connector.get(path)
+        return RegistryService.registry_connector.get(path)
 
     @staticmethod
     def set(path, value):
@@ -32,7 +32,7 @@ class Registry:
         :param value: String of the value to set
         :return: None or Exception
         """
-        return Registry.registry_connector.set(path, value)
+        return RegistryService.registry_connector.set(path, value)
 
     @staticmethod
     def get_database_connection():
@@ -42,10 +42,10 @@ class Registry:
         :return:
         """
         try:
-            db_database = Registry.get('/database/postgres/database')
-            db_username = Registry.get('/database/postgres/username')
-            db_password = Registry.get('/database/postgres/password')
-            db_hostname = Registry.get('/database/postgres/hostname')
+            db_database = RegistryService.get('/database/postgres/database')
+            db_username = RegistryService.get('/database/postgres/username')
+            db_password = RegistryService.get('/database/postgres/password')
+            db_hostname = RegistryService.get('/database/postgres/hostname')
 
             return PostgresqlConnector(host=db_hostname, database=db_database,
                                        username=db_username, password=db_password)

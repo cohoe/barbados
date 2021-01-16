@@ -1,11 +1,11 @@
 from barbados.exceptions import ValidationException
-from barbados.services.logging import Log
+from barbados.services.logging import LogService
 
 
 class BaseValidator:
 
     def fail(self, message):
-        Log.error(message)
+        LogService.error(message)
         if self.fatal:
             raise ValidationException(message)
 

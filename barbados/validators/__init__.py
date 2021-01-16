@@ -1,7 +1,7 @@
-from .cocktailmodelvalidator import CocktailModelValidator
-from .ingredientmodelvalidator import IngredientModelValidator
-from .menumodelvalidator import MenuModelValidator
-from .inventorymodelvalidator import InventoryModelValidator
+from barbados.validators.cocktailmodel import CocktailModelValidator
+from barbados.validators.ingredientmodel import IngredientModelValidator
+from barbados.validators.menumodel import MenuModelValidator
+from barbados.validators.inventorymodel import InventoryModelValidator
 
 
 class ValidatorFactory:

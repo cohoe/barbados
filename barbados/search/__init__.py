@@ -1,4 +1,4 @@
-from barbados.services.logging import Log
+from barbados.services.logging import LogService
 from elasticsearch_dsl.query import Bool, Wildcard, MatchPhrase, Prefix, Match, Range, Exists
 from barbados.exceptions import ValidationException
 from barbados.search.occurrences import occurrence_factory, MustOccurrence, MustNotOccurrence
@@ -72,7 +72,7 @@ class SearchBase:
         # @TODO address the search range hacks here.
         """
         results = self.index_class.search()[0:1000].query(self.q).sort(sort).execute()
-        Log.info("Got %s results." % results.hits.total.value)
+        LogService.info("Got %s results." % results.hits.total.value)
         return SearchResults(hits=results)
 
     def add_query_parameter(self, url_parameter, query_class, fields, url_parameter_type=str,
@@ -257,7 +257,7 @@ class SearchBase:
 
         # Build the overall query.
         query = Bool(must=musts, must_not=must_nots)
-        Log.info("Search Conditions are %s" % query)
+        LogService.info("Search Conditions are %s" % query)
         return query
 
     @staticmethod

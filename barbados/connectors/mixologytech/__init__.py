@@ -1,4 +1,4 @@
-from barbados.services.logging import Log
+from barbados.services.logging import LogService
 from barbados.connectors.sqlite import SqliteConnector
 from barbados.objects.ingredientkinds import IngredientKind, ProductKind
 from barbados.objects.text import Slug, DisplayName
@@ -40,14 +40,14 @@ class MixologyTechConnector:
             }
 
             standardized_ingredients.append(standardized_ingredient)
-            Log.info(standardized_ingredient) if not standardized_ingredient['parent'] else None
+            LogService.info(standardized_ingredient) if not standardized_ingredient['parent'] else None
 
         # print(len(IngredientModel.query.all()))
         # for ingredient in IngredientModel.query.all():
         # print(ingredient.canonical_name)
         # for altname in IngredientAlternateSpellingModel.query.all():
         # print(altname.ingredient_id)
-        Log.info("Orphans at %i" % orphan_count)
+        LogService.info("Orphans at %i" % orphan_count)
         return standardized_ingredients
 
     @staticmethod
@@ -75,7 +75,7 @@ class MixologyTechConnector:
             if category.position and category.position >= 5:
                 return category.display_name
 
-        Log.error("Could not find category for %s" % ingredient.canonical_name)
+        LogService.error("Could not find category for %s" % ingredient.canonical_name)
 
     def get_recipes(self):
         with self.dbconn.get_session() as session:

@@ -3,8 +3,8 @@ from treelib import Node, Tree
 from treelib.exceptions import NodeIDAbsentError
 from barbados.models import IngredientModel
 from barbados.objects.ingredientkinds import IngredientKinds, CategoryKind, FamilyKind
-from barbados.services.logging import Log
-from barbados.services.registry import Registry
+from barbados.services.logging import LogService
+from barbados.services.registry import RegistryService
 
 
 class IngredientTree:
@@ -16,7 +16,7 @@ class IngredientTree:
     def _build_tree(self, passes, root=root_node):
         tree = Tree()
 
-        pgconn = Registry.get_database_connection()
+        pgconn = RegistryService.get_database_connection()
         with pgconn.get_session() as session:
 
             tree.create_node(root, root)
@@ -28,21 +28,21 @@ class IngredientTree:
 
             ingredients_to_place = list(IngredientModel.get_usable_ingredients(session))
             for i in range(1, passes + 1):
-                Log.debug("Pass %i/%i" % (i, passes))
+                LogService.debug("Pass %i/%i" % (i, passes))
 
                 for item in ingredients_to_place[:]:
                     if item.kind == FamilyKind.value:
                         ingredients_to_place.remove(item)
-                        Log.debug("Skipping %s because it is a family." % item.slug)
+                        LogService.debug("Skipping %s because it is a family." % item.slug)
                         continue
                     try:
                         tree.create_node(item.slug, item.slug, parent=item.parent, data=self._create_tree_data(item))
                         ingredients_to_place.remove(item)
                     except NodeIDAbsentError:
-                        Log.debug("skipping %s (Attempt %i/%s)" % (item.slug, i, passes))
+                        LogService.debug("skipping %s (Attempt %i/%s)" % (item.slug, i, passes))
 
                 if len(ingredients_to_place) == 0:
-                    Log.info("All done after pass %i" % i)
+                    LogService.info("All done after pass %i" % i)
                     break
 
         return tree

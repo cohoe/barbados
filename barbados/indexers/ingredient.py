@@ -2,7 +2,7 @@ from barbados.indexers.base import BaseIndexer
 from barbados.factories import IngredientFactory
 from barbados.indexes import IngredientIndex
 from barbados.objects.ingredient import Ingredient
-from barbados.services.logging import Log
+from barbados.services.logging import LogService
 from elasticsearch.exceptions import NotFoundError
 
 
@@ -23,4 +23,4 @@ class IngredientIndexer(BaseIndexer):
         try:
             IngredientIndex.delete(index)
         except NotFoundError:
-            Log.warn("Object %s was not found in index on DELETE. This probably isn't a problem?" % ingredient_object.slug)
+            LogService.warn("Object %s was not found in index on DELETE. This probably isn't a problem?" % ingredient_object.slug)

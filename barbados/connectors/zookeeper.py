@@ -4,7 +4,7 @@ from kazoo.exceptions import NoNodeError
 from kazoo.retry import KazooRetry
 from kazoo.handlers.threading import KazooTimeoutError
 from barbados.exceptions import FatalException
-from barbados.services.logging import Log
+from barbados.services.logging import LogService
 
 
 class ZookeeperConnector:
@@ -12,7 +12,7 @@ class ZookeeperConnector:
         self.hosts = hosts
         self.read_only = read_only
 
-        Log.info("Using Zookeeper hosts: \"%s\"" % hosts)
+        LogService.info("Using Zookeeper hosts: \"%s\"" % hosts)
 
     def set(self, path, value):
         self._connect()
@@ -31,14 +31,14 @@ class ZookeeperConnector:
         except NoNodeError:
             raise KeyError("%s does not exist." % path)
         except Exception as e:
-            Log.error(e.__class__)
-            Log.error(e)
+            LogService.error(e.__class__)
+            LogService.error(e)
 
     def _connect(self):
         if not hasattr(self, 'zk'):
             self.zk = KazooClient(hosts=self.hosts, read_only=self.read_only, timeout=5, connection_retry=self._get_retry())
         elif self.zk.state != KazooState.CONNECTED:
-            Log.warning("ZooKeeper state is %s" % self.zk.state)
+            LogService.warning("ZooKeeper state is %s" % self.zk.state)
             pass
         elif self.zk.state == KazooState.CONNECTED:
             return

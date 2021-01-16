@@ -1,7 +1,7 @@
 from barbados.connectors import RedisConnector
 
 
-class Cache:
+class CacheService:
     """
     Generic cache class. This exists to provide a common interface
     to the connectors. Potential connectors could be:
@@ -18,7 +18,7 @@ class Cache:
         :param key: Cache key.
         :return: str or Exception
         """
-        return Cache.cache_connector.get(key)
+        return CacheService.cache_connector.get(key)
 
     @staticmethod
     def set(key, value):
@@ -29,7 +29,7 @@ class Cache:
         :param value: String of the value to set
         :return: None or Exception
         """
-        return Cache.cache_connector.set(key, value)
+        return CacheService.cache_connector.set(key, value)
 
     @staticmethod
     def delete(key):
@@ -38,4 +38,4 @@ class Cache:
         :param key: cache key
         :return: None or Exception
         """
-        return Cache.cache_connector.delete(key)
+        return CacheService.cache_connector.delete(key)

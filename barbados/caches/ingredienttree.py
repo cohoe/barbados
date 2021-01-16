@@ -1,8 +1,8 @@
 import pickle
 from barbados.caches import Caches
 from barbados.caches.base import CacheBase
-from barbados.services.cache import Cache
-from barbados.services.logging import Log
+from barbados.services.cache import CacheService
+from barbados.services.logging import LogService
 from barbados.objects.ingredienttree import IngredientTree
 
 
@@ -15,16 +15,16 @@ class IngredientTreeCache(CacheBase):
 
     @classmethod
     def populate(cls):
-        Cache.set(cls.cache_key, pickle.dumps(IngredientTree()))
+        CacheService.set(cls.cache_key, pickle.dumps(IngredientTree()))
 
     @classmethod
     def retrieve(cls):
         try:
-            return pickle.loads(Cache.get(cls.cache_key))
+            return pickle.loads(CacheService.get(cls.cache_key))
         except KeyError:
-            Log.warning("Attempted to retrieve '%s' but it was empty. Repopulating..." % cls.cache_key)
+            LogService.warning("Attempted to retrieve '%s' but it was empty. Repopulating..." % cls.cache_key)
             cls.populate()
-            return pickle.loads(Cache.get(cls.cache_key))
+            return pickle.loads(CacheService.get(cls.cache_key))
 
 
 Caches.register_cache(IngredientTreeCache)

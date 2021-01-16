@@ -1,7 +1,7 @@
 import sqlalchemy
 from sqlalchemy.orm import sessionmaker
 # from barbados.models.base import BarbadosModel, session
-from barbados.services.logging import Log
+from barbados.services.logging import LogService
 from contextlib import contextmanager
 
 
@@ -9,7 +9,7 @@ class SqliteConnector:
 
     def __init__(self, path):
         connection_string = "sqlite:///%s" % path
-        Log.info("connection string is '%s'" % connection_string)
+        LogService.info("connection string is '%s'" % connection_string)
 
         self.engine = sqlalchemy.create_engine(connection_string)
         # session.configure(bind=self.engine)
