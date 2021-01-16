@@ -1,6 +1,6 @@
 from barbados.objects.spec import Spec
 from barbados.objects.origin import Origin
-from barbados.glassware import Glassware
+from barbados.objects.glassware import Glassware
 from barbados.objects.speccomponent import SpecComponent
 from barbados.objects.text import Text, Slug, DisplayName
 from barbados.objects.construction import Construction
