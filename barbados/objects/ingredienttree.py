@@ -4,7 +4,7 @@ from treelib.exceptions import NodeIDAbsentError
 from barbados.models.ingredient import IngredientModel
 from barbados.objects.ingredientkinds import IngredientKinds, CategoryKind, FamilyKind
 from barbados.services.logging import LogService
-from barbados.services.registry import RegistryService
+from barbados.services.database import DatabaseService
 
 
 class IngredientTree:
@@ -16,7 +16,7 @@ class IngredientTree:
     def _build_tree(self, passes, root=root_node):
         tree = Tree()
 
-        pgconn = RegistryService.get_database_connection()
+        pgconn = DatabaseService.database_connector
         with pgconn.get_session() as session:
 
             tree.create_node(root, root)

@@ -1,4 +1,4 @@
-from barbados.services.registry import RegistryService
+from barbados.services.database import DatabaseService
 from barbados.models.cocktail import CocktailModel
 from barbados.factories.cocktailfactory import CocktailFactory
 
@@ -18,7 +18,7 @@ class Bibliography:
         :return: List[Citation]
         """
         citations = []
-        pgconn = RegistryService.get_database_connection()
+        pgconn = DatabaseService.database_connector
         with pgconn.get_session() as session:
             results = session.query(CocktailModel).all()
             for result in results:

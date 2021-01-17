@@ -2,22 +2,23 @@ import os
 from barbados.exceptions import ServiceUnavailableException
 from redis import Redis, exceptions
 from barbados.services.logging import LogService
-
-
-# @TODO implement global connection pooling somewhere
+from barbados.settings import Setting
 
 
 class RedisConnector:
-    def __init__(self, host=os.getenv('AMARI_REDIS_HOST', default='127.0.0.1'),
-                 port=int(os.getenv('AMARI_REDIS_PORT', default=6379)),
-                 username=None, password=None, ssl=False):
-        self.host = host
-        self.port = port
-        self.username = username
-        self.password = password
-        self.ssl = ssl
+    """
+    Connector to the Redis cache service. The CacheService creates an instance of this connector
+    and uses it to communicate with the backend.
+    @TODO implement global connection pooling somewhere
+    """
+    def __init__(self):
+        self.host = Setting(path='/cache/redis/host', env='AMARI_REDIS_HOST', default='127.0.0.1', type_=str).get_value()
+        self.port = Setting(path='/cache/redis/port', env='AMARI_REDIS_PORT', default=6379, type_=int).get_value()
+        self.username = Setting(path='/cache/redis/username', env='AMARI_REDIS_USERNAME', default=None, type_=str).get_value()
+        self.password = Setting(path='/cache/redis/password', env='AMARI_REDIS_PASSWORD', default=None, type_=str).get_value()
+        self.ssl = Setting(path='/cache/redis/ssl', env='AMARI_REDIS_SSL', default=False, type_=bool).get_value()
 
-        LogService.info("Using Redis host: \"%s:%i\"" % (host, port))
+        LogService.info("Redis connection: %s:%s@%s:%s?ssl=%s" % (self.username, self.password, self.host, self.port, self.ssl))
 
     def set(self, key, value):
         self._connect()

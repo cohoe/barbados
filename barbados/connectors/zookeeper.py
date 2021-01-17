@@ -7,6 +7,7 @@ from barbados.exceptions import FatalException
 from barbados.services.logging import LogService
 
 
+# @TODO settingify this
 class ZookeeperConnector:
     def __init__(self, hosts=os.getenv('AMARI_ZOOKEEPER_HOSTS', '127.0.0.1:2181'), read_only=False):
         self.hosts = hosts

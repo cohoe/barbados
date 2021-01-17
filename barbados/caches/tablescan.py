@@ -1,7 +1,7 @@
 import json
 from barbados.caches import Caches
 from barbados.caches.base import CacheBase
-from barbados.services.registry import RegistryService
+from barbados.services.database import DatabaseService
 from barbados.services.cache import CacheService
 from barbados.serializers import ObjectSerializer
 
@@ -36,7 +36,7 @@ class TableScanCache(CacheBase):
         Populate the cache with its expected value(s).
         :return: None
         """
-        pgconn = RegistryService.get_database_connection()
+        pgconn = DatabaseService.database_connector
 
         with pgconn.get_session() as session:
             cache_objects = []

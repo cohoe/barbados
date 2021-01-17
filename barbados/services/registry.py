@@ -1,6 +1,4 @@
 from barbados.connectors.zookeeper import ZookeeperConnector
-from barbados.connectors.postgresql import PostgresqlConnector
-from barbados.exceptions import FatalException
 
 
 class RegistryService:
@@ -33,21 +31,3 @@ class RegistryService:
         :return: None or Exception
         """
         return RegistryService.registry_connector.set(path, value)
-
-    @staticmethod
-    def get_database_connection():
-        """
-        @TODO I don't like this is here but until a better place
-        presents itself its good enough.
-        :return:
-        """
-        try:
-            db_database = RegistryService.get('/database/postgres/database')
-            db_username = RegistryService.get('/database/postgres/username')
-            db_password = RegistryService.get('/database/postgres/password')
-            db_hostname = RegistryService.get('/database/postgres/hostname')
-
-            return PostgresqlConnector(host=db_hostname, database=db_database,
-                                       username=db_username, password=db_password)
-        except KeyError as e:
-            raise FatalException("Failure to get database connection (%s)" % e)
