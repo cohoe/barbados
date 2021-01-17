@@ -16,7 +16,7 @@ class IngredientTree:
     def _build_tree(self, passes, root=root_node):
         tree = Tree()
 
-        pgconn = DatabaseService.database_connector
+        pgconn = DatabaseService.connector
         with pgconn.get_session() as session:
 
             tree.create_node(root, root)

@@ -9,7 +9,7 @@ class CacheService:
     * Memcached
     """
 
-    cache_connector = RedisConnector()
+    connector = RedisConnector()
 
     @staticmethod
     def get(key):
@@ -18,7 +18,7 @@ class CacheService:
         :param key: Cache key.
         :return: str or Exception
         """
-        return CacheService.cache_connector.get(key)
+        return CacheService.connector.get(key)
 
     @staticmethod
     def set(key, value):
@@ -29,7 +29,7 @@ class CacheService:
         :param value: String of the value to set
         :return: None or Exception
         """
-        return CacheService.cache_connector.set(key, value)
+        return CacheService.connector.set(key, value)
 
     @staticmethod
     def delete(key):
@@ -38,4 +38,4 @@ class CacheService:
         :param key: cache key
         :return: None or Exception
         """
-        return CacheService.cache_connector.delete(key)
+        return CacheService.connector.delete(key)

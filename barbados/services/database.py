@@ -8,6 +8,9 @@ class DatabaseService:
     * PostgreSQL
     * SQLite
     * DynamoDB
+
+    Since everything in database-land operates via a connection object that's all
+    this class really creates.
     """
 
-    database_connector = PostgresqlConnector()
+    connector = PostgresqlConnector()

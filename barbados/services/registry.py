@@ -10,7 +10,7 @@ class RegistryService:
     * etcd
     """
 
-    registry_connector = ZookeeperConnector()
+    connector = ZookeeperConnector()
 
     @staticmethod
     def get(path):
@@ -19,7 +19,7 @@ class RegistryService:
         :param path: Normalized path in the hierarchy to the key.
         :return: str or Exception
         """
-        return RegistryService.registry_connector.get(path)
+        return RegistryService.connector.get(path)
 
     @staticmethod
     def set(path, value):
@@ -30,4 +30,4 @@ class RegistryService:
         :param value: String of the value to set
         :return: None or Exception
         """
-        return RegistryService.registry_connector.set(path, value)
+        return RegistryService.connector.set(path, value)

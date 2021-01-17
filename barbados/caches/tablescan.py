@@ -36,7 +36,7 @@ class TableScanCache(CacheBase):
         Populate the cache with its expected value(s).
         :return: None
         """
-        pgconn = DatabaseService.database_connector
+        pgconn = DatabaseService.connector
 
         with pgconn.get_session() as session:
             cache_objects = []
