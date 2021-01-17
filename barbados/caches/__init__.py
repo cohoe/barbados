@@ -33,6 +33,13 @@ class CacheFactory:
             raise KeyError("Cache '%s' not found." % key)
         return cache
 
+    def init(self):
+        """
+        Invalidate all caches.
+        :return: None
+        """
+        [self.get_cache(key).invalidate() for key in self._keys]
+
 
 # This is the thing that you import in other caches and use to register
 # that cache with the system. Also used if you want to retrieve a cache
