@@ -57,3 +57,19 @@ indexer_factory.register_class(RecipeIndexer)
 indexer_factory.register_class(IngredientIndexer)
 indexer_factory.register_class(MenuIndexer)
 indexer_factory.register_class(InventorySpecResolutionIndexer)
+
+
+class ObjectIndexer:
+    """
+    Generic object indexer class that provides a common way to index
+    any supported object.
+    """
+    @staticmethod
+    def index(indexable):
+        """
+        Take an object and index it.
+        :param indexable: barbados.objects.* that supports indexation.
+        @TODO someday should indexes return the index object for what they made?
+        """
+        indexer = indexer_factory.get_indexer(indexable=indexable)
+        indexer.index(indexable)
