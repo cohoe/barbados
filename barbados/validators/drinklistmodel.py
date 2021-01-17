@@ -1,11 +1,11 @@
 from barbados.objects.text import Slug
 from barbados.models.cocktail import CocktailModel
-from barbados.models.menu import MenuModel
+from barbados.models.drinklist import DrinkListModel
 from barbados.validators.base import BaseValidator
 
 
-class MenuModelValidator(BaseValidator):
-    for_class = MenuModel
+class DrinkListModelValidator(BaseValidator):
+    for_class = DrinkListModel
 
     def __init__(self, model, fatal=True):
         self.model = model
@@ -14,15 +14,16 @@ class MenuModelValidator(BaseValidator):
 
     def validate(self, session):
         self.session = session
-        self._check_slug()
+        # self._check_slug()
+        # @TODO check_id
         self._check_items()
 
-    def _check_slug(self):
-        slug = self.model.slug
-        calculated_slug = Slug(self.model.display_name)
-
-        if slug != calculated_slug:
-            self.fail("Slug (%s) is inconsistent with display_name (%s)." % (self.model.slug, self.model.display_name))
+    # def _check_slug(self):
+    #     slug = self.model.slug
+    #     calculated_slug = Slug(self.model.display_name)
+    #
+    #     if slug != calculated_slug:
+    #         self.fail("Slug (%s) is inconsistent with display_name (%s)." % (self.model.slug, self.model.display_name))
 
     def _check_items(self):
         for item in self.model.items:

@@ -1,7 +1,7 @@
 from barbados.services.logging import LogService
 from barbados.indexes.recipe import RecipeIndex
 from barbados.indexes.ingredient import IngredientIndex
-from barbados.indexes.menu import MenuIndex
+from barbados.indexes.drinklist import DrinkListIndex
 from barbados.indexes.inventoryspecresolution import InventorySpecResolution
 from barbados.connectors.elasticsearch import ElasticsearchConnector
 from elasticsearch.exceptions import NotFoundError
@@ -55,15 +55,17 @@ class IndexFactory:
         """
         try:
             index_class._index.delete()
-            index_class.init()
-            LogService.info("Successfully rebuilt index %s" % index_class.Index.name)
         except NotFoundError:
             LogService.warning("Index %s did not exist." % index_class.Index.name)
+
+        # Proceed with rebuild.
+        index_class.init()
+        LogService.info("Successfully rebuilt index %s" % index_class.Index.name)
 
     def get_indexes(self):
         """
         Return a dictionary containing all registered ElasticSearch indexes.
-        Keys are the name of the index (ex: recipe, ingredient, menu) with the
+        Keys are the name of the index (ex: recipe, ingredient, drinklist) with the
         value being the class represening that index.
         :return: Dict
         """
@@ -73,5 +75,5 @@ class IndexFactory:
 index_factory = IndexFactory()
 index_factory.register_index(RecipeIndex)
 index_factory.register_index(IngredientIndex)
-index_factory.register_index(MenuIndex)
+index_factory.register_index(DrinkListIndex)
 index_factory.register_index(InventorySpecResolution)

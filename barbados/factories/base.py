@@ -21,7 +21,7 @@ class BaseFactory:
         :param format: Format of the data to pass to the serializer.
         :return: Instance of the Index class.
         """
-        return index_class(meta={'id': obj.slug}, **ObjectSerializer.serialize(obj, format))
+        return index_class(meta={'id': obj.id}, **ObjectSerializer.serialize(obj, format))
 
     @classmethod
     def model_to_obj(cls, model):

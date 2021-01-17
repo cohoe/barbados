@@ -1,6 +1,6 @@
 from barbados.validators.cocktailmodel import CocktailModelValidator
 from barbados.validators.ingredientmodel import IngredientModelValidator
-from barbados.validators.menumodel import MenuModelValidator
+from barbados.validators.drinklistmodel import DrinkListModelValidator
 from barbados.validators.inventorymodel import InventoryModelValidator
 
 
@@ -24,7 +24,7 @@ class ValidatorFactory:
 validator_factory = ValidatorFactory()
 validator_factory.register_class(CocktailModelValidator)
 validator_factory.register_class(IngredientModelValidator)
-validator_factory.register_class(MenuModelValidator)
+validator_factory.register_class(DrinkListModelValidator)
 validator_factory.register_class(InventoryModelValidator)
 
 

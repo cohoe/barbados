@@ -1,6 +1,6 @@
 import slugify
 from datetime import datetime as DateTime
-from barbados.objects.base import BarbadosObject
+from barbados.objects.base import BaseObject
 
 
 class DisplayName:
@@ -24,7 +24,7 @@ class DisplayName:
         return text.title()
 
 
-class Text(BarbadosObject):
+class Text(BaseObject):
     def __init__(self, text, author=None, datetime=None):
         if not datetime:
             datetime = DateTime.utcnow().isoformat()

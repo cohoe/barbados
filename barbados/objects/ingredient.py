@@ -1,8 +1,8 @@
-from barbados.objects.base import BarbadosObject
+from barbados.objects.base import BaseObject
 from barbados.objects.ingredientkinds import IngredientKinds
 
 
-class Ingredient(BarbadosObject):
+class Ingredient(BaseObject):
     def __init__(self, slug, display_name, kind, parent=None, aliases=None, elements=None):
         if aliases is None:
             aliases = []

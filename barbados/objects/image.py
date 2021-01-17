@@ -1,7 +1,7 @@
-from barbados.objects.base import BarbadosObject
+from barbados.objects.base import BaseObject
 
 
-class Image(BarbadosObject):
+class Image(BaseObject):
     def __init__(self, text, href, credit):
         self.text = text
         self.href = href

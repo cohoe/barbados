@@ -1,4 +1,4 @@
-class BarbadosObject:
+class BaseObject:
     """
     Common object class that any non-operational object must inherit
     from. In general this is anything that gets stored in the various

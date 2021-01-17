@@ -1,10 +1,10 @@
 from barbados.objects.resolution import Resolution
 from barbados.serializers import ObjectSerializer
 from barbados.objects.resolution import resolution_factory
-from barbados.objects.base import BarbadosObject
+from barbados.objects.base import BaseObject
 
 
-class SpecResolutionSummary(BarbadosObject):
+class SpecResolutionSummary(BaseObject):
     """
     Summary of a comparison between an Inventory and a Spec. Figure out
     what this inventory has, both explicitly and implicitly.

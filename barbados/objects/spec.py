@@ -1,8 +1,8 @@
-from barbados.objects.base import BarbadosObject
+from barbados.objects.base import BaseObject
 from barbados.serializers import ObjectSerializer
 
 
-class Spec(BarbadosObject):
+class Spec(BaseObject):
     def __init__(self, slug, display_name, origin, glassware, components, citations, notes, straw, garnish, instructions, construction, images):
         self.slug = slug
         self.display_name = display_name

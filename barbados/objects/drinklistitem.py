@@ -1,10 +1,10 @@
-from barbados.objects.base import BarbadosObject
+from barbados.objects.base import BaseObject
 
 
-class MenuItem(BarbadosObject):
+class DrinkListItem(BaseObject):
     """
-    A MenuItem is a glorified hint/pointer to a specific item
-    in a menu. Right now this is only coded for either a "cocktail"
+    A DrinkListitem is a glorified hint/pointer to a specific item
+    in a DrinkList. Right now this is only coded for either a "cocktail"
     or a specific Spec of a particular Cocktail.
     @TODO add a Kind field and make this generic?
     @TODO deal with notes
@@ -18,7 +18,7 @@ class MenuItem(BarbadosObject):
         self.spec_slug = spec_slug
 
     def __repr__(self):
-        return "Barbados::Objects::MenuItem[%s]" % self.cocktail_slug
+        return "Barbados::Objects::DrinkListItem[%s]" % self.cocktail_slug
 
     def serialize(self, serializer):
         serializer.add_property('cocktail_slug', self.cocktail_slug)
