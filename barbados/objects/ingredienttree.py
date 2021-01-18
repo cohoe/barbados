@@ -23,6 +23,7 @@ class IngredientTree:
             for item in IngredientModel.get_by_kind(session, CategoryKind):
                 tree.create_node(item.slug, item.slug, parent=root, data=self._create_tree_data(item))
 
+            # @TODO allow nested families, potentially by doing a coupe passes thorugh this.
             for item in IngredientModel.get_by_kind(session, FamilyKind):
                 tree.create_node(item.slug, item.slug, parent=item.parent, data=self._create_tree_data(item))
 
