@@ -21,7 +21,13 @@ class BaseFactory:
         :param format: Format of the data to pass to the serializer.
         :return: Instance of the Index class.
         """
-        return index_class(meta={'id': obj.id}, **ObjectSerializer.serialize(obj, format))
+        # I really hope I don't regret this. id and slug could be problematic.
+        try:
+            id = getattr(obj, 'id')
+        except AttributeError:
+            id = getattr(obj, 'slug')
+
+        return index_class(meta={'id': id}, **ObjectSerializer.serialize(obj, format))
 
     @classmethod
     def model_to_obj(cls, model):
@@ -126,7 +132,7 @@ class BaseFactory:
         return model
 
     @classmethod
-    def delete_obj(cls, session, obj, commit=True):
+    def delete_obj(cls, session, obj, commit=True, id_attr='slug'):
         """
         Delete an object from the database.
         :param session: Database Session context.
@@ -134,10 +140,14 @@ class BaseFactory:
         :param commit: Whether to commit this transaction now or deal with it yourself. Useful for batches.
         :return: Model corresponding to the object that was deleted.
         """
-        model = session.query(cls._model).get(obj.slug)
+        try:
+            id = obj.slug
+        except AttributeError:
+            id = obj.id
+        model = session.query(cls._model).get(id)
 
         if not model:
-            raise KeyError("Model for %s not found" % obj.slug)
+            raise KeyError("Model for %s not found" % id)
 
         # Delete it from the database.
         session.delete(model)
