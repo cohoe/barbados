@@ -35,6 +35,8 @@ class SpecFactory:
                 glassware_obj_list.append(Glassware(**glassware))
             else:
                 glassware_slug = Slug(glassware)
+                if len(glassware_slug) <= 2:
+                    raise KeyError("Probably bad glassware (slug way too short)")
                 glassware_display_name = DisplayName(glassware_slug)
                 glassware_obj_list.append(Glassware(slug=glassware_slug, display_name=glassware_display_name))
 
