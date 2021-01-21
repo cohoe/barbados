@@ -1,5 +1,5 @@
 from barbados.search import SearchBase
-from elasticsearch_dsl.query import MatchPhrase, Wildcard, Prefix, Match, Exists
+from elasticsearch_dsl.query import MatchPhrase, Wildcard, Prefix, Match, Exists, MultiMatch
 from barbados.indexes import RecipeIndex
 from barbados.search.occurrences import ShouldOccurrence
 
@@ -34,3 +34,10 @@ class CocktailSearch(SearchBase):
                                  url_parameter_type=bool,
                                  query_class=Exists,
                                  fields=['spec.garnish'])
+        self.add_query_parameter(url_parameter='citation_name',
+                                 query_class=MatchPhrase,
+                                 occurrence=ShouldOccurrence,
+                                 fields=['spec.citations.publisher', 'spec.citations.title'])
+        self.add_query_parameter(url_parameter='citation_author',
+                                 query_class=MatchPhrase,
+                                 fields=['spec.citations.author'])
