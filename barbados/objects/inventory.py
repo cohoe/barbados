@@ -29,6 +29,7 @@ class Inventory(BaseObject):
         :param tree: IngredientTree instance.
         :return: None
         """
+        # print("INFLATION")
         for slug, item in self.items.items():
             # Substitutes are anything that is implied by this item.
             # and contained within the explicit inventory items.
@@ -36,6 +37,7 @@ class Inventory(BaseObject):
             # ingredients/{slug}/substitution to help you find something
             # appropriate.
             tree_implied_slugs = tree.implies(slug)
+            # print("%s => %s" % (slug, tree_implied_slugs)) if 'gin' in slug or 'aquavit' in slug else None
             for implied_slug in tree_implied_slugs:
                 try:
                     # We've already created an implied item based on this explicit item.
@@ -103,6 +105,7 @@ class Inventory(BaseObject):
             return self.items.get(ingredient).substitutes
 
         if implicit and ingredient in self.implicit_items.keys():
+            # print(self.implicit_items.get(ingredient).substitutes) if 'gin' in ingredient else None
             return self.implicit_items.get(ingredient).substitutes
 
         return []

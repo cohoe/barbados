@@ -61,7 +61,10 @@ class CategoryKind(Kind):
 
 class FamilyKind(Kind):
     """
-    High-level container of a genre of products.
+    High-level container of a genre of products. This serves as the terminus
+    level for any suggestions. If you have a Product or Ingredient under a Family
+    you can generally swap between them without much effort. Families can have
+    several levels hence they can descend from each other.
 
     Examples:
         * Sugarcane
@@ -69,7 +72,7 @@ class FamilyKind(Kind):
         * Dairy
     """
     value = 'family'
-    allowed_parents = [CategoryKind.value]
+    allowed_parents = [CategoryKind.value, value]
     usable = True
     implicit = False
 

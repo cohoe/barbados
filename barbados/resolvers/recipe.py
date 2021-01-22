@@ -40,38 +40,45 @@ class RecipeResolver(BaseResolver):
                 # The spec.component.slug is specifically named in the inventory items.
                 substitutes = inventory.substitutes(component.slug)
                 r = Resolution(slug=component.slug, status=DirectResolution, substitutes=substitutes)
-            elif inventory.contains(component.slug, implicit=True):
-                # The spec.component.slug is specifically named in the inventory implicit items.
-                # Targets "generic" spec components when there are "specific" or "generic"
-                # implicit items in the inventory.
-                substitutes = inventory.substitutes(component.slug, implicit=True)
-                r = Resolution(slug=component.slug, status=ImplicitResolution, substitutes=substitutes)
+            # @TODO this block is preventing madness in the implies/substitutes
+            # @TODO I think this can stay dropped. Check out some suggestions first.
+            # elif inventory.contains(component.slug, implicit=True):
+            #     # The spec.component.slug is specifically named in the inventory implicit items.
+            #     # Targets "generic" spec components when there are "specific" or "generic"
+            #     # implicit items in the inventory.
+            #     substitutes = inventory.substitutes(component.slug, implicit=True)
+            #     print("HAHA", substitutes) if 'gin' in component.slug else None
+            #     r = Resolution(slug=component.slug, status=ImplicitResolution, substitutes=substitutes)
             else:
                 # Now we're looking at the implied versions of the component. By definition
                 # all of these will be ImpliedResolution because we've had to change what
                 # we're looking up as.
+                substitutes = []
                 for implied_component in tree.implies(component.slug):
                     # Test for if the inventory contains the implied component
                     # explicitly or implicitly.
-                    # Stop further processing on this component if it does.
                     if inventory.contains(implied_component):
-                        # The inventory explicitly contains this implied component
-                        substitutes = inventory.substitutes(implied_component)
-                        r = Resolution(slug=component.slug, status=ImplicitResolution, substitutes=substitutes)
-                        break
+                        # The inventory explicitly contains this implied component.
+                        substitutes += inventory.substitutes(implied_component)
                     elif inventory.contains(implied_component, implicit=True):
-                        # The inventory implicitly  contains this implied component
-                        substitutes = inventory.substitutes(implied_component, implicit=True)
-                        r = Resolution(slug=component.slug, status=ImplicitResolution, substitutes=substitutes)
-                        break
+                        # The inventory implicitly contains this implied component.
+                        substitutes += inventory.substitutes(implied_component, implicit=True)
+                    else:
+                        # The inventory does not contain this implied component in any way.
+                        continue
+
+                # We have to de-duplicate the substitutes we just calculated.
+                substitutes = list(set(substitutes))
+                r = Resolution(slug=component.slug, status=ImplicitResolution, substitutes=substitutes)
+
                 # By this point we haven't found any explicit or implicit matches
                 # for either the direct component or any of its implications.
                 # It's missing.
                 if r is None:
                     r = Resolution(slug=component.slug, status=MissingResolution)
 
-            # Fill in the parent and parents of the component.
-            # r.parent = tree.parent(r.slug).tag # @TODO is this actually needed anymore? I don't think so.
+            # Fill in any blanks of the component that we want to carry along
+            # in the Resolution.
             r.parents = tree.parents(r.slug)
 
             # Add the resolution to the summary

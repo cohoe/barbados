@@ -1,5 +1,5 @@
 from barbados.search import SearchBase
-from elasticsearch_dsl.query import MatchPhrase, Wildcard, Prefix, Match, Range
+from elasticsearch_dsl.query import MatchPhrase, Wildcard, Prefix, Match, Range, Exists
 from barbados.indexes.inventoryspecresolution import InventorySpecResolution
 from barbados.search.occurrences import ShouldOccurrence
 
@@ -39,3 +39,15 @@ class InventorySpecResolutionSearch(SearchBase):
         self.add_query_parameter(url_parameter='component_count',
                                  query_class=Match,
                                  fields=['component_count'])
+        # @TODO add stuff to the resolution
+        self.add_query_parameter(url_parameter='garnish',
+                                 url_parameter_type=bool,
+                                 query_class=Exists,
+                                 fields=['spec.garnish'])
+        self.add_query_parameter(url_parameter='citation_name',
+                                 query_class=MatchPhrase,
+                                 occurrence=ShouldOccurrence,
+                                 fields=['spec.citations.publisher', 'spec.citations.title'])
+        self.add_query_parameter(url_parameter='citation_author',
+                                 query_class=MatchPhrase,
+                                 fields=['spec.citations.author'])

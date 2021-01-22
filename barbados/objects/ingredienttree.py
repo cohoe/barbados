@@ -2,7 +2,7 @@ import copy
 from treelib import Node, Tree
 from treelib.exceptions import NodeIDAbsentError
 from barbados.models.ingredient import IngredientModel
-from barbados.objects.ingredientkinds import IngredientKinds, CategoryKind, FamilyKind
+from barbados.objects.ingredientkinds import IngredientKinds, CategoryKind, FamilyKind, IngredientKind
 from barbados.services.logging import LogService
 from barbados.services.database import DatabaseService
 
@@ -23,19 +23,24 @@ class IngredientTree:
             for item in IngredientModel.get_by_kind(session, CategoryKind):
                 tree.create_node(item.slug, item.slug, parent=root, data=self._create_tree_data(item))
 
-            # @TODO allow nested families, potentially by doing a coupe passes thorugh this.
-            for item in IngredientModel.get_by_kind(session, FamilyKind):
-                tree.create_node(item.slug, item.slug, parent=item.parent, data=self._create_tree_data(item))
+            # for i in range(1, passes + 1):
+            #     LogService.debug("Pass %i/%i for Families" % (i, passes))
+            # for item in IngredientModel.get_by_kind(session, FamilyKind):
+            #     print(item.slug)
+            #     tree.create_node(item.slug, item.slug, parent=item.parent, data=self._create_tree_data(item))
 
             ingredients_to_place = list(IngredientModel.get_usable_ingredients(session))
             for i in range(1, passes + 1):
                 LogService.debug("Pass %i/%i" % (i, passes))
 
-                for item in ingredients_to_place[:]:
-                    if item.kind == FamilyKind.value:
-                        ingredients_to_place.remove(item)
-                        LogService.debug("Skipping %s because it is a family." % item.slug)
-                        continue
+                # I don't remember exactly why I have to copy the list here.
+                # It's similar to the dict deepcopy crap that exists elsewhere in
+                # this codebase.
+                for item in ingredients_to_place.copy():
+                    # if item.kind == FamilyKind.value:
+                    #     ingredients_to_place.remove(item)
+                    #     LogService.debug("Skipping %s because it is a family." % item.slug)
+                    #     continue
                     try:
                         tree.create_node(item.slug, item.slug, parent=item.parent, data=self._create_tree_data(item))
                         ingredients_to_place.remove(item)
@@ -46,6 +51,7 @@ class IngredientTree:
                     LogService.info("All done after pass %i" % i)
                     break
 
+        LogService.info("Tree has len %i" % len(tree))
         return tree
 
     def subtree(self, node_id):
@@ -104,6 +110,7 @@ class IngredientTree:
         parent = self.parent(node_id)
         parents = self.parents(node_id)
         siblings = self.siblings(node_id)
+        implies = self.implies(node_id)
 
         children = node.fpointer
 
@@ -113,7 +120,8 @@ class IngredientTree:
             'parents': parents,
             'children': children + node.data.get('elements'),
             'siblings': siblings,
-            'kind': node.data.get('kind')
+            'kind': node.data.get('kind'),
+            'implies': implies
         })
 
     def siblings(self, node_id):
@@ -188,22 +196,37 @@ class IngredientTree:
         """
         Return a list of all ingredients that this node implies.
         This is done by looking at all parent ingredients up
-        to the family, children, and siblings.
+        to the family (exclusive!) plus its direct children and (maybe) siblings.
         Examples:
           * the-dead-rabbit-irish-whiskey -> [irish-whiskey, jameson-irish-whiskey]
           * el-dorado-12-year-rum -> [aged-blended-rum, aged-rum, rum]
           * orange-bitters -> [citrus-bitters, angostura-orange-bitters, regans-orange-bitters, grapefruit-bitters]
+          * tequila -> [casamigos-reposado-tequila, astral-blanco-tequila, tres-generaciones-anejo-tequila]
         :param node_id: ID of the node to investigate.
         :return: List of node tags (slugs).
         """
-        implied_nodes = self.parents(node_id) + self.children(node_id, extended=True) + self.siblings(node_id)
-        # print(node_id) if 'gin' in node_id else None
-        # print(implied_nodes) if 'gin' in node_id else None
-        # Log.info("All parents of %s are: %s" % (node_id, parents))
+        # Families should not imply siblings or parents since they are the top
+        # of the metaphorical phood chain. See the FamilyKind class for more.
+        self_node_kind = self.node(node_id).data.get('kind')
+        if self_node_kind == FamilyKind.value:
+            implied_nodes = self.children(node_id, extended=True)
+        # Ingredients being the middleware shouldn't return their siblings otherwise
+        # you could have say sweet-vermouth -> [dry-vermouth] which is not accurate.
+        elif self_node_kind == IngredientKind.value:
+            implied_nodes = self.parents(node_id) + self.children(node_id, extended=True)
+        # Products should imply their parents, any custom children, and their siblings
+        # since they generally can get swapped out for each other. Yes I know there are
+        # differences between Laphroaig and Lagavulin but you get the idea I hope.
+        else:
+            implied_nodes = self.parents(node_id) + self.children(node_id, extended=True) + self.siblings(node_id)
+        # print("%s: %s" % (node_id, implied_nodes)) if 'gin' in node_id else None
+        # print(node_id) if 'tequila' in node_id else None
+        # print(implied_nodes) if 'tequila' in node_id else None
+        # LogService.info("All parents of %s are: %s" % (node_id, parents))
 
         # Figure out which IngredientKinds we allow for implicit substitution.
         implicit_kind_values = [kind.value for kind in IngredientKinds.implicits]
-        # Log.info("Allowed implicit kinds are: %s" % implicit_kind_values)
+        # LogService.info("Allowed implicit kinds are: %s" % implicit_kind_values)
 
         # Create a list of allowed parents based on whether the parent is
         # of an approved type.
@@ -216,5 +239,5 @@ class IngredientTree:
             if implied_node_kind in implicit_kind_values:
                 allowed_implicit_nodes.append(implied_node_id)
 
-        # Log.info("Allowed implicit nodes for %s are: %s" % (node_id, allowed_implicit_nodes))
+        # LogService.info("Allowed implicit nodes for %s are: %s" % (node_id, allowed_implicit_nodes))
         return allowed_implicit_nodes
