@@ -38,7 +38,8 @@ class Ingredient(BaseObject):
 
         conditions = [
             QueryCondition(bin_op='or', field='slug', operator='contains', value='el-dorado'),
-            QueryCondition(bin_op='or', field='slug', operator='contains', value='appleton')
+            # QueryCondition(bin_op='or', field='slug', operator='contains', value='appleton'),
+            # QueryCondition(bin_op='or', field='slug', operator='contains', value='bayou')
         ]
 
         results = QueryBuilder(model=IngredientModel, conditions=conditions).execute(session=session)

@@ -1,6 +1,7 @@
 import copy
 from barbados.serializers import ObjectSerializer
 from barbados.validators import ObjectValidator
+from barbados.services.logging import LogService
 
 
 class BaseFactory:
@@ -164,21 +165,25 @@ class BaseFactory:
     @classmethod
     def update_obj(cls, session, obj, commit=True):
         """
-        @TODO: THIS IS NOT RELATION-COMPATIBLE!
-        Drop-n-Add is not a good way to do this. But since I'm relationshipless (good joke)
-        this should be just fine.
+        Update an existing model based on its current object state.
         :param session: Database Session context.
         :param obj: The object to delete.
         :param commit: Whether to commit this transaction now or deal with it yourself. Useful for batches.
         :return: New model.
         """
-        print(obj.__dict__.keys())
-        old_model = session.query(cls._model).get(obj.slug)
-        session.delete(old_model)
-        # old_model = session.query(cls._model).get(obj.slug)
-        new_model = cls.obj_to_model(obj)
-        session.add(new_model)
+        # @TODO this is unsafe based on if the slug/id changes. Maybe I gotta enforce that?
+        model = session.query(cls._model).get(obj.slug)
+
+        # This feels unsafe, but should be OK.
+        # https://stackoverflow.com/questions/9667138/how-to-update-sqlalchemy-row-entry
+        for key, value in ObjectSerializer.serialize(obj, 'dict').items():
+            old_value = getattr(model, key)
+            setattr(model, key, value)
+
+            if old_value != value:
+                LogService.info("Updating %s: '%s'->'%s'" % (key, old_value, value))
+
         if commit:
             session.commit()
 
-        return new_model
+        return model
