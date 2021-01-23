@@ -1,5 +1,7 @@
 from barbados.objects.base import BaseObject
-from barbados.objects.ingredientkinds import IngredientKinds
+from barbados.objects.ingredientkinds import IngredientKinds, IndexKind
+from barbados.query import QueryCondition, QueryBuilder
+from barbados.models.ingredient import IngredientModel
 
 
 class Ingredient(BaseObject):
@@ -24,3 +26,20 @@ class Ingredient(BaseObject):
         serializer.add_property('parent', self.parent)
         serializer.add_property('aliases', self.aliases)
         serializer.add_property('elements', self.elements)
+
+    def refresh(self, session):
+        """
+        If this ingredient is an index, its elements can be refreshed
+        from the current ingredient dataset.
+        :return: None
+        """
+        if self.kind is not IndexKind:
+            raise Exception("Refresh is not supported for %s" % self.kind)
+
+        conditions = [
+            QueryCondition(bin_op='or', field='slug', operator='contains', value='el-dorado'),
+            QueryCondition(bin_op='or', field='slug', operator='contains', value='appleton')
+        ]
+
+        results = QueryBuilder(model=IngredientModel, conditions=conditions).execute(session=session)
+        print([result.slug for result in results])

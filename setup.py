@@ -28,5 +28,6 @@ setup(
         'elasticsearch',
         'elasticsearch_dsl',
         'bs4',
+        'sqlalchemy_json_querybuilder'
     ]
 )
