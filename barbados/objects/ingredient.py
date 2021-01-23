@@ -42,4 +42,4 @@ class Ingredient(BaseObject):
         ]
 
         results = QueryBuilder(model=IngredientModel, conditions=conditions).execute(session=session)
-        print([result.slug for result in results])
+        self.elements = [result.slug for result in results]

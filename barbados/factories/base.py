@@ -51,6 +51,10 @@ class BaseFactory:
 
         return cls.raw_to_obj(model_dict)
 
+    @classmethod
+    def obj_to_model(cls, obj):
+        return cls._model(**ObjectSerializer.serialize(obj, 'dict'))
+
     @staticmethod
     def raw_to_obj(raw):
         raise NotImplementedError
@@ -118,7 +122,8 @@ class BaseFactory:
         :param obj: The object to store.
         :return: Model corresponding to the object.
         """
-        model = cls._model(**ObjectSerializer.serialize(obj, 'dict'))
+        # model = cls._model(**ObjectSerializer.serialize(obj, 'dict'))
+        model = cls.obj_to_model(obj)
 
         # Validate it.
         ObjectValidator.validate(model, session=session)
@@ -155,3 +160,25 @@ class BaseFactory:
             session.commit()
 
         return model
+
+    @classmethod
+    def update_obj(cls, session, obj, commit=True):
+        """
+        @TODO: THIS IS NOT RELATION-COMPATIBLE!
+        Drop-n-Add is not a good way to do this. But since I'm relationshipless (good joke)
+        this should be just fine.
+        :param session: Database Session context.
+        :param obj: The object to delete.
+        :param commit: Whether to commit this transaction now or deal with it yourself. Useful for batches.
+        :return: New model.
+        """
+        print(obj.__dict__.keys())
+        old_model = session.query(cls._model).get(obj.slug)
+        session.delete(old_model)
+        # old_model = session.query(cls._model).get(obj.slug)
+        new_model = cls.obj_to_model(obj)
+        session.add(new_model)
+        if commit:
+            session.commit()
+
+        return new_model
