@@ -8,12 +8,31 @@ from barbados.services.database import DatabaseService
 
 
 class IngredientTree:
+    """
+    The IngredientTree is the real magic of where ingredient substitution recommendations
+    come from. This class provides an interface to the underlying treelib which can answer
+    some relatively normal questions about parents, siblings, children, etc.
+
+    Generating this object is somewhat computationally intensive so it is designed to be
+    cached and retrieved by clients.
+    """
     root_node = 'ingredients'
 
     def __init__(self, passes=5):
+        """
+        This will trigger the build of the tree
+        :param passes: Number of passes over the ingredients table to place things in the tree.
+                       Items could be out of order so it may take a pass or two to get everything.
+        """
         self.tree = self._build_tree(passes=passes)
 
     def _build_tree(self, passes, root=root_node):
+        """
+        Construct the treelib.Tree object.
+        :param passes: Number of iterations to construct to tree in.
+        :param root: String ID of the root node of the tree.
+        :return: Completed treelib.Tree object
+        """
         tree = Tree()
 
         pgconn = DatabaseService.connector
@@ -55,6 +74,11 @@ class IngredientTree:
         return tree
 
     def subtree(self, node_id):
+        """
+        Return the tree starting at the given node. This includes all children.
+        :param node_id: String ID of the node to start at.
+        :return: tree.Tree object.
+        """
         try:
             return self.tree.subtree(node_id)
         except NodeIDAbsentError:
@@ -143,17 +167,24 @@ class IngredientTree:
 
         return siblings
 
-    def parents(self, node_id):
+    def parents(self, node_id, stop_at_first_family=False):
         """
         Return a list of all parent nodes of this node going up to the root.
+        This will return the list in order going up the tree.
         :param node_id: ID of the node to investigate.
+        :param stop_at_first_family: Stop processing of parents after finding the first FamilyKind
+                                     parent. This is useful for not going too far up the tree.
         :return: List of node tags.
         """
         parents = []
 
         node = self.node(node_id)
+        # This walks up the tree by calling self.parent() over and over until
+        # we hit the root.
         while not node.is_root():
             parents.append(node.tag) if node.tag != node_id else None
+            if stop_at_first_family and node.data.get('kind') == FamilyKind.value:
+                break
             node = self.parent(node.tag)
 
         return parents
@@ -196,7 +227,7 @@ class IngredientTree:
         """
         Return a list of all ingredients that this node implies.
         This is done by looking at all parent ingredients up
-        to the family (exclusive!) plus its direct children and (maybe) siblings.
+        to the first family plus its direct children and (maybe) siblings.
         Examples:
           * the-dead-rabbit-irish-whiskey -> [irish-whiskey, jameson-irish-whiskey]
           * el-dorado-12-year-rum -> [aged-blended-rum, aged-rum, rum]
@@ -213,12 +244,12 @@ class IngredientTree:
         # Ingredients being the middleware shouldn't return their siblings otherwise
         # you could have say sweet-vermouth -> [dry-vermouth] which is not accurate.
         elif self_node_kind == IngredientKind.value:
-            implied_nodes = self.parents(node_id) + self.children(node_id, extended=True)
+            implied_nodes = self.parents(node_id, stop_at_first_family=True) + self.children(node_id, extended=True)
         # Products should imply their parents, any custom children, and their siblings
         # since they generally can get swapped out for each other. Yes I know there are
         # differences between Laphroaig and Lagavulin but you get the idea I hope.
         else:
-            implied_nodes = self.parents(node_id) + self.children(node_id, extended=True) + self.siblings(node_id)
+            implied_nodes = self.parents(node_id, stop_at_first_family=True) + self.children(node_id, extended=True) + self.siblings(node_id)
         # print("%s: %s" % (node_id, implied_nodes)) if 'gin' in node_id else None
         # print(node_id) if 'tequila' in node_id else None
         # print(implied_nodes) if 'tequila' in node_id else None

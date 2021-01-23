@@ -69,12 +69,11 @@ class FamilyKind(Kind):
     Examples:
         * Sugarcane
         * Citrus
-        * Dairy
+        * Tequila
     """
     value = 'family'
     allowed_parents = [CategoryKind.value, value]
     usable = True
-    implicit = False
 
 
 class IngredientKind(Kind):
