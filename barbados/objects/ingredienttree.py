@@ -246,15 +246,23 @@ class IngredientTree:
         if self_node_kind == FamilyKind.value:
             # Need this here to prevent FamilyKind from getting the else below.
             pass
-        # Ingredients being the middleware shouldn't return their siblings otherwise
-        # you could have say sweet-vermouth -> [dry-vermouth] which is not accurate.
-        elif self_node_kind == IngredientKind.value:
-            implied_nodes += self.parents(node_id, stop_at_first_family=True)
+        # Ingredients being the middleware shouldn't return their siblings.
+        # Since Indexes are basically fancy Ingredients they should follow the same rules.
+        # @TODO ponder this more. How deep should family inception go? If unlimited then this may
+        # be able to go away since family represents the stop of the implication. Likely requires
+        # lots of tree trimming to refactor.
+        # elif self_node_kind == IngredientKind.value or self_node_kind == IndexKind.value:
+        # elif self_node_kind == self_node_kind == IndexKind.value:
+        #     implied_nodes += self.parents(node_id, stop_at_first_family=True)
+        # Perhaps indexes should imply their non-family siblings?
         # Products should imply their parents, any Custom children, and their siblings
         # since they generally can get swapped out for each other. Yes I know there are
         # differences between Laphroaig and Lagavulin but you get the idea I hope.
         else:
-            implied_nodes += self.parents(node_id, stop_at_first_family=True) + self.siblings(node_id)
+            # implied_nodes += self.siblings(node_id)
+            for parent_node in self.parents(node_id, stop_at_first_family=True):
+                implied_nodes += [parent_node]
+                implied_nodes += self.implies(parent_node)
 
         # Indexes should imply their elements
         if self_node_kind == IndexKind.value:

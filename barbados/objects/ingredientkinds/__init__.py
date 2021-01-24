@@ -134,7 +134,7 @@ class IndexKind(Kind):
         * Peaty Scotch
     """
     value = 'index'
-    allowed_parents = [FamilyKind.value, IngredientKind.value]
+    allowed_parents = [FamilyKind.value, IngredientKind.value, value]
     usable = True
     index = True
 
