@@ -1,6 +1,6 @@
 from barbados.models.base import BarbadosModel
 from barbados.objects.ingredientkinds import IngredientKinds
-from sqlalchemy import Column, String, or_, ARRAY, JSON
+from sqlalchemy import Column, String, or_, ARRAY, JSON, DateTime
 
 
 class IngredientModel(BarbadosModel):
@@ -15,7 +15,10 @@ class IngredientModel(BarbadosModel):
     parent = Column(String, nullable=True)
     aliases = Column(ARRAY(String), nullable=True)
     elements = Column(ARRAY(String), nullable=True)
-    conditions = Column(JSON)
+    conditions = Column(JSON, nullable=True)
+    last_refresh = Column(DateTime, nullable=True)
+    elements_include = Column(ARRAY(String), nullable=True)
+    elements_exclude = Column(ARRAY(String), nullable=True)
 
     @staticmethod
     def get_usable_ingredients(session):

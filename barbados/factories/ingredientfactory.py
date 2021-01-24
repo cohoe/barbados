@@ -15,6 +15,9 @@ class IngredientFactory(BaseFactory):
         'elements': list(),
         'aliases': list(),
         'conditions': list(),
+        'elements_include': list(),
+        'elements_exclude': list(),
+        'last_refresh': None,
     }
 
     @staticmethod
@@ -23,6 +26,7 @@ class IngredientFactory(BaseFactory):
 
         # Beware the Python dict copying bullshit!
         raw_ingredient = IngredientFactory._parse_conditions(raw_ingredient)
+        # @TODO parse aliases and displayname as displayname objects, among other things.
 
         # Build the object
         i = Ingredient(**raw_ingredient)
