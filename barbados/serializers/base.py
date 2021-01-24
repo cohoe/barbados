@@ -32,6 +32,7 @@ class BaseSerializer:
     def serialize(self):
         """
         Method to actually generate the serialized object.
+        This is what actually gets called in the objects.
         :return: Various.
         """
         raise NotImplementedError

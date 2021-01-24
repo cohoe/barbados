@@ -1,8 +1,9 @@
 from sqlalchemy_json_querybuilder.querybuilder.search import Search
 from barbados.services.logging import LogService
+from barbados.objects.base import BaseObject
 
 
-class QueryCondition:
+class QueryCondition(BaseObject):
     """
     Representation of a generic Query Condition.
     """
@@ -17,6 +18,12 @@ class QueryCondition:
         self.field = field
         self.operator = operator
         self.value = value
+
+    def serialize(self, serializer):
+        serializer.add_property('bin_op', self.bin_op)
+        serializer.add_property('field', self.field)
+        serializer.add_property('operator', self.operator)
+        serializer.add_property('value', self.value)
 
 
 class QueryBuilder:

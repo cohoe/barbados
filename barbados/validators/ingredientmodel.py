@@ -21,6 +21,7 @@ class IngredientModelValidator(BaseValidator):
         self._check_parent_kind()
         self._check_elements()
         self._check_slug()
+        self._check_conditions()
         # @TODO check_aliases display_name not in aliases
 
     def _check_kind(self):
@@ -62,6 +63,11 @@ class IngredientModelValidator(BaseValidator):
                 child = self.session.query(IngredientModel).get(slug)
                 if child is None:
                     raise ValidationException("Element %s of %s does not exist." % (slug, self.model.slug))
+
+    def _check_conditions(self):
+        if self.model.conditions:
+            if self.model.kind != IngredientKinds.index.value:
+                raise ValidationException("Kind %s of %s cannot have conditions." % (self.model.kind, self.model.slug))
 
     def _check_slug(self):
         if self.model.slug != Slug(self.model.display_name):
