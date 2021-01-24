@@ -70,19 +70,25 @@ class Ingredient(BaseObject):
         if self.kind is not IndexKind:
             raise Exception("Refresh is not supported for %s" % self.kind)
 
-        results = QueryBuilder(model=IngredientModel, conditions=self.conditions).execute(session=session)
-        self.elements = [result.slug for result in results]
+        # If we don't have any conditions (set to [] in __init__ above)
+        # Then we need to skip querying otherwise it will return every object
+        # which would be bad.
+        if self.conditions:
+            results = QueryBuilder(model=IngredientModel, conditions=self.conditions).execute(session=session)
+            elements = [result.slug for result in results]
+        else:
+            elements = []
 
         # Add the includes and remove the excludes
-        self.elements += self.elements_include
+        elements += self.elements_include
         for exclude in self.elements_exclude:
             try:
-                self.elements.remove(exclude)
+                elements.remove(exclude)
             except ValueError:
                 pass
 
-        # dedup the list
-        self.elements = list(set(self.elements))
+        # dedup the list and set the property
+        self.elements = list(set(elements))
 
         # Update the last_refresh time to now so we know when it was last done.
         self.last_refresh = datetime.utcnow()
