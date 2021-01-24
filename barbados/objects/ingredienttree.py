@@ -2,7 +2,7 @@ import copy
 from treelib import Node, Tree
 from treelib.exceptions import NodeIDAbsentError
 from barbados.models.ingredient import IngredientModel
-from barbados.objects.ingredientkinds import IngredientKinds, CategoryKind, FamilyKind, IngredientKind
+from barbados.objects.ingredientkinds import IngredientKinds, CategoryKind, FamilyKind, IngredientKind, IndexKind
 from barbados.services.logging import LogService
 from barbados.services.database import DatabaseService
 
@@ -236,24 +236,33 @@ class IngredientTree:
         :param node_id: ID of the node to investigate.
         :return: List of node tags (slugs).
         """
+        self_node_kind = self.node(node_id).data.get('kind')
+
+        # All nodes imply their children.
+        implied_nodes = self.children(node_id, extended=True)
+
         # Families should not imply siblings or parents since they are the top
         # of the metaphorical phood chain. See the FamilyKind class for more.
-        self_node_kind = self.node(node_id).data.get('kind')
         if self_node_kind == FamilyKind.value:
-            implied_nodes = self.children(node_id, extended=True)
+            # Need this here to prevent FamilyKind from getting the else below.
+            pass
         # Ingredients being the middleware shouldn't return their siblings otherwise
         # you could have say sweet-vermouth -> [dry-vermouth] which is not accurate.
         elif self_node_kind == IngredientKind.value:
-            implied_nodes = self.parents(node_id, stop_at_first_family=True) + self.children(node_id, extended=True)
-        # Products should imply their parents, any custom children, and their siblings
+            implied_nodes += self.parents(node_id, stop_at_first_family=True)
+        # Products should imply their parents, any Custom children, and their siblings
         # since they generally can get swapped out for each other. Yes I know there are
         # differences between Laphroaig and Lagavulin but you get the idea I hope.
         else:
-            implied_nodes = self.parents(node_id, stop_at_first_family=True) + self.children(node_id, extended=True) + self.siblings(node_id)
-        # print("%s: %s" % (node_id, implied_nodes)) if 'gin' in node_id else None
-        # print(node_id) if 'tequila' in node_id else None
-        # print(implied_nodes) if 'tequila' in node_id else None
-        # LogService.info("All parents of %s are: %s" % (node_id, parents))
+            implied_nodes += self.parents(node_id, stop_at_first_family=True) + self.siblings(node_id)
+
+        # Indexes should imply their elements
+        if self_node_kind == IndexKind.value:
+            implied_nodes += self.node(node_id).data.get('elements')
+
+        # Dedup and sort the list
+        implied_nodes = list(set(implied_nodes))
+        implied_nodes.sort()
 
         # Figure out which IngredientKinds we allow for implicit substitution.
         implicit_kind_values = [kind.value for kind in IngredientKinds.implicits]
