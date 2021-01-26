@@ -64,8 +64,8 @@ class InventoryFactory(BaseFactory):
         return raw_input
 
     @classmethod
-    def produce_obj(cls, session, id, expand=False):
-        i = super().produce_obj(session=session, id=id)
+    def produce_obj(cls, id, expand=False):
+        i = super().produce_obj(id=id)
         if expand:
             tree = IngredientTreeCache.retrieve()
             i.expand(tree)

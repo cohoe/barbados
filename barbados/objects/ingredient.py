@@ -58,9 +58,9 @@ class Ingredient(BaseObject):
         serializer.add_property('conditions', [ObjectSerializer.serialize(condition, serializer.format) for condition in self.conditions])
         serializer.add_property('elements_include', self.elements_include)
         serializer.add_property('elements_exclude', self.elements_exclude)
-        serializer.add_property('last_refresh', self.last_refresh)
+        serializer.add_property('last_refresh', str(self.last_refresh))
 
-    def refresh(self, session):
+    def refresh(self):
         """
         If this ingredient is an index, its elements can be refreshed
         from the current ingredient dataset based on conditions and
@@ -74,7 +74,7 @@ class Ingredient(BaseObject):
         # Then we need to skip querying otherwise it will return every object
         # which would be bad.
         if self.conditions:
-            results = QueryBuilder(model=IngredientModel, conditions=self.conditions).execute(session=session)
+            results = QueryBuilder(model=IngredientModel, conditions=self.conditions).execute()
             elements = [result.slug for result in results]
         else:
             elements = []

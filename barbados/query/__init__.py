@@ -1,6 +1,7 @@
 from sqlalchemy_json_querybuilder.querybuilder.search import Search
 from barbados.services.logging import LogService
 from barbados.objects.base import BaseObject
+from barbados.services.database import DatabaseService
 
 
 class QueryCondition(BaseObject):
@@ -39,7 +40,7 @@ class QueryBuilder:
         self.conditions = conditions
         self.criteria = {}
 
-    def execute(self, session):
+    def execute(self):
         """
         Generate and perform this query
         :param session: SQLAlchemy session
@@ -52,7 +53,9 @@ class QueryBuilder:
         # maybe not scalable but whatever.
         # @TODO pagination?
         module_name = self.model.__module__
-        search_obj = Search(session, module_name, (self.model,), filter_by=self.criteria, all=True)
+
+        with DatabaseService.connector.get_session() as session:
+            search_obj = Search(session, module_name, (self.model,), filter_by=self.criteria, all=True)
 
         return search_obj.results.get('data')
 

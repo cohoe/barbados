@@ -2,6 +2,7 @@ import copy
 from barbados.serializers import ObjectSerializer
 from barbados.validators import ObjectValidator
 from barbados.services.logging import LogService
+from barbados.services.database import DatabaseService
 
 
 class BaseFactory:
@@ -85,38 +86,39 @@ class BaseFactory:
         return raw_input
 
     @classmethod
-    def produce_obj(cls, session, id):
+    def produce_obj(cls, id):
         """
         Produce an appropriate object from the factory.
-        :param session: Database Session context.
         :param id: ID parameter of the record to lookup
         :return: Object from the Model.
         """
-        # @TODO make this support multiple conditions to .get()
-        result = session.query(cls._model).get(id)
-        if not result:
-            raise KeyError('Not found')
-        obj = cls.model_to_obj(result)
+        with DatabaseService.connector.get_session() as current_session:
+            result = current_session.query(cls._model).get(id)
+            if not result:
+                raise KeyError('Not found')
+            obj = cls.model_to_obj(result)
+
         return obj
 
     @classmethod
-    def produce_all_objs(cls, session):
+    def produce_all_objs(cls):
         """
         Produce a list of appropriate objects from this factory.
         :param session: Database Session context.
         :return:
         """
-        results = session.query(cls._model).all()
+        with DatabaseService.connector.get_session() as session:
+            results = session.query(cls._model).all()
 
-        objects = []
-        for result in results:
-            obj = cls.model_to_obj(result)
-            objects.append(obj)
+            objects = []
+            for result in results:
+                obj = cls.model_to_obj(result)
+                objects.append(obj)
 
         return objects
 
     @classmethod
-    def store_obj(cls, session, obj):
+    def store_obj(cls, obj):
         """
         Store an object in the database.
         :param session: Database Session context.
@@ -124,24 +126,20 @@ class BaseFactory:
         :return: Model corresponding to the object.
         """
         # model = cls._model(**ObjectSerializer.serialize(obj, 'dict'))
-        model = cls.obj_to_model(obj)
+        with DatabaseService.connector.get_session() as session:
+            model = cls.obj_to_model(obj)
 
-        # Validate it.
-        ObjectValidator.validate(model, session=session)
+            # Validate it.
+            ObjectValidator.validate(model, session=session)
 
-        # Save it to the database.
-        session.add(model)
-        session.commit()
-
-        # I'm not sure if it's gonna be useful to return the model,
-        # but I'll make it available just in case.
-        return model
+            # Save it to the database.
+            session.add(model)
+            session.commit()
 
     @classmethod
-    def delete_obj(cls, session, obj, commit=True, id_attr='slug'):
+    def delete_obj(cls, obj, commit=True, id_attr='slug'):
         """
         Delete an object from the database.
-        :param session: Database Session context.
         :param obj: The object to delete.
         :param commit: Whether to commit this transaction now or deal with it yourself. Useful for batches.
         :return: Model corresponding to the object that was deleted.
@@ -150,40 +148,40 @@ class BaseFactory:
             id = obj.slug
         except AttributeError:
             id = obj.id
-        model = session.query(cls._model).get(id)
 
-        if not model:
-            raise KeyError("Model for %s not found" % id)
+        with DatabaseService.connector.get_session() as session:
+            model = session.query(cls._model).get(id)
 
-        # Delete it from the database.
-        session.delete(model)
-        if commit:
-            session.commit()
+            if not model:
+                raise KeyError("Model for %s not found" % id)
 
-        return model
+            # Delete it from the database.
+            session.delete(model)
+            if commit:
+                session.commit()
 
     @classmethod
-    def update_obj(cls, session, obj, commit=True):
+    def update_obj(cls, obj, commit=True):
         """
         Update an existing model based on its current object state.
-        :param session: Database Session context.
         :param obj: The object to delete.
         :param commit: Whether to commit this transaction now or deal with it yourself. Useful for batches.
         :return: New model.
         """
         # @TODO this is unsafe based on if the slug/id changes. Maybe I gotta enforce that?
-        model = session.query(cls._model).get(obj.slug)
+        with DatabaseService.connector.get_session() as session:
+            model = session.query(cls._model).get(obj.slug)
 
-        # This feels unsafe, but should be OK.
-        # https://stackoverflow.com/questions/9667138/how-to-update-sqlalchemy-row-entry
-        for key, value in ObjectSerializer.serialize(obj, 'dict').items():
-            old_value = getattr(model, key)
-            setattr(model, key, value)
+            # This feels unsafe, but should be OK.
+            # https://stackoverflow.com/questions/9667138/how-to-update-sqlalchemy-row-entry
+            for key, value in ObjectSerializer.serialize(obj, 'dict').items():
+                old_value = getattr(model, key)
+                setattr(model, key, value)
 
-            if old_value != value:
-                LogService.info("Updating %s: '%s'->'%s'" % (key, old_value, value))
+                if old_value != value:
+                    LogService.info("Updating %s: '%s'->'%s'" % (key, old_value, value))
 
-        if commit:
-            session.commit()
+            if commit:
+                session.commit()
 
-        return model
+            return model

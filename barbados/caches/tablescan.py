@@ -36,13 +36,10 @@ class TableScanCache(CacheBase):
         Populate the cache with its expected value(s).
         :return: None
         """
-        pgconn = DatabaseService.connector
-
-        with pgconn.get_session() as session:
-            cache_objects = []
-            objects = cls.factory_class.produce_all_objs(session=session)
-            for result_object in objects:
-                cache_objects.append(ObjectSerializer.serialize(result_object, 'dict'))
+        cache_objects = []
+        objects = cls.factory_class.produce_all_objs()
+        for result_object in objects:
+            cache_objects.append(ObjectSerializer.serialize(result_object, 'dict'))
 
         CacheService.set(cls.cache_key, json.dumps(cache_objects))
 
