@@ -18,8 +18,7 @@ class Bibliography:
         :return: List[Citation]
         """
         citations = []
-        pgconn = DatabaseService.connector
-        with pgconn.get_session() as session:
+        with DatabaseService.get_session() as session:
             results = session.query(CocktailModel).all()
             for result in results:
                 c = CocktailFactory.model_to_obj(model=result)

@@ -14,3 +14,27 @@ class DatabaseService:
     """
 
     connector = PostgresqlConnector()
+
+    @staticmethod
+    def get_session():
+        """
+        Retrieve a SQLAlchemy Session context from the connector.
+        :return: SQLAlchemy Session object.
+        """
+        return DatabaseService.connector.get_session()
+
+    @staticmethod
+    def drop_all():
+        """
+        Drop all tables from the database.
+        :return: None
+        """
+        DatabaseService.connector.drop_all()
+
+    @staticmethod
+    def create_all():
+        """
+        Create all tables in the database.
+        :return: None
+        """
+        DatabaseService.connector.create_all()

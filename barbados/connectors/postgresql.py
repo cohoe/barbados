@@ -70,6 +70,8 @@ class PostgresqlConnector:
         except Exception:
             session.rollback()
             raise
+        # finally:
+        #     session.commit()
 
     def _build_session(self):
         """

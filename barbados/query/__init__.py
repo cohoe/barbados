@@ -54,7 +54,7 @@ class QueryBuilder:
         # @TODO pagination?
         module_name = self.model.__module__
 
-        with DatabaseService.connector.get_session() as session:
+        with DatabaseService.get_session() as session:
             search_obj = Search(session, module_name, (self.model,), filter_by=self.criteria, all=True)
 
         return search_obj.results.get('data')

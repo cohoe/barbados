@@ -92,7 +92,7 @@ class BaseFactory:
         :param id: ID parameter of the record to lookup
         :return: Object from the Model.
         """
-        with DatabaseService.connector.get_session() as current_session:
+        with DatabaseService.get_session() as current_session:
             result = current_session.query(cls._model).get(id)
             if not result:
                 raise KeyError('Not found')
@@ -107,7 +107,7 @@ class BaseFactory:
         :param session: Database Session context.
         :return:
         """
-        with DatabaseService.connector.get_session() as session:
+        with DatabaseService.get_session() as session:
             results = session.query(cls._model).all()
 
             objects = []
@@ -126,7 +126,7 @@ class BaseFactory:
         :return: Model corresponding to the object.
         """
         # model = cls._model(**ObjectSerializer.serialize(obj, 'dict'))
-        with DatabaseService.connector.get_session() as session:
+        with DatabaseService.get_session() as session:
             model = cls.obj_to_model(obj)
 
             # Validate it.
@@ -149,7 +149,7 @@ class BaseFactory:
         except AttributeError:
             id = obj.id
 
-        with DatabaseService.connector.get_session() as session:
+        with DatabaseService.get_session() as session:
             model = session.query(cls._model).get(id)
 
             if not model:
@@ -169,7 +169,7 @@ class BaseFactory:
         :return: New model.
         """
         # @TODO this is unsafe based on if the slug/id changes. Maybe I gotta enforce that?
-        with DatabaseService.connector.get_session() as session:
+        with DatabaseService.get_session() as session:
             model = session.query(cls._model).get(obj.slug)
 
             # This feels unsafe, but should be OK.

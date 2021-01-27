@@ -58,7 +58,7 @@ class Ingredient(BaseObject):
         serializer.add_property('conditions', [ObjectSerializer.serialize(condition, serializer.format) for condition in self.conditions])
         serializer.add_property('elements_include', self.elements_include)
         serializer.add_property('elements_exclude', self.elements_exclude)
-        serializer.add_property('last_refresh', str(self.last_refresh))
+        serializer.add_property('last_refresh', str(self.last_refresh) if self.last_refresh is not None else None)
 
     def refresh(self):
         """

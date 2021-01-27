@@ -35,8 +35,7 @@ class IngredientTree:
         """
         tree = Tree()
 
-        pgconn = DatabaseService.connector
-        with pgconn.get_session() as session:
+        with DatabaseService.get_session() as session:
 
             tree.create_node(root, root)
             for item in IngredientModel.get_by_kind(session, CategoryKind):
