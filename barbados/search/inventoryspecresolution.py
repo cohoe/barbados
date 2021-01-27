@@ -39,15 +39,14 @@ class InventorySpecResolutionSearch(SearchBase):
         self.add_query_parameter(url_parameter='component_count',
                                  query_class=Match,
                                  fields=['component_count'])
-        # @TODO add stuff to the resolution
         self.add_query_parameter(url_parameter='garnish',
                                  url_parameter_type=bool,
                                  query_class=Exists,
-                                 fields=['spec.garnish'])
+                                 fields=['garnish'])
         self.add_query_parameter(url_parameter='citation_name',
                                  query_class=MatchPhrase,
                                  occurrence=ShouldOccurrence,
-                                 fields=['spec.citations.publisher', 'spec.citations.title'])
+                                 fields=['citations.publisher', 'citations.title'])
         self.add_query_parameter(url_parameter='citation_author',
                                  query_class=MatchPhrase,
-                                 fields=['spec.citations.author'])
+                                 fields=['citations.author'])

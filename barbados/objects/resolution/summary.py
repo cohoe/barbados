@@ -17,6 +17,8 @@ class SpecResolutionSummary(BaseObject):
         self.component_count = spec.component_count
         self.alpha = cocktail.alpha
         self.construction_slug = spec.construction.slug
+        self.citations = spec.citations
+        self.garnish = spec.garnish
 
     def __repr__(self):
         return "Barbados::Resolution::SpecResolutionSummary[%s::%s]" % (self.cocktail_slug, self.spec_slug)
@@ -59,3 +61,5 @@ class SpecResolutionSummary(BaseObject):
         serializer.add_property('component_count', self.component_count)
         serializer.add_property('alpha', self.alpha)
         serializer.add_property('construction_slug', self.construction_slug)
+        serializer.add_property('citations', [ObjectSerializer.serialize(citation, serializer.format) for citation in self.citations])
+        serializer.add_property('garnish', [ObjectSerializer.serialize(garnish, serializer.format) for garnish in self.garnish])
