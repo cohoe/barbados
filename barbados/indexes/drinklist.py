@@ -3,12 +3,12 @@ from barbados.indexes.base import BaseIndex, BarbadosIndex
 
 
 class DrinkListItemIndex(InnerDoc):
-    cocktail_slug = Text()
-    spec_slug = Text()
+    cocktail_slug = Text(analyzer='whitespace', search_analyzer='whitespace')
+    spec_slug = Text(analyzer='whitespace', search_analyzer='whitespace')
 
 
 class DrinkListIndex(Document, BarbadosIndex):
-    id = Text()
+    id = Text(analyzer='whitespace', search_analyzer='whitespace')
     display_name = Text()
     items = Object(DrinkListItemIndex, multi=True)
 

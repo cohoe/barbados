@@ -12,13 +12,13 @@ class NoteIndex(InnerDoc):
 
 
 class GarnishIndex(InnerDoc):
-    slug = Text()
+    slug = Text(analyzer='whitespace', search_analyzer='whitespace')
     display_name = Text()
     notes = Object(NoteIndex, multi=True)
 
 
 class ComponentIndex(InnerDoc):
-    slug = Text()
+    slug = Text(analyzer='whitespace', search_analyzer='whitespace')
     display_name = Text()
     quantity = Integer()
     unit = Text()
@@ -31,10 +31,10 @@ class SpecIndex(InnerDoc):
 
 
 class RecipeIndex(Document, BarbadosIndex):
-    slug = Text()
     # The whitespace analyzer is needed because alpha can contain '#' which indicates a number
-    # and we want to search on that character.
+    # and we want to search on that character. Same thing with slugs and '-''s.
     # https://stackoverflow.com/questions/49322009/elasticsearch-does-not-find-characters-other-than-alpha-numeric
+    slug = Text(analyzer='whitespace', search_analyzer='whitespace')
     alpha = Text(analyzer='whitespace', search_analyzer='whitespace')
     spec = Object(SpecIndex)
 

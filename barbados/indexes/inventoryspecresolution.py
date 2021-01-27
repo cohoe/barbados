@@ -3,15 +3,15 @@ from barbados.indexes.base import BaseIndex, BarbadosIndex
 
 
 class ComponentIndex(InnerDoc):
-    slug = Text()
+    slug = Text(analyzer='whitespace', search_analyzer='whitespace')
     status = Text()
     substitutes = Text(multi=True)
-    parent = Text()
+    parent = Text(analyzer='whitespace', search_analyzer='whitespace')
 
 
 class InventorySpecResolution(Document, BarbadosIndex):
-    cocktail_slug = Text()
-    spec_slug = Text()
+    cocktail_slug = Text(analyzer='whitespace', search_analyzer='whitespace')
+    spec_slug = Text(analyzer='whitespace', search_analyzer='whitespace')
     components = Object(ComponentIndex)
     status_count = Object()
     # The whitespace analyzer is needed because alpha can contain '#' which indicates a number
