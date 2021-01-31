@@ -139,12 +139,13 @@ class IngredientTree:
 
         return ({
             'self': node.identifier,
-            'parent': parent.identifier,
+            'parent': parent.identifier if parent else None,
             'parents': parents,
-            'children': children + node.data.get('elements'),
+            'children': children + node.data.get('elements') if node.data else None,
             'siblings': siblings,
-            'kind': node.data.get('kind'),
-            'implies': implies
+            'kind': node.data.get('kind') if node.data else None,
+            'implies': implies,
+            'implies_root': self.implies_root(node_id)
         })
 
     def siblings(self, node_id):
@@ -161,8 +162,12 @@ class IngredientTree:
         # I don't know how long this bug was there, but my gods...
         # Apparently I was deleting a bunch of stuff from the tree!
         # Remove this node from the list of siblings.
-        siblings = copy.deepcopy(parent.fpointer)
-        siblings.remove(node.identifier)
+        siblings = []
+        try:
+            siblings = copy.deepcopy(parent.fpointer)
+            siblings.remove(node.identifier)
+        except AttributeError:
+            LogService.warn("Error calculating siblings for %s" % node_id)
 
         return siblings
 
@@ -213,6 +218,28 @@ class IngredientTree:
 
         return children
 
+    def implies_root(self, node_id):
+        """
+        Return the node id (tag) of the root of the implied tree for the given
+        node id. This generally means the first family in the parents.
+        :param node_id: slug of the ingredient to look up.
+        :return: slug of the root of the tree to use for implied ingredients.
+        """
+        # Families are the root of their implied trees.
+        try:
+            self_kind = self.node(node_id).data.get('kind')
+        except AttributeError:
+            LogService.warn("Unable to find kind for %s" % node_id)
+            return
+
+        if self_kind in [FamilyKind.value, CategoryKind.value]:
+            return node_id
+        # Look through all parents until we find one. We can be reasonably sure
+        # that all Ingredient/Product/Custom kinds have a family parent.
+        for parent in self.parents(node_id):
+            if self.node(parent).data.get('kind') == FamilyKind.value:
+                return parent
+
     @staticmethod
     def _create_tree_data(item):
         return ({
@@ -235,7 +262,11 @@ class IngredientTree:
         :param node_id: ID of the node to investigate.
         :return: List of node tags (slugs).
         """
-        self_node_kind = self.node(node_id).data.get('kind')
+        try:
+            self_node_kind = self.node(node_id).data.get('kind')
+        except AttributeError:
+            LogService.warn("Problem calculating implies for %s" % node_id)
+            return []
 
         # All nodes imply their children.
         implied_nodes = self.children(node_id, extended=True)

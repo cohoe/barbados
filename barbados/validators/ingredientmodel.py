@@ -3,6 +3,7 @@ from barbados.models.ingredient import IngredientModel
 from barbados.validators.base import BaseValidator
 from barbados.objects.ingredientkinds import IngredientKinds
 from barbados.exceptions import ValidationException
+from barbados.caches.ingredienttree import IngredientTreeCache
 
 
 class IngredientModelValidator(BaseValidator):
@@ -12,9 +13,11 @@ class IngredientModelValidator(BaseValidator):
         self.model = model
         self.fatal = fatal
         self.session = None
+        self.tree = None
 
     def validate(self, session):
         self.session = session
+        self.tree = IngredientTreeCache.retrieve()
 
         self._check_kind()
         self._check_parent_existence()
@@ -55,14 +58,29 @@ class IngredientModelValidator(BaseValidator):
         return self.session.query(IngredientModel).get(self.model.parent) if self.model.parent is not None else None
 
     def _check_elements(self):
-        if self.model.elements:
-            if self.model.kind != IngredientKinds.index.value:
-                raise ValidationException("Kind %s of %s cannot have elements." % (self.model.kind, self.model.slug))
+        if not self.model.elements_include:
+            return
 
-            for slug in self.model.elements:
-                child = self.session.query(IngredientModel).get(slug)
-                if child is None:
-                    raise ValidationException("Element %s of %s does not exist." % (slug, self.model.slug))
+        # Only indexes can have elements
+        if self.model.kind != IngredientKinds.index.value:
+            raise ValidationException("Kind %s of %s cannot have elements." % (self.model.kind, self.model.slug))
+
+        for slug in self.model.elements_include:
+            # Ensure that all elements exist
+            child = self.session.query(IngredientModel).get(slug)
+            if child is None:
+                raise ValidationException("Element %s of %s does not exist." % (slug, self.model.slug))
+
+            # Elements must have a common family ancestor
+            # @TODO disabling this because this fails and is a legitimate case.
+            # * rum (family)
+            #   * jamican-rum (index)
+            #     * -> smith-cross (product)
+            #   * lightly-aged-rum (family)
+            #     * lightly-aged-pot-rum (ingredient)
+            #       * smith-cross (product)
+            # if self.model.parent not in self.tree.implies(slug):
+            #     raise ValidationException("Element %s of %s must have a common implied parent." % (slug, self.model.slug))
 
     def _check_conditions(self):
         if self.model.conditions:

@@ -68,7 +68,7 @@ class Ingredient(BaseObject):
         :return: None
         """
         if self.kind is not IndexKind:
-            raise Exception("Refresh is not supported for %s" % self.kind)
+            return
 
         # If we don't have any conditions (set to [] in __init__ above)
         # Then we need to skip querying otherwise it will return every object
