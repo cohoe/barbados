@@ -65,22 +65,17 @@ class IngredientModelValidator(BaseValidator):
         if self.model.kind != IngredientKinds.index.value:
             raise ValidationException("Kind %s of %s cannot have elements." % (self.model.kind, self.model.slug))
 
-        for slug in self.model.elements_include:
+        for element_slug in self.model.elements_include:
             # Ensure that all elements exist
-            child = self.session.query(IngredientModel).get(slug)
+            child = self.session.query(IngredientModel).get(element_slug)
             if child is None:
-                raise ValidationException("Element %s of %s does not exist." % (slug, self.model.slug))
+                raise ValidationException("Element %s of %s does not exist." % (element_slug, self.model.slug))
 
-            # Elements must have a common family ancestor
-            # @TODO disabling this because this fails and is a legitimate case.
-            # * rum (family)
-            #   * jamican-rum (index)
-            #     * -> smith-cross (product)
-            #   * lightly-aged-rum (family)
-            #     * lightly-aged-pot-rum (ingredient)
-            #       * smith-cross (product)
-            # if self.model.parent not in self.tree.implies(slug):
-            #     raise ValidationException("Element %s of %s must have a common implied parent." % (slug, self.model.slug))
+            # Elements must have a common family ancestor or
+            # be implied by the parents.
+            allowed_parents = self.tree.implies(element_slug) + self.tree.parents(element_slug)
+            if self.model.parent not in allowed_parents and element_slug not in allowed_parents:
+                raise ValidationException("Element '%s' of '%s' must have a common implied parent." % (element_slug, self.model.slug))
 
     def _check_conditions(self):
         if self.model.conditions:

@@ -24,6 +24,7 @@ class IngredientTree:
         :param passes: Number of passes over the ingredients table to place things in the tree.
                        Items could be out of order so it may take a pass or two to get everything.
         """
+        self._index_node_ids = []
         self.tree = self._build_tree(passes=passes)
 
     def _build_tree(self, passes, root=root_node):
@@ -61,6 +62,10 @@ class IngredientTree:
                     #     continue
                     try:
                         tree.create_node(item.slug, item.slug, parent=item.parent, data=self._create_tree_data(item))
+                        # This is to maintain a list of all index elements since finding those
+                        # is somewhat hard after the fact.
+                        if item.kind == IndexKind.value:
+                            self._index_node_ids.append(item.slug)
                         ingredients_to_place.remove(item)
                     except NodeIDAbsentError:
                         LogService.debug("skipping %s (Attempt %i/%s)" % (item.slug, i, passes))
@@ -240,6 +245,20 @@ class IngredientTree:
             if self.node(parent).data.get('kind') == FamilyKind.value:
                 return parent
 
+    def indexed_in(self, node_id):
+        """
+        Return a list of all node IDs that contain the given node ID
+        as an element in them (aka, they're indexes).
+        :param node_id: Slug of the ingredient to look for.
+        :return: List of Slugs.
+        """
+        indexes = []
+        for index_id in self._index_node_ids:
+            if node_id in self.node(index_id).data.get('elements'):
+                indexes.append(index_id)
+
+        return indexes
+
     @staticmethod
     def _create_tree_data(item):
         return ({
@@ -271,24 +290,20 @@ class IngredientTree:
         # All nodes imply their children.
         implied_nodes = self.children(node_id, extended=True)
 
+        # If the ingredientis indexed in something, imply its index.
+        implied_nodes += self.indexed_in(node_id)
+
         # Families should not imply siblings or parents since they are the top
-        # of the metaphorical phood chain. See the FamilyKind class for more.
-        if self_node_kind == FamilyKind.value:
-            # Need this here to prevent FamilyKind from getting the else below.
-            pass
-        # Ingredients being the middleware shouldn't return their siblings.
-        # Since Indexes are basically fancy Ingredients they should follow the same rules.
-        # @TODO ponder this more. How deep should family inception go? If unlimited then this may
-        # be able to go away since family represents the stop of the implication. Likely requires
-        # lots of tree trimming to refactor.
-        # elif self_node_kind == IngredientKind.value or self_node_kind == IndexKind.value:
-        # elif self_node_kind == self_node_kind == IndexKind.value:
-        #     implied_nodes += self.parents(node_id, stop_at_first_family=True)
-        # Perhaps indexes should imply their non-family siblings?
+        # of the metaphorical phood chain (aka, implies_root). See the FamilyKind class for more.
+        #
         # Products should imply their parents, any Custom children, and their siblings
         # since they generally can get swapped out for each other. Yes I know there are
         # differences between Laphroaig and Lagavulin but you get the idea I hope.
-        else:
+        #
+        # Ingredients being the middleware shouldn't return their siblings.
+        # Since Indexes are basically fancy Ingredients they should follow the
+        # same rules as them.
+        if self_node_kind != FamilyKind.value:
             # implied_nodes += self.siblings(node_id)
             for parent_node in self.parents(node_id, stop_at_first_family=True):
                 implied_nodes += [parent_node]
