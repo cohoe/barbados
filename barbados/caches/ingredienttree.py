@@ -8,7 +8,7 @@ from barbados.objects.ingredienttree import IngredientTree
 
 class IngredientTreeCache(CacheBase):
     """
-    Serializing and cacheing objects is dangerous. But the Treelib
+    Serializing and caching objects is dangerous. But the Treelib
     doesn't have support for loading from JSON yet (only saving to).
     """
     cache_key = 'ingredient_tree_object'

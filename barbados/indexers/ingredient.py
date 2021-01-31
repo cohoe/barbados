@@ -1,5 +1,5 @@
 from barbados.indexers.base import BaseIndexer
-from barbados.factories import IngredientFactory
+from barbados.factories.ingredientfactory import IngredientFactory
 from barbados.indexes import IngredientIndex
 from barbados.objects.ingredient import Ingredient
 from barbados.services.logging import LogService

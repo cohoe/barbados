@@ -1,5 +1,5 @@
 from barbados.indexers.base import BaseIndexer
-from barbados.factories import DrinkListFactory
+from barbados.factories.drinklistfactory import DrinkListFactory
 from barbados.indexes import DrinkListIndex
 from barbados.objects.drinklist import DrinkList
 

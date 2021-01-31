@@ -18,7 +18,7 @@ class RedisConnector:
         self.password = Setting(path='/cache/redis/password', env='AMARI_REDIS_PASSWORD', default=None, type_=str).get_value()
         self.ssl = Setting(path='/cache/redis/ssl', env='AMARI_REDIS_SSL', default=False, type_=bool).get_value()
 
-        LogService.info("Redis connection: %s:%s@%s:%s?ssl=%s" % (self.username, self.password, self.host, self.port, self.ssl))
+        LogService.info("Redis connection: redis://%s:%s@%s:%s?ssl=%s" % (self.username, self.password, self.host, self.port, self.ssl))
 
     def set(self, key, value):
         self._connect()

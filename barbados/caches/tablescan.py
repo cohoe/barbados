@@ -1,7 +1,6 @@
 import json
 from barbados.caches import Caches
 from barbados.caches.base import CacheBase
-from barbados.services.database import DatabaseService
 from barbados.services.cache import CacheService
 from barbados.serializers import ObjectSerializer
 

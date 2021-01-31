@@ -1,5 +1,5 @@
 from barbados.objects.ingredient import Ingredient
-from .base import BaseFactory
+from barbados.factories.base import BaseFactory
 from barbados.models.ingredient import IngredientModel
 from barbados.query import QueryCondition
 

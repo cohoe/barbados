@@ -23,8 +23,11 @@ class PostgresqlConnector:
         self.debug_sql = Setting(path='/database/postgres/debug_sql', env='AMARI_DATABASE_DEBUG_SQL', default=False, type_=bool).get_value()
 
         connection_string = "postgres://%s:%s@%s:%i/%s" % (self.username, self.password, self.host, self.port, self.database)
-        LogService.info("Postgres string: %s" % connection_string)
-        LogService.warn("Starting PostgreSQL connection!")
+
+        # https://stackoverflow.com/questions/48995979/how-to-replace-all-characters-in-a-string-with-one-character/48996018
+        masked_connection_string = connection_string.replace(self.password, '*' * len(self.password))
+        LogService.info("Postgres string: %s" % masked_connection_string)
+        LogService.warn('Starting PostgreSQL connection!')
 
         self.engine = sqlalchemy.create_engine(connection_string, echo=self.debug_sql)
         self.Session = sessionmaker(bind=self.engine)
@@ -37,6 +40,7 @@ class PostgresqlConnector:
         Setup some testing event handlers to report when things happen in SQLAlchemy.
         :return:
         """
+
         def event_new_session(session, transaction, connection):
             LogService.info("Opening new database session: %s" % session)
 
