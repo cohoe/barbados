@@ -26,21 +26,3 @@ validator_factory.register_class(CocktailModelValidator)
 validator_factory.register_class(IngredientModelValidator)
 validator_factory.register_class(DrinkListModelValidator)
 validator_factory.register_class(InventoryModelValidator)
-
-
-class ObjectValidator:
-    """
-    https://realpython.com/factory-method-python/
-    """
-    @staticmethod
-    def validate(input_object, session, fatal=True):
-        """
-        This provides a generic method to call with any object and magically
-        find its validator and run the validate() method.
-        :param input_object: Object to validate.
-        :param session: Database session.
-        :param fatal: Whether validation should trigger a fatal exception or not.
-        :return: None
-        """
-        validator = validator_factory.get_validator(input_object, fatal)
-        validator.validate(session)

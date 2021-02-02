@@ -1,6 +1,6 @@
 import copy
 from barbados.serializers import ObjectSerializer
-from barbados.validators import ObjectValidator
+from barbados.validators.object import ObjectValidator
 from barbados.services.logging import LogService
 from barbados.services.database import DatabaseService
 

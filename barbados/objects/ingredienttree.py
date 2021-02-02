@@ -1,10 +1,13 @@
 import copy
+import json
 from treelib import Node, Tree
 from treelib.exceptions import NodeIDAbsentError
 from barbados.models.ingredient import IngredientModel
 from barbados.objects.ingredientkinds import IngredientKinds, CategoryKind, FamilyKind, IngredientKind, IndexKind
 from barbados.services.logging import LogService
 from barbados.services.database import DatabaseService
+from barbados.factories.ingredientfactory import IngredientFactory
+from barbados.serializers import ObjectSerializer
 
 
 class IngredientTree:
@@ -39,39 +42,32 @@ class IngredientTree:
         with DatabaseService.get_session() as session:
 
             tree.create_node(root, root)
-            for item in IngredientModel.get_by_kind(session, CategoryKind):
-                tree.create_node(item.slug, item.slug, parent=root, data=self._create_tree_data(item))
+            for i in IngredientModel.get_by_kind(session, CategoryKind):
+                i = IngredientFactory.model_to_obj(i)
+                tree.create_node(i.slug, i.slug, parent=root, data=i)
 
-            # for i in range(1, passes + 1):
-            #     LogService.debug("Pass %i/%i for Families" % (i, passes))
-            # for item in IngredientModel.get_by_kind(session, FamilyKind):
-            #     print(item.slug)
-            #     tree.create_node(item.slug, item.slug, parent=item.parent, data=self._create_tree_data(item))
+            ingredients_to_place = [IngredientFactory.model_to_obj(item) for item in IngredientModel.get_usable_ingredients(session)]
+            for idx in range(1, passes + 1):
+                LogService.debug("Pass %i/%i" % (idx, passes))
 
-            ingredients_to_place = list(IngredientModel.get_usable_ingredients(session))
-            for i in range(1, passes + 1):
-                LogService.debug("Pass %i/%i" % (i, passes))
-
-                # I don't remember exactly why I have to copy the list here.
-                # It's similar to the dict deepcopy crap that exists elsewhere in
-                # this codebase.
-                for item in ingredients_to_place.copy():
-                    # if item.kind == FamilyKind.value:
-                    #     ingredients_to_place.remove(item)
-                    #     LogService.debug("Skipping %s because it is a family." % item.slug)
-                    #     continue
+                # If you remove items from a list you're iterating over you
+                # dynamically change the indexing, making things get out of whack.
+                # You can get around this by making a copy of the list and iterating
+                # over that while you remove items from the original list.
+                # https://thispointer.com/python-remove-elements-from-a-list-while-iterating/
+                for i in ingredients_to_place.copy():
                     try:
-                        tree.create_node(item.slug, item.slug, parent=item.parent, data=self._create_tree_data(item))
+                        tree.create_node(i.slug, i.slug, parent=i.parent, data=i)
                         # This is to maintain a list of all index elements since finding those
                         # is somewhat hard after the fact.
-                        if item.kind == IndexKind.value:
-                            self._index_node_ids.append(item.slug)
-                        ingredients_to_place.remove(item)
+                        if i.kind == IndexKind:
+                            self._index_node_ids.append(i.slug)
+                        ingredients_to_place.remove(i)
                     except NodeIDAbsentError:
-                        LogService.debug("skipping %s (Attempt %i/%s)" % (item.slug, i, passes))
+                        LogService.debug("skipping %s (Attempt %i/%s)" % (i.slug, idx, passes))
 
                 if len(ingredients_to_place) == 0:
-                    LogService.info("All done after pass %i" % i)
+                    LogService.info("All done after pass %i" % idx)
                     break
 
         LogService.info("Tree has len %i" % len(tree))
@@ -146,9 +142,9 @@ class IngredientTree:
             'self': node.identifier,
             'parent': parent.identifier if parent else None,
             'parents': parents,
-            'children': children + node.data.get('elements') if node.data else None,
+            'children': children + node.data.elements if node.data else [],
             'siblings': siblings,
-            'kind': node.data.get('kind') if node.data else None,
+            'kind': node.data.kind.value if node.data else None,
             'implies': implies,
             'implies_root': self.implies_root(node_id)
         })
@@ -192,7 +188,7 @@ class IngredientTree:
         # we hit the root.
         while not node.is_root():
             parents.append(node.tag) if node.tag != node_id else None
-            if stop_at_first_family and node.data.get('kind') == FamilyKind.value:
+            if stop_at_first_family and node.data.kind == FamilyKind:
                 break
             node = self.parent(node.tag)
 
@@ -232,17 +228,17 @@ class IngredientTree:
         """
         # Families are the root of their implied trees.
         try:
-            self_kind = self.node(node_id).data.get('kind')
+            self_kind = self.node(node_id).data.kind
         except AttributeError:
             LogService.warn("Unable to find kind for %s" % node_id)
             return
 
-        if self_kind in [FamilyKind.value, CategoryKind.value]:
+        if self_kind in [FamilyKind, CategoryKind]:
             return node_id
         # Look through all parents until we find one. We can be reasonably sure
         # that all Ingredient/Product/Custom kinds have a family parent.
         for parent in self.parents(node_id):
-            if self.node(parent).data.get('kind') == FamilyKind.value:
+            if self.node(parent).data.kind == FamilyKind:
                 return parent
 
     def indexed_in(self, node_id):
@@ -254,19 +250,10 @@ class IngredientTree:
         """
         indexes = []
         for index_id in self._index_node_ids:
-            if node_id in self.node(index_id).data.get('elements'):
+            if node_id in self.node(index_id).data.elements:
                 indexes.append(index_id)
 
         return indexes
-
-    @staticmethod
-    def _create_tree_data(item):
-        return ({
-            'display_name': item.display_name,
-            'kind': item.kind,
-            'aliases': item.aliases,
-            'elements': item.elements,
-        })
 
     def implies(self, node_id):
         """
@@ -282,7 +269,7 @@ class IngredientTree:
         :return: List of node tags (slugs).
         """
         try:
-            self_node_kind = self.node(node_id).data.get('kind')
+            self_node_kind = self.node(node_id).data.kind
         except AttributeError:
             LogService.warn("Problem calculating implies for %s" % node_id)
             return []
@@ -303,7 +290,7 @@ class IngredientTree:
         # Ingredients being the middleware shouldn't return their siblings.
         # Since Indexes are basically fancy Ingredients they should follow the
         # same rules as them.
-        if self_node_kind != FamilyKind.value:
+        if self_node_kind != FamilyKind:
             # implied_nodes += self.siblings(node_id)
             for parent_node in self.parents(node_id, stop_at_first_family=True):
                 implied_nodes += [parent_node]
@@ -311,14 +298,14 @@ class IngredientTree:
 
         # Indexes should imply their elements
         if self_node_kind == IndexKind.value:
-            implied_nodes += self.node(node_id).data.get('elements')
+            implied_nodes += self.node(node_id).data.elements
 
         # Dedup and sort the list
         implied_nodes = list(set(implied_nodes))
         implied_nodes.sort()
 
         # Figure out which IngredientKinds we allow for implicit substitution.
-        implicit_kind_values = [kind.value for kind in IngredientKinds.implicits]
+        implicit_kinds = [kind for kind in IngredientKinds.implicits]
         # LogService.info("Allowed implicit kinds are: %s" % implicit_kind_values)
 
         # Create a list of allowed parents based on whether the parent is
@@ -326,11 +313,28 @@ class IngredientTree:
         allowed_implicit_nodes = []
         for implied_node_id in implied_nodes:
             implied_node = self.node(node_id=implied_node_id)
-            implied_node_kind = implied_node.data.get('kind')
+            implied_node_kind = implied_node.data.kind
             # Log.info("Kind of parent %s is %s" % (parent, parent_kind))
 
-            if implied_node_kind in implicit_kind_values:
+            if implied_node_kind in implicit_kinds:
                 allowed_implicit_nodes.append(implied_node_id)
 
         # LogService.info("Allowed implicit nodes for %s are: %s" % (node_id, allowed_implicit_nodes))
         return allowed_implicit_nodes
+
+    def to_json(self):
+        """
+        Return a JSON serialized version of the tree. This wraps the treelib.Tree.to_json
+        function but since that one doesn't allow for a custom encoder class I took its code
+        and put it here.
+        :return: JSON-serialized object.
+        """
+        return json.dumps(self.tree.to_dict(with_data=True, sort=False, reverse=False), cls=TreeEncoder)
+
+
+class TreeEncoder(json.JSONEncoder):
+    """
+    Class to JSON-encode the tree elements (which are Ingredient objects).
+    """
+    def default(self, o):
+        return ObjectSerializer.serialize(o, 'dict')

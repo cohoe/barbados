@@ -3,7 +3,6 @@ from barbados.models.ingredient import IngredientModel
 from barbados.validators.base import BaseValidator
 from barbados.objects.ingredientkinds import IngredientKinds
 from barbados.exceptions import ValidationException
-from barbados.caches.ingredienttree import IngredientTreeCache
 
 
 class IngredientModelValidator(BaseValidator):
@@ -13,11 +12,9 @@ class IngredientModelValidator(BaseValidator):
         self.model = model
         self.fatal = fatal
         self.session = None
-        self.tree = None
 
     def validate(self, session):
         self.session = session
-        self.tree = IngredientTreeCache.retrieve()
 
         self._check_kind()
         self._check_parent_existence()
@@ -65,6 +62,12 @@ class IngredientModelValidator(BaseValidator):
         if self.model.kind != IngredientKinds.index.value:
             raise ValidationException("Kind %s of %s cannot have elements." % (self.model.kind, self.model.slug))
 
+        # If this is at the top if sets off a chain reaction of circular imports.
+        # If we load it here then everything has already been initialized and it
+        # is safe to do so.
+        from barbados.caches.ingredienttree import IngredientTreeCache
+        tree = IngredientTreeCache.retrieve()
+
         for element_slug in self.model.elements_include:
             # Ensure that all elements exist
             child = self.session.query(IngredientModel).get(element_slug)
@@ -73,7 +76,7 @@ class IngredientModelValidator(BaseValidator):
 
             # Elements must have a common family ancestor or
             # be implied by the parents.
-            allowed_parents = self.tree.implies(element_slug) + self.tree.parents(element_slug)
+            allowed_parents = tree.implies(element_slug) + tree.parents(element_slug)
             if self.model.parent not in allowed_parents and element_slug not in allowed_parents:
                 raise ValidationException("Element '%s' of '%s' must have a common implied parent." % (element_slug, self.model.slug))
 
