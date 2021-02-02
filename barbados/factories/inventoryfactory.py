@@ -7,10 +7,12 @@ from barbados.services.logging import LogService
 from uuid import uuid4
 from barbados.models.inventory import InventoryModel
 from barbados.caches.ingredienttree import IngredientTreeCache
+from barbados.validators.inventorymodel import InventoryModelValidator
 
 
 class InventoryFactory(BaseFactory):
     _model = InventoryModel
+    _validator = InventoryModelValidator
 
     required_keys = {
         'id': uuid4(),

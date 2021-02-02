@@ -3,12 +3,14 @@ from barbados.objects.text import DisplayName
 from barbados.objects.drinklist import DrinkList
 from barbados.objects.drinklistitem import DrinkListItem
 from barbados.models.drinklist import DrinkListModel
+from barbados.validators.drinklistmodel import DrinkListModelValidator
 from uuid import uuid4
 
 
 class DrinkListFactory(BaseFactory):
     # @TODO this needs some refactoring love.
     _model = DrinkListModel
+    _validator = DrinkListModelValidator
 
     @staticmethod
     def model_to_obj(model):

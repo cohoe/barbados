@@ -2,10 +2,12 @@ from barbados.objects.ingredient import Ingredient
 from barbados.factories.base import BaseFactory
 from barbados.models.ingredient import IngredientModel
 from barbados.query import QueryCondition
+from barbados.validators.ingredientmodel import IngredientModelValidator
 
 
 class IngredientFactory(BaseFactory):
     _model = IngredientModel
+    _validator = IngredientModelValidator
 
     required_keys = {
         'slug': str(),

@@ -8,11 +8,13 @@ from barbados.serializers import ObjectSerializer
 from barbados.factories.base import BaseFactory
 from barbados.objects.image import Image
 from barbados.models.cocktail import CocktailModel
+from barbados.validators.cocktailmodel import CocktailModelValidator
 
 
 # @TODO this needs to standardize into modern constructs!
 class CocktailFactory(BaseFactory):
     _model = CocktailModel
+    _validator = CocktailModelValidator
 
     @staticmethod
     def raw_to_obj(raw_recipe, slug):

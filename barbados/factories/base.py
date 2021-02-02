@@ -1,6 +1,5 @@
 import copy
 from barbados.serializers import ObjectSerializer
-from barbados.validators.object import ObjectValidator
 from barbados.services.logging import LogService
 from barbados.services.database import DatabaseService
 
@@ -11,6 +10,10 @@ class BaseFactory:
     # It still shits an error so that's good.
     @property
     def _model(self):
+        raise NotImplementedError()
+
+    @property
+    def _validator(self):
         raise NotImplementedError()
 
     @staticmethod
@@ -130,7 +133,7 @@ class BaseFactory:
             model = cls.obj_to_model(obj)
 
             # Validate it.
-            ObjectValidator.validate(model, session=session)
+            cls._validator(model).validate(session=session)
 
             # Save it to the database.
             session.add(model)
