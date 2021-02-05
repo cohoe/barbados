@@ -35,6 +35,10 @@ class BaseFactory:
         return index_class(meta={'id': id}, **ObjectSerializer.serialize(obj, format))
 
     @classmethod
+    def index_to_obj(cls, indexable):
+        return cls.raw_to_obj(indexable.to_dict())
+
+    @classmethod
     def model_to_obj(cls, model):
         """
         This exists to ensure common functionality with CocktailModel.
@@ -91,7 +95,7 @@ class BaseFactory:
     @classmethod
     def produce_obj(cls, id):
         """
-        Produce an appropriate object from the factory.
+        Produce an appropriate object from the database.
         :param id: ID parameter of the record to lookup
         :return: Object from the Model.
         """
@@ -120,6 +124,7 @@ class BaseFactory:
 
         return objects
 
+    # @TODO refactor to insert
     @classmethod
     def store_obj(cls, obj):
         """

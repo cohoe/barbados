@@ -9,16 +9,20 @@ class SpecResolutionSummary(BaseObject):
     Summary of a comparison between an Inventory and a Spec. Figure out
     what this inventory has, both explicitly and implicitly.
     """
-    def __init__(self, inventory_id, cocktail, spec):
+    def __init__(self, inventory_id, cocktail_slug, spec_slug, components, alpha, construction_slug,
+                 garnish, component_count=0, status_count=0, citations=None):
+        # @TODO this seems sketchy....
+        if citations is None:
+            citations = []
         self.inventory_id = inventory_id
-        self.cocktail_slug = cocktail.slug
-        self.spec_slug = spec.slug
-        self.components = []
-        self.component_count = spec.component_count
-        self.alpha = cocktail.alpha
-        self.construction_slug = spec.construction.slug
-        self.citations = spec.citations
-        self.garnish = spec.garnish
+        self.cocktail_slug = cocktail_slug
+        self.spec_slug = spec_slug
+        self.components = components
+        self.component_count = component_count
+        self.alpha = alpha
+        self.construction_slug = construction_slug
+        self.citations = citations
+        self.garnish = garnish
 
     def __repr__(self):
         return "Barbados::Resolution::SpecResolutionSummary[%s::%s]" % (self.cocktail_slug, self.spec_slug)
@@ -51,6 +55,14 @@ class SpecResolutionSummary(BaseObject):
             except KeyError:
                 counts.update({status_key: 1})
         return counts
+
+    @property
+    def index_id(self):
+        """
+        The document ID for the index. Has to be unique.
+        :return:
+        """
+        return "%s::%s::%s" % (self.inventory_id, self.cocktail_slug, self.spec_slug)
 
     def serialize(self, serializer):
         serializer.add_property('inventory_id', self.inventory_id)

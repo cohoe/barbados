@@ -6,11 +6,22 @@ class BaseIndexer:
     def index(cls, obj):
         """
         Store the object in the index.
+        @TODO rebrand to .put()?
         :param obj: barbados.objects.base.BarbadosObject child.
         :return: None
         """
         index = cls.factory.obj_to_index(obj, cls.for_index)
         index.save()
+
+    @classmethod
+    def get(cls, id):
+        """
+        Retrieve an object from the index.
+        :param id: ElasticSearch document ID
+        :return: BarbadosObject child.
+        """
+        index = cls.for_index.get(id)
+        return cls.factory.index_to_obj(index)
 
     @property
     def for_class(self):
