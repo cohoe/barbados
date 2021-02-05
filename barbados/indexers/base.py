@@ -1,3 +1,7 @@
+# @TODO get this into the search service
+from barbados.exceptions import NotFoundError
+
+
 class BaseIndexer:
     """
     Template interface class for any Indexers.
@@ -20,8 +24,11 @@ class BaseIndexer:
         :param id: ElasticSearch document ID
         :return: BarbadosObject child.
         """
-        index = cls.for_index.get(id)
-        return cls.factory.index_to_obj(index)
+        try:
+            index = cls.for_index.get(id)
+            return cls.factory.index_to_obj(index)
+        except NotFoundError:
+            raise KeyError("Document %s not found in Index %s" % (id, cls.for_index.Index.name))
 
     @property
     def for_class(self):

@@ -28,7 +28,7 @@ class Resolution:
             substitutes = []
         self.slug = slug
         # @TODO enforcement without isinstance() since its not an instance.
-        self.status = status
+        self.status = resolution_factory.get_resolution(status)
         self.substitutes = substitutes
         self.parent = parent
         self.parents = parents
@@ -52,6 +52,18 @@ class ResolutionFactory:
         self._resolutions[resolution.status] = resolution
 
     def get_resolution(self, key):
+        """
+        Find the BaseResolution child class based on its key. Sometimes we
+        might be given a class already so we do a sniff test and simply
+        return it if that happens.
+        :param key: Status key (string or BaseResolution child).
+        :return: BaseResolution child class.
+        """
+        try:
+            status_value = key.status
+            return key
+        except AttributeError:
+            pass
         r = self._resolutions.get(key)
         if not r:
             raise KeyError("No resolution found for '%s'." % key)
