@@ -4,6 +4,7 @@ from barbados.objects.resolution.summary import SpecResolutionSummary
 from uuid import uuid4, UUID
 from barbados.objects.resolution import Resolution
 from barbados.objects.speccomponent import SpecComponent
+from barbados.objects.text import Text
 from barbados.factories.citationfactory import CitationFactory
 
 
@@ -20,6 +21,7 @@ class SpecResolutionFactory(BaseFactory):
         'inventory_id': uuid4(),
         'spec_slug': str(),
         'status_count': dict(),
+        # 'notes': list(),
     }
 
     @classmethod
@@ -40,6 +42,7 @@ class SpecResolutionFactory(BaseFactory):
         raw_srs = cls._parse_components(raw_srs)
         raw_srs = cls._parse_garnish(raw_srs)
         raw_srs = cls._parse_citations(raw_srs)
+        # raw_srs = cls._parse_notes(raw_srs)
 
         return SpecResolutionSummary(**raw_srs)
 
@@ -70,6 +73,11 @@ class SpecResolutionFactory(BaseFactory):
 
         objs = []
         for raw_garnish in raw_input.get(key):
+            # @TODO techically this means factory
+            if raw_garnish.get('notes'):
+                notes = []
+                [notes.append(Text(**n)) for n in raw_garnish.get('notes')]
+                raw_garnish.update({'notes': notes})
             s = SpecComponent(**raw_garnish)
             objs.append(s)
         raw_input.update({key: objs})
@@ -84,6 +92,18 @@ class SpecResolutionFactory(BaseFactory):
         for raw_citation in raw_input.get(key):
             c = CitationFactory.raw_to_obj(raw_citation)
             objs.append(c)
+        raw_input.update({key: objs})
+
+        return raw_input
+
+    @staticmethod
+    def _parse_notes(raw_input):
+        key = 'notes'
+
+        objs = []
+        for raw_note in raw_input.get(key):
+            n = Text(**raw_note)
+            objs.append(n)
         raw_input.update({key: objs})
 
         return raw_input

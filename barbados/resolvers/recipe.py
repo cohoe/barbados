@@ -27,7 +27,7 @@ class RecipeResolver(BaseResolver):
         tree = IngredientTreeCache.retrieve()
         inventory.expand(tree=tree)
 
-        LogService.info("Found cocktail specs: %s" % [spec.slug for spec in cocktail.specs])
+        LogService.info("Cocktail %s has specs: %s" % (cocktail.slug, [spec.slug for spec in cocktail.specs]))
         for spec in cocktail.specs:
             # Skip any specs that the user didn't ask for with the spec_slug
             # parameter.

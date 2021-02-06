@@ -39,3 +39,18 @@ class CacheService:
         :return: None or Exception
         """
         return CacheService.connector.delete(key)
+
+    @staticmethod
+    def get_flask_config():
+        """
+        Return a dictionary of Flask_Caching config directives.
+        https://flask-caching.readthedocs.io/en/latest/#configuring-flask-caching
+        :return: Dict
+        """
+        return {
+            'CACHE_TYPE': 'redis',
+            'CACHE_REDIS_HOST': CacheService.connector.host,
+            'CACHE_REDIS_PORT': CacheService.connector.port,
+            'CACHE_REDIS_DB': CacheService.connector.flask_database_id,
+            'CACHE_DEFAULT_TIMEOUT': CacheService.connector.request_timeout,
+        }
