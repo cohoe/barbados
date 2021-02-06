@@ -58,28 +58,25 @@ class RecipeResolver(BaseResolver):
         # rs = SpecResolutionSummary(inventory_id=inventory.id, cocktail=cocktail, spec=spec)
         rs = SpecResolutionFactory.from_objects(inventory, cocktail, spec)
 
-        try:
-            rs = InventorySpecResolutionIndexer.get(rs.index_id)
-        except KeyError:
-            LogService.warn("Document %s not found in index. Regenerating..." % rs.index_id)
+        LogService.warn("Document %s not found in index. Regenerating..." % rs.index_id)
 
-            # @TODO move this into the SpecResolution object itself?
-            for component in list(spec.components):
-                if inventory.contains(component.slug):
-                    substitutes, resolution_status = RecipeResolver._get_direct_resolution(inventory, component)
-                else:
-                    substitutes, resolution_status = RecipeResolver._get_nondirect_resolution(inventory, component, tree)
+        # @TODO move this into the SpecResolution object itself?
+        for component in list(spec.components):
+            if inventory.contains(component.slug):
+                substitutes, resolution_status = RecipeResolver._get_direct_resolution(inventory, component)
+            else:
+                substitutes, resolution_status = RecipeResolver._get_nondirect_resolution(inventory, component, tree)
 
-                # Construct the SpecResolution object.
-                LogService.info("Resolution for %s::%s::%s is %s" % (cocktail.slug, spec.slug, component.slug, resolution_status.status))
-                r = Resolution(slug=component.slug, status=resolution_status, substitutes=substitutes,
-                               parents=tree.parents(component.slug))
+            # Construct the SpecResolution object.
+            LogService.info("Resolution for %s::%s::%s is %s" % (cocktail.slug, spec.slug, component.slug, resolution_status.status))
+            r = Resolution(slug=component.slug, status=resolution_status, substitutes=substitutes,
+                           parents=tree.parents(component.slug))
 
-                # Add the resolution to the summary
-                rs.add_component(r)
+            # Add the resolution to the summary
+            rs.add_component(r)
 
-            # Index and Return
-            InventorySpecResolutionIndexer.index(rs)
+        # Index and Return
+        InventorySpecResolutionIndexer.index(rs)
 
         return rs
 
