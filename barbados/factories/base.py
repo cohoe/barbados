@@ -5,6 +5,10 @@ from barbados.services.database import DatabaseService
 
 
 class BaseFactory:
+    """
+    Factories should exist for any objects with complex attributes (ie,
+    nested things) like Cocktail and SpecResolutionSummary.
+    """
 
     # @TODO I'm pretty sure this isn't manifesting how I expected it to.
     # It still shits an error so that's good.
