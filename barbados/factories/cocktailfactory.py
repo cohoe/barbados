@@ -3,7 +3,7 @@ from barbados.objects.cocktail import Cocktail
 from barbados.objects.origin import Origin
 from barbados.objects.text import Text, Slug
 from barbados.factories.specfactory import SpecFactory
-from barbados.factories.citationfactory import CitationFactory
+from barbados.factories.citation import CitationFactory
 from barbados.serializers import ObjectSerializer
 from barbados.factories.base import BaseFactory
 from barbados.objects.image import Image

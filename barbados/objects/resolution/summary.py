@@ -4,7 +4,7 @@ from barbados.objects.resolution.results import ResolutionResults
 from barbados.objects.base import BaseObject
 
 
-class SpecResolutionSummary(BaseObject):
+class RecipeResolutionSummary(BaseObject):
     """
     Summary of a comparison between an Inventory and a Spec. Figure out
     what this inventory has, both explicitly and implicitly.
@@ -25,7 +25,7 @@ class SpecResolutionSummary(BaseObject):
         self.garnish = garnish
 
     def __repr__(self):
-        return "Barbados::Resolution::SpecResolutionSummary[%s::%s]" % (self.cocktail_slug, self.spec_slug)
+        return "Barbados::Objects::Resolution::RecipeResolutionSummary[%s]" % self.index_id
 
     def add_component(self, resolution):
         """

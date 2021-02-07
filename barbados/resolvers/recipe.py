@@ -2,10 +2,10 @@ from barbados.resolvers.base import BaseResolver
 from barbados.services.logging import LogService
 from barbados.objects.resolution.results import DirectResolutionResult, ImplicitResolutionResult, MissingResolutionResult
 from barbados.objects.resolution import Resolution
-from barbados.objects.resolution.summary import SpecResolutionSummary
+from barbados.objects.resolution.summary import RecipeResolutionSummary
 from barbados.caches.ingredienttree import IngredientTreeCache
 from barbados.indexers.inventoryspec import InventorySpecResolutionIndexer
-from barbados.factories.specresolution import SpecResolutionFactory
+from barbados.factories.reciperesolution import RecipeResolutionFactory
 from barbados.serializers import ObjectSerializer
 
 
@@ -57,7 +57,7 @@ class RecipeResolver(BaseResolver):
         # assume a 1:1 mapping between them.
         LogService.info("Resolving spec %s" % spec.slug)
         # rs = SpecResolutionSummary(inventory_id=inventory.id, cocktail=cocktail, spec=spec)
-        rs = SpecResolutionFactory.from_objects(inventory, cocktail, spec)
+        rs = RecipeResolutionFactory.from_objects(inventory, cocktail, spec)
 
         LogService.warn("Document %s not found in index. Regenerating..." % rs.index_id)
 

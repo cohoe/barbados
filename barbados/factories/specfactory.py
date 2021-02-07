@@ -4,7 +4,7 @@ from barbados.objects.glassware import Glassware
 from barbados.objects.speccomponent import SpecComponent
 from barbados.objects.text import Text, Slug, DisplayName
 from barbados.objects.construction import Construction
-from barbados.factories.citationfactory import CitationFactory
+from barbados.factories.citation import CitationFactory
 from barbados.objects.image import Image
 
 

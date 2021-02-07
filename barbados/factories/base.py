@@ -72,6 +72,10 @@ class BaseFactory:
     def raw_to_obj(raw):
         raise NotImplementedError
 
+    @classmethod
+    def raw_list_to_obj(cls, raw_list):
+        return [cls.raw_to_obj(item) for item in raw_list]
+
     @staticmethod
     def required_keys():
         raise NotImplementedError
