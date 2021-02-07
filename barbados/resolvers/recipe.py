@@ -1,6 +1,7 @@
 from barbados.resolvers.base import BaseResolver
 from barbados.services.logging import LogService
-from barbados.objects.resolution import Resolution, DirectResolution, ImplicitResolution, MissingResolution
+from barbados.objects.resolution.results import DirectResolutionResult, ImplicitResolutionResult, MissingResolutionResult
+from barbados.objects.resolution import Resolution
 from barbados.objects.resolution.summary import SpecResolutionSummary
 from barbados.caches.ingredienttree import IngredientTreeCache
 from barbados.indexers.inventoryspec import InventorySpecResolutionIndexer
@@ -86,7 +87,7 @@ class RecipeResolver(BaseResolver):
         The spec.component.slug is specifically named in the inventory items.
         :return: Tuple of List of substitutes and DirectResolution
         """
-        return inventory.substitutes(component.slug), DirectResolution
+        return inventory.substitutes(component.slug), DirectResolutionResult
 
     @staticmethod
     def _get_nondirect_resolution(inventory, component, tree):
@@ -120,6 +121,6 @@ class RecipeResolver(BaseResolver):
         # for either the direct component or any of its implications, it's missing.
         # If we have then it's considered implicitly available.
         if substitutes:
-            return substitutes, ImplicitResolution
+            return substitutes, ImplicitResolutionResult
 
-        return [], MissingResolution
+        return [], MissingResolutionResult

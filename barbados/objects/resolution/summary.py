@@ -1,6 +1,6 @@
 from barbados.objects.resolution import Resolution
 from barbados.serializers import ObjectSerializer
-from barbados.objects.resolution import resolution_factory
+from barbados.objects.resolution.results import ResolutionResults
 from barbados.objects.base import BaseObject
 
 
@@ -47,7 +47,7 @@ class SpecResolutionSummary(BaseObject):
         resolution. Example: {3x direct, 1x implicit, 1x missing}.
         :return: Dict
         """
-        counts = {key: 0 for key in resolution_factory.get_resolution_statuses()}
+        counts = {key: 0 for key in ResolutionResults.get_resolution_statuses()}
         for r in self.components:
             status_key = r.status.status
             try:
