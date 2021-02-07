@@ -1,7 +1,7 @@
 from barbados.resolvers.base import BaseResolver
 from barbados.services.logging import LogService
-from barbados.objects.resolution.results import DirectResolutionResult, ImplicitResolutionResult, MissingResolutionResult
-from barbados.objects.resolution import Resolution
+from barbados.objects.resolution.results import DirectResolutionStatus, ImplicitResolutionStatus, MissingResolutionStatus
+from barbados.objects.resolution import SpecComponentResolution
 from barbados.objects.resolution.summary import RecipeResolutionSummary
 from barbados.caches.ingredienttree import IngredientTreeCache
 from barbados.indexers.inventoryspec import InventorySpecResolutionIndexer
@@ -70,8 +70,8 @@ class RecipeResolver(BaseResolver):
 
             # Construct the SpecResolution object.
             LogService.info("Resolution for %s::%s::%s is %s" % (cocktail.slug, spec.slug, component.slug, resolution_status.status))
-            r = Resolution(slug=component.slug, status=resolution_status, substitutes=substitutes,
-                           parents=tree.parents(component.slug))
+            r = SpecComponentResolution(slug=component.slug, status=resolution_status, substitutes=substitutes,
+                                        parents=tree.parents(component.slug))
 
             # Add the resolution to the summary
             rs.add_component(r)
@@ -87,7 +87,7 @@ class RecipeResolver(BaseResolver):
         The spec.component.slug is specifically named in the inventory items.
         :return: Tuple of List of substitutes and DirectResolution
         """
-        return inventory.substitutes(component.slug), DirectResolutionResult
+        return inventory.substitutes(component.slug), DirectResolutionStatus
 
     @staticmethod
     def _get_nondirect_resolution(inventory, component, tree):
@@ -121,6 +121,6 @@ class RecipeResolver(BaseResolver):
         # for either the direct component or any of its implications, it's missing.
         # If we have then it's considered implicitly available.
         if substitutes:
-            return substitutes, ImplicitResolutionResult
+            return substitutes, ImplicitResolutionStatus
 
-        return [], MissingResolutionResult
+        return [], MissingResolutionStatus

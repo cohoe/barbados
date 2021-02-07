@@ -1,6 +1,6 @@
-from barbados.objects.resolution import Resolution
+from barbados.objects.resolution import SpecComponentResolution
 from barbados.serializers import ObjectSerializer
-from barbados.objects.resolution.results import ResolutionResults
+from barbados.objects.resolution.results import ResolutionStatuses
 from barbados.objects.base import BaseObject
 
 
@@ -34,8 +34,8 @@ class RecipeResolutionSummary(BaseObject):
         :return: None
         """
         # Test the incoming
-        if not isinstance(resolution, Resolution):
-            raise ValueError("Bad resolution type. %s" % Resolution)
+        if not isinstance(resolution, SpecComponentResolution):
+            raise ValueError("Bad resolution type. %s" % SpecComponentResolution)
 
         # Add the resolution to the list of components for this spec.
         self.components.append(resolution)
@@ -47,7 +47,7 @@ class RecipeResolutionSummary(BaseObject):
         resolution. Example: {3x direct, 1x implicit, 1x missing}.
         :return: Dict
         """
-        counts = {key: 0 for key in ResolutionResults.get_resolution_statuses()}
+        counts = {key: 0 for key in ResolutionStatuses.get_resolution_statuses()}
         for r in self.components:
             status_key = r.status.status
             try:

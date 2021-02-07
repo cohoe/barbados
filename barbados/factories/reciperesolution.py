@@ -2,10 +2,11 @@ from barbados.factories.base import BaseFactory
 from barbados.serializers import ObjectSerializer
 from barbados.objects.resolution.summary import RecipeResolutionSummary
 from uuid import uuid4, UUID
-from barbados.objects.resolution import Resolution
+from barbados.objects.resolution import SpecComponentResolution
 from barbados.objects.speccomponent import SpecComponent
 from barbados.objects.text import Text
 from barbados.factories.citation import CitationFactory
+from barbados.factories.speccomponent import SpecComponentFactory
 
 
 class RecipeResolutionFactory(BaseFactory):
@@ -52,7 +53,7 @@ class RecipeResolutionFactory(BaseFactory):
 
         objs = []
         for raw_component in raw_input.get(key):
-            r = Resolution(**raw_component)
+            r = SpecComponentResolution(**raw_component)
             objs.append(r)
         raw_input.update({key: objs})
 
@@ -62,15 +63,7 @@ class RecipeResolutionFactory(BaseFactory):
     def _parse_garnish(raw_input):
         key = 'garnish'
 
-        objs = []
-        for raw_garnish in raw_input.get(key):
-            # @TODO techically this means factory
-            if raw_garnish.get('notes'):
-                notes = []
-                [notes.append(Text(**n)) for n in raw_garnish.get('notes')]
-                raw_garnish.update({'notes': notes})
-            s = SpecComponent(**raw_garnish)
-            objs.append(s)
+        objs = SpecComponentFactory.raw_list_to_obj(raw_input.get(key))
         raw_input.update({key: objs})
 
         return raw_input

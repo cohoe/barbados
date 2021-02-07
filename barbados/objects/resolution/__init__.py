@@ -1,7 +1,7 @@
-from barbados.objects.resolution.results import ResolutionResults
+from barbados.objects.resolution.results import ResolutionStatuses
 
 
-class Resolution:
+class SpecComponentResolution:
     """
     A Resolution represents a comparison of an ingredient (SpecComponent) to what you
     have in your Inventory. Generally this can mean you have it (Direct), you can substitute
@@ -14,13 +14,13 @@ class Resolution:
         if substitutes is None:
             substitutes = []
         self.slug = slug
-        self.status = ResolutionResults.get_resolution(status)
+        self.status = ResolutionStatuses.get_status(status)
         self.substitutes = substitutes
         self.parent = parent
         self.parents = parents
 
     def __repr__(self):
-        return "Barbados::Objects::Resolution[%s]" % self.slug
+        return "Barbados::Objects::SpecComponentResolution[%s]" % self.slug
 
     def serialize(self, serializer):
         serializer.add_property('slug', self.slug)

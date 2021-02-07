@@ -1,4 +1,4 @@
-class BaseResolutionResult:
+class BaseResolutionStatus:
     """
     ResolutionResults define the responses to whether you have something
     in your inventory. THis defines a common base class to inherit from.
@@ -10,21 +10,21 @@ class BaseResolutionResult:
         raise NotImplementedError()
 
 
-class DirectResolutionResult(BaseResolutionResult):
+class DirectResolutionStatus(BaseResolutionStatus):
     status = 'DIRECT'
 
 
-class ImplicitResolutionResult(BaseResolutionResult):
+class ImplicitResolutionStatus(BaseResolutionStatus):
     status = 'IMPLICIT'
 
 
-class MissingResolutionResult(BaseResolutionResult):
+class MissingResolutionStatus(BaseResolutionStatus):
     status = 'MISSING'
 
 
-class ResolutionResultsFactory:
+class ResolutionStatusFactory:
     """
-    Handler for managing the various ResolutionResults.
+    Handler for managing the various ResolutionStatuses.
     """
     def __init__(self):
         self._resolutions = {}
@@ -37,7 +37,7 @@ class ResolutionResultsFactory:
         """
         self._resolutions[resolution.status] = resolution
 
-    def get_resolution(self, key):
+    def get_status(self, key):
         """
         Find the BaseResolution child class based on its key. Sometimes we
         might be given a class already so we do a sniff test and simply
@@ -58,14 +58,14 @@ class ResolutionResultsFactory:
 
     def get_resolution_statuses(self):
         """
-        Get a list of all status strings for the various ResolutionResult
+        Get a list of all status strings for the various ResolutionStatus
         classes that are registered.
         :return: List of Strings.
         """
         return list(self._resolutions.keys())
 
 
-ResolutionResults = ResolutionResultsFactory()
-ResolutionResults.register(DirectResolutionResult)
-ResolutionResults.register(ImplicitResolutionResult)
-ResolutionResults.register(MissingResolutionResult)
+ResolutionStatuses = ResolutionStatusFactory()
+ResolutionStatuses.register(DirectResolutionStatus)
+ResolutionStatuses.register(ImplicitResolutionStatus)
+ResolutionStatuses.register(MissingResolutionStatus)
