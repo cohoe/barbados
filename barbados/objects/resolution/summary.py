@@ -1,6 +1,6 @@
-from barbados.objects.resolution import SpecComponentResolution
+from barbados.objects.resolution.speccomponent import SpecComponentResolution
 from barbados.serializers import ObjectSerializer
-from barbados.objects.resolution.results import ResolutionStatuses
+from barbados.objects.resolution.status import ResolutionStatuses
 from barbados.objects.base import BaseObject
 
 

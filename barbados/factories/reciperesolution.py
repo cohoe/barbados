@@ -2,7 +2,7 @@ from barbados.factories.base import BaseFactory
 from barbados.serializers import ObjectSerializer
 from barbados.objects.resolution.summary import RecipeResolutionSummary
 from uuid import uuid4, UUID
-from barbados.objects.resolution import SpecComponentResolution
+from barbados.objects.resolution.speccomponent import SpecComponentResolution
 from barbados.objects.speccomponent import SpecComponent
 from barbados.objects.text import Text
 from barbados.factories.citation import CitationFactory

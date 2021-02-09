@@ -1,7 +1,7 @@
 class BaseResolutionStatus:
     """
-    ResolutionResults define the responses to whether you have something
-    in your inventory. THis defines a common base class to inherit from.
+    ResolutionStatuses define the responses to whether you have something
+    in your inventory. This defines a common base class to inherit from.
     Heads up that __repr__() doesn't show up in child classes so even if
     I were to define it here it would not be useful.
     """
