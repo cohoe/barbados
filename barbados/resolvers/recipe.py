@@ -46,7 +46,7 @@ class RecipeResolver(BaseResolver):
     @staticmethod
     def _resolve_spec(inventory, cocktail, spec, tree):
         """
-        Generate a SpecResolutionSummary object for this particular recipe. Reminder
+        Generate a RecipeResolutionSummary object for this particular recipe. Reminder
         that Recipe = Cocktail + Spec.
         :param inventory: The Inventory object to resolve against.
         :param cocktail: The Cocktail object to resolve.
@@ -57,41 +57,49 @@ class RecipeResolver(BaseResolver):
         # Components use the ingredient slug as their slug so we can safely
         # assume a 1:1 mapping between them.
         LogService.info("Resolving spec %s" % spec.slug)
-        # rs = SpecResolutionSummary(inventory_id=inventory.id, cocktail=cocktail, spec=spec)
         rs = RecipeResolutionFactory.from_objects(inventory, cocktail, spec)
         try:
             rs = RecipeResolutionFactory.produce_obj(id=rs.index_id)
+            LogService.info("Found resolution %s in the database" % rs.index_id)
         except KeyError:
-            print("NOT IN DB")
-            # @TODO how to honor this
+            LogService.warn("Document %s not found in database. Regenerating..." % rs.index_id)
+            rs = RecipeResolver._populate_components(summary=rs, cocktail=cocktail, spec=spec, inventory=inventory, tree=tree)
+            RecipeResolutionFactory.store_obj(rs)
+            InventorySpecResolutionIndexer.index(rs)
 
-        LogService.warn("Document %s not found in index. Regenerating..." % rs.index_id)
+        return rs
 
-        # @TODO move this into the SpecResolution object itself?
+    @staticmethod
+    def _populate_components(summary, cocktail, spec, inventory, tree):
+        """
+        Fill in the components of a RecipeResolutionSummary.
+        :param summary: RecipeResolutionSummary object.
+        :param cocktail: Cocktail object.
+        :param spec: Spec object.
+        :param inventory: Inventory object.
+        :param tree: IngredientTree object. This is loaded elsewhere to prevent over-loading.
+        :return: RecipeResolutionSummary.
+        """
+        # Just in case we were given a populated object, blow away the components.
+        summary.components = []
+
+        # Go through all of them.
         for component in list(spec.components):
             if inventory.contains(component.slug):
                 substitutes, resolution_status = RecipeResolver._get_direct_resolution(inventory, component)
             else:
                 substitutes, resolution_status = RecipeResolver._get_nondirect_resolution(inventory, component, tree)
 
-            # Construct the SpecResolution object.
+                # Construct the SpecResolution object.
             LogService.info("Resolution for %s::%s::%s is %s" % (cocktail.slug, spec.slug, component.slug, resolution_status.status))
             r = SpecComponentResolution(slug=component.slug, status=resolution_status, substitutes=substitutes,
                                         parents=tree.parents(component.slug))
 
             # Add the resolution to the summary
-            rs.add_component(r)
+            summary.add_component(r)
 
-        # Save, Index, and Return
-        # with DatabaseService.get_session() as session:
-            # session
-            # pass
-            # model = RecipeResolutionFactory.obj_to_model(rs)
-            # session.add(model)
-        RecipeResolutionFactory.store_obj(rs)
-        InventorySpecResolutionIndexer.index(rs)
-
-        return rs
+        # Done
+        return summary
 
     @staticmethod
     def _get_direct_resolution(inventory, component):
