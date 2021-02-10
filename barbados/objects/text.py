@@ -27,6 +27,7 @@ class DisplayName:
 class Text(BaseObject):
     def __init__(self, text, author=None, datetime=None):
         if not datetime:
+            # @TODO deprecate with below
             datetime = DateTime.utcnow().isoformat()
 
         self.text = text
@@ -55,3 +56,17 @@ class Slug:
 
     def __new__(cls, text):
         return slugify.slugify(text=text, replacements=cls.replacements)
+
+
+class Timestamp:
+    """
+    Common class for any stored reference to a timestamp.
+    If we were given a timestamp string then we assume it is already formatted
+    and we can pass it along. If there was no value then we assume we're generating
+    a new timestamp and should return now.
+    All UTC All The Time(tm)!
+    """
+    def __new__(cls, value=None):
+        if not value:
+            return DateTime.utcnow().isoformat()
+        return value

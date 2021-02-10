@@ -7,6 +7,7 @@ from barbados.caches.ingredienttree import IngredientTreeCache
 from barbados.indexers.inventoryspec import InventorySpecResolutionIndexer
 from barbados.factories.reciperesolution import RecipeResolutionFactory
 from barbados.serializers import ObjectSerializer
+from barbados.services.database import DatabaseService
 
 
 class RecipeResolver(BaseResolver):
@@ -58,6 +59,11 @@ class RecipeResolver(BaseResolver):
         LogService.info("Resolving spec %s" % spec.slug)
         # rs = SpecResolutionSummary(inventory_id=inventory.id, cocktail=cocktail, spec=spec)
         rs = RecipeResolutionFactory.from_objects(inventory, cocktail, spec)
+        try:
+            rs = RecipeResolutionFactory.produce_obj(id=rs.index_id)
+        except KeyError:
+            print("NOT IN DB")
+            # @TODO how to honor this
 
         LogService.warn("Document %s not found in index. Regenerating..." % rs.index_id)
 
@@ -76,7 +82,13 @@ class RecipeResolver(BaseResolver):
             # Add the resolution to the summary
             rs.add_component(r)
 
-        # Index and Return
+        # Save, Index, and Return
+        # with DatabaseService.get_session() as session:
+            # session
+            # pass
+            # model = RecipeResolutionFactory.obj_to_model(rs)
+            # session.add(model)
+        RecipeResolutionFactory.store_obj(rs)
         InventorySpecResolutionIndexer.index(rs)
 
         return rs

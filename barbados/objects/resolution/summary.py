@@ -2,6 +2,7 @@ from barbados.objects.resolution.speccomponent import SpecComponentResolution
 from barbados.serializers import ObjectSerializer
 from barbados.objects.resolution.status import ResolutionStatuses
 from barbados.objects.base import BaseObject
+from barbados.objects.text import Timestamp
 
 
 class RecipeResolutionSummary(BaseObject):
@@ -10,19 +11,22 @@ class RecipeResolutionSummary(BaseObject):
     what this inventory has, both explicitly and implicitly.
     """
     def __init__(self, inventory_id, cocktail_slug, spec_slug, components, alpha, construction_slug,
-                 garnish, component_count=0, status_count=0, citations=None):
-        # @TODO this seems sketchy....
+                 garnish=None, citations=None, generated_at=None):
         if citations is None:
             citations = []
+        if garnish is None:
+            garnish = []
+        if generated_at is None:
+            generated_at = Timestamp()
         self.inventory_id = inventory_id
         self.cocktail_slug = cocktail_slug
         self.spec_slug = spec_slug
         self.components = components
-        self.component_count = component_count
         self.alpha = alpha
         self.construction_slug = construction_slug
         self.citations = citations
         self.garnish = garnish
+        self.generated_at = generated_at
 
     def __repr__(self):
         return "Barbados::Objects::Resolution::RecipeResolutionSummary[%s]" % self.index_id
@@ -57,6 +61,15 @@ class RecipeResolutionSummary(BaseObject):
         return counts
 
     @property
+    def component_count(self):
+        """
+        Helper property to easily view the number of components that have been
+        resolved correctly.
+        :return: Integer
+        """
+        return len(self.components)
+
+    @property
     def index_id(self):
         """
         The document ID for the index. Has to be unique.
@@ -75,3 +88,4 @@ class RecipeResolutionSummary(BaseObject):
         serializer.add_property('construction_slug', self.construction_slug)
         serializer.add_property('citations', [ObjectSerializer.serialize(citation, serializer.format) for citation in self.citations])
         serializer.add_property('garnish', [ObjectSerializer.serialize(garnish, serializer.format) for garnish in self.garnish])
+        serializer.add_property('generated_at', self.generated_at)

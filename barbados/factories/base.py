@@ -81,13 +81,18 @@ class BaseFactory:
         raise NotImplementedError
 
     @staticmethod
-    def sanitize_raw(raw_input, required_keys):
+    def sanitize_raw(raw_input, required_keys, unwanted_keys=None):
         """
         Forces the default value of certain required attributes to their expected defaults.
         :param raw_input: Dictionary
         :param required_keys: Dictionary of keys and their data expected data type.
+        :param unwanted_keys: Keys to strip away before processing.
         :return: sanitized raw_input (dict)
         """
+        if unwanted_keys is None:
+            unwanted_keys = []
+
+        # Set default values
         for key in required_keys.keys():
             # If the required key is not in the input, set it to the default.
             if key not in raw_input.keys():
@@ -97,6 +102,11 @@ class BaseFactory:
             if type(required_keys[key]) is list:
                 if raw_input[key] is None:
                     raw_input[key] = required_keys[key]
+
+        # Remove certain keys if they exist. Useful for properties that should get
+        # blow away when imported from a model since they self-redefine.
+        for key in unwanted_keys:
+            raw_input.pop(key, None)
 
         return raw_input
 
@@ -137,7 +147,6 @@ class BaseFactory:
     def store_obj(cls, obj):
         """
         Store an object in the database.
-        :param session: Database Session context.
         :param obj: The object to store.
         :return: Model corresponding to the object.
         """
@@ -146,10 +155,15 @@ class BaseFactory:
             model = cls.obj_to_model(obj)
 
             # Validate it.
-            cls._validator(model).validate(session=session)
+            if cls._validator is not None:
+                cls._validator(model).validate(session=session)
+            else:
+                LogService.warn("No validator configured for %s" % cls._model)
 
             # Save it to the database.
-            session.add(model)
+            # Merge vs Add
+            # https://docs.sqlalchemy.org/en/13/orm/session_api.html#sqlalchemy.orm.session.Session.merge
+            session.merge(model)
             session.commit()
 
     @classmethod

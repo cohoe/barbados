@@ -3,21 +3,20 @@ from barbados.serializers import ObjectSerializer
 from barbados.objects.resolution.summary import RecipeResolutionSummary
 from uuid import uuid4, UUID
 from barbados.objects.resolution.speccomponent import SpecComponentResolution
-from barbados.objects.speccomponent import SpecComponent
 from barbados.objects.text import Text
 from barbados.factories.citation import CitationFactory
 from barbados.factories.speccomponent import SpecComponentFactory
+from barbados.models.reciperesolutionsummary import RecipeResolutionSummaryModel
 
 
 class RecipeResolutionFactory(BaseFactory):
-    _model = None
+    _model = RecipeResolutionSummaryModel
     _validator = None
 
     required_keys = {
         'alpha': str(),
         'citations': list(),
         'cocktail_slug': str(),
-        'component_count': int(),
         'components': list(),
         'construction_slug': str(),
         'garnish': list(),
@@ -26,9 +25,15 @@ class RecipeResolutionFactory(BaseFactory):
         'status_count': dict(),
     }
 
+    unwanted_keys = [
+        'component_count',
+        'id',
+        'status_count'
+    ]
+
     @classmethod
     def raw_to_obj(cls, raw):
-        raw_srs = cls.sanitize_raw(raw_input=raw, required_keys=cls.required_keys)
+        raw_srs = cls.sanitize_raw(raw_input=raw, required_keys=cls.required_keys, unwanted_keys=cls.unwanted_keys)
 
         # Parse the fields
         raw_srs = cls._parse_inventory_id(raw_srs)
@@ -42,8 +47,9 @@ class RecipeResolutionFactory(BaseFactory):
     def _parse_inventory_id(raw_input):
         key = 'inventory_id'
 
-        raw_id = raw_input.get(key)
-        raw_input.update({key: UUID(raw_id)})
+        if type(raw_input.get(key)) is not UUID:
+            raw_id = raw_input.get(key)
+            raw_input.update({key: UUID(raw_id)})
 
         return raw_input
 
@@ -105,6 +111,12 @@ class RecipeResolutionFactory(BaseFactory):
     def index_to_obj(cls, indexable):
         raw_indexable = indexable.to_dict()
         return cls.raw_to_obj(raw_indexable)
+
+    @classmethod
+    def obj_to_model(cls, obj):
+        raw_dict = ObjectSerializer.serialize(obj, 'dict')
+        raw_dict.update({'id': obj.index_id})
+        return cls._model(**raw_dict)
 
     @classmethod
     def from_objects(cls, inventory, cocktail, spec):
