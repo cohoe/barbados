@@ -174,8 +174,9 @@ class BaseFactory:
         :param commit: Whether to commit this transaction now or deal with it yourself. Useful for batches.
         :return: Model corresponding to the object that was deleted.
         """
+        # @TODO this is sketch
         try:
-            id = obj.slug
+            id = getattr(obj, id_attr)
         except AttributeError:
             id = obj.id
 
