@@ -27,8 +27,7 @@ class DisplayName:
 class Text(BaseObject):
     def __init__(self, text, author=None, datetime=None):
         if not datetime:
-            # @TODO deprecate with below
-            datetime = DateTime.utcnow().isoformat()
+            datetime = Timestamp()
 
         self.text = text
         self.author = author

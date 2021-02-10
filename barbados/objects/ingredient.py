@@ -3,7 +3,7 @@ from barbados.objects.ingredientkinds import IngredientKinds, IndexKind
 from barbados.query import QueryBuilder
 from barbados.models.ingredient import IngredientModel
 from barbados.serializers import ObjectSerializer
-from datetime import datetime
+from barbados.objects.text import Timestamp
 
 
 class Ingredient(BaseObject):
@@ -20,7 +20,7 @@ class Ingredient(BaseObject):
         :param conditions: List of QueryCondition objects that generate elements for this index.
         :param elements_include: List of Ingredient slugs that should be manually included in this index.
         :param elements_exclude: List of Ingredient slugs that should be excluded from this index.
-        :param last_refresh: Datetime of the last refresh of the elements in this index.
+        :param last_refresh: Timestamp of the last refresh of the elements in this index.
         """
         if aliases is None:
             aliases = []
@@ -91,4 +91,4 @@ class Ingredient(BaseObject):
         self.elements = list(set(elements))
 
         # Update the last_refresh time to now so we know when it was last done.
-        self.last_refresh = datetime.utcnow()
+        self.last_refresh = Timestamp()
