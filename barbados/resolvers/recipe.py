@@ -2,12 +2,8 @@ from barbados.resolvers.base import BaseResolver
 from barbados.services.logging import LogService
 from barbados.objects.resolution.status import DirectResolutionStatus, ImplicitResolutionStatus, MissingResolutionStatus
 from barbados.objects.resolution.speccomponent import SpecComponentResolution
-from barbados.objects.resolution.summary import RecipeResolutionSummary
 from barbados.caches.ingredienttree import IngredientTreeCache
-from barbados.indexers.inventoryspec import InventorySpecResolutionIndexer
 from barbados.factories.reciperesolution import RecipeResolutionFactory
-from barbados.serializers import ObjectSerializer
-from barbados.services.database import DatabaseService
 
 
 class RecipeResolver(BaseResolver):
@@ -64,8 +60,6 @@ class RecipeResolver(BaseResolver):
         except KeyError:
             LogService.warn("Document %s not found in database. Regenerating..." % rs.index_id)
             rs = RecipeResolver._populate_components(summary=rs, cocktail=cocktail, spec=spec, inventory=inventory, tree=tree)
-            RecipeResolutionFactory.store_obj(rs)
-            InventorySpecResolutionIndexer.index(rs)
 
         return rs
 

@@ -183,8 +183,10 @@ class BaseFactory:
         with DatabaseService.get_session() as session:
             model = session.query(cls._model).get(id)
 
+            # If we haven't found the model then it means its not in the database.
+            # Intentional? Hopefully.
             if not model:
-                raise KeyError("Model for %s not found" % id)
+                return
 
             # Delete it from the database.
             session.delete(model)
