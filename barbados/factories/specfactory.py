@@ -6,6 +6,7 @@ from barbados.objects.text import Text, Slug, DisplayName
 from barbados.factories.citation import CitationFactory
 from barbados.objects.image import Image
 from barbados.factories.construction import ConstructionFactory
+from barbados.exceptions import ValidationException
 
 
 class SpecFactory:
@@ -103,14 +104,10 @@ class SpecFactory:
                 instr_obj_list.append(Text(text=instruction))
         # print(instr_obj_list)
 
-        construction_obj = ConstructionFactory.produce_obj(id=raw_spec['construction']['slug'])
-        #
-        # if type(raw_spec['construction']) is dict:
-        #     construction_obj = ConstructionFactory.produce_obj(id=raw_spec['construction'].get('slug'))
-        # elif type(raw_spec['construction']) is None:
-        #     construction_obj = ConstructionFactory.raw_to_obj({'slug': 'unknown'})
-        # else:
-        #     construction_obj = ConstructionFactory.raw_to_obj({'slug': raw_spec['construction']})
+        try:
+            construction_obj = ConstructionFactory.produce_obj(id=raw_spec['construction']['slug'])
+        except KeyError:
+            raise ValidationException("Error with construction on %s (%s)" % (spec_slug, components))
 
         image_obj_list = []
         for image in raw_spec['images']:
