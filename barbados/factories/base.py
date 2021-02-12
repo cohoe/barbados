@@ -144,10 +144,11 @@ class BaseFactory:
 
     # @TODO refactor to insert
     @classmethod
-    def store_obj(cls, obj):
+    def store_obj(cls, obj, overwrite=False):
         """
         Store an object in the database.
         :param obj: The object to store.
+        :param overwrite: Use Merge rather than Add.
         :return: Model corresponding to the object.
         """
         # model = cls._model(**ObjectSerializer.serialize(obj, 'dict'))
@@ -163,7 +164,10 @@ class BaseFactory:
             # Save it to the database.
             # Merge vs Add
             # https://docs.sqlalchemy.org/en/13/orm/session_api.html#sqlalchemy.orm.session.Session.merge
-            session.merge(model)
+            if overwrite:
+                session.merge(model)
+            else:
+                session.add(model)
             session.commit()
 
     @classmethod

@@ -8,11 +8,13 @@ from barbados.models.cocktail import CocktailModel
 from barbados.models.inventory import InventoryModel
 from barbados.models.ingredient import IngredientModel
 from barbados.models.drinklist import DrinkListModel
+from barbados.models.construction import ConstructionModel
 
 from barbados.factories.cocktailfactory import CocktailFactory
 from barbados.factories.inventoryfactory import InventoryFactory
 from barbados.factories.ingredientfactory import IngredientFactory
 from barbados.factories.drinklistfactory import DrinkListFactory
+from barbados.factories.construction import ConstructionFactory
 
 
 class TableScanCache(CacheBase):
@@ -67,7 +69,14 @@ class InventoryScanCache(TableScanCache):
     factory_class = InventoryFactory
 
 
+class ConstructionScanCache(TableScanCache):
+    cache_key = 'construction_scan_cache'
+    model_class = ConstructionModel
+    factory_class = ConstructionFactory
+
+
 Caches.register_cache(CocktailScanCache)
 Caches.register_cache(IngredientScanCache)
 Caches.register_cache(DrinkListScanCache)
 Caches.register_cache(InventoryScanCache)
+Caches.register_cache(ConstructionScanCache)

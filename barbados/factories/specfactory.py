@@ -3,9 +3,9 @@ from barbados.objects.origin import Origin
 from barbados.objects.glassware import Glassware
 from barbados.objects.speccomponent import SpecComponent
 from barbados.objects.text import Text, Slug, DisplayName
-from barbados.objects.construction import Construction
 from barbados.factories.citation import CitationFactory
 from barbados.objects.image import Image
+from barbados.factories.construction import ConstructionFactory
 
 
 class SpecFactory:
@@ -103,12 +103,14 @@ class SpecFactory:
                 instr_obj_list.append(Text(text=instruction))
         # print(instr_obj_list)
 
-        if type(raw_spec['construction']) is dict:
-            construction_obj = Construction(**raw_spec['construction'])
-        elif type(raw_spec['construction']) is None:
-            construction_obj = Construction(slug='unknown')
-        else:
-            construction_obj = Construction(slug=raw_spec['construction'])
+        construction_obj = ConstructionFactory.produce_obj(id=raw_spec['construction']['slug'])
+        #
+        # if type(raw_spec['construction']) is dict:
+        #     construction_obj = ConstructionFactory.produce_obj(id=raw_spec['construction'].get('slug'))
+        # elif type(raw_spec['construction']) is None:
+        #     construction_obj = ConstructionFactory.raw_to_obj({'slug': 'unknown'})
+        # else:
+        #     construction_obj = ConstructionFactory.raw_to_obj({'slug': raw_spec['construction']})
 
         image_obj_list = []
         for image in raw_spec['images']:
