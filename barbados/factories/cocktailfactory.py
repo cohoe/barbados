@@ -9,7 +9,7 @@ from barbados.factories.base import BaseFactory
 from barbados.objects.image import Image
 from barbados.models.cocktail import CocktailModel
 from barbados.validators.cocktailmodel import CocktailModelValidator
-from barbados.exceptions import ValidationException
+from barbados.exceptions import FactoryException
 
 
 # @TODO this needs to standardize into modern constructs!
@@ -34,8 +34,8 @@ class CocktailFactory(BaseFactory):
             try:
                 spec_obj = SpecFactory.raw_to_obj(raw_spec)
                 s_obj_list.append(spec_obj)
-            except ValidationException as e:
-                raise ValidationException("Error with %s: %s" % (slug, e))
+            except FactoryException as e:
+                raise FactoryException("Error with %s: %s" % (slug, e))
 
         citation_obj_list = CitationFactory.raw_list_to_obj(raw_recipe['citations'])
 

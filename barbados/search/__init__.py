@@ -1,6 +1,6 @@
 from barbados.services.logging import LogService
 from elasticsearch_dsl.query import Bool, Wildcard, MatchPhrase, Prefix, Match, Range, Exists
-from barbados.exceptions import ValidationException
+from barbados.exceptions import SearchException
 from barbados.search.occurrences import occurrence_factory, MustOccurrence, MustNotOccurrence
 
 
@@ -93,7 +93,7 @@ class SearchBase:
         try:
             occurrence_factory.get_occurrence(occurrence.occur)
         except Exception as e:
-            raise ValidationException("Invalid occurrence: %s" % e)
+            raise SearchException("Invalid occurrence: %s" % e)
 
         # Setup the settings for this URL parameter.
         self.query_parameters[url_parameter] = {
@@ -231,7 +231,7 @@ class SearchBase:
                 for field in fields:
                     url_parameter_conditions.append(self.get_query_condition(url_parameter=url_parameter, field=field, value=raw_value))
             else:
-                raise ValidationException("Unsupported url_parameter data type: %s" % expected_value_type)
+                raise SearchException("Unsupported url_parameter data type: %s" % expected_value_type)
 
             # The occurrence is used to determine which method to use for
             # searching the index for this particular condition. There are
@@ -272,7 +272,7 @@ class SearchBase:
         :return: None
         """
         if type(value) is not type_:
-            raise ValidationException("Value of parameter '%s' is not a '%s' (got '%s')" % (parameter, type_, value))
+            raise SearchException("Value of parameter '%s' is not a '%s' (got '%s')" % (parameter, type_, value))
 
     @staticmethod
     def _parse_range_value(raw_value):

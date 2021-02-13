@@ -6,7 +6,7 @@ from barbados.objects.text import Text, Slug, DisplayName
 from barbados.factories.citation import CitationFactory
 from barbados.objects.image import Image
 from barbados.factories.construction import ConstructionFactory
-from barbados.exceptions import ValidationException
+from barbados.exceptions import FactoryException
 
 
 class SpecFactory:
@@ -107,7 +107,7 @@ class SpecFactory:
         try:
             construction_obj = ConstructionFactory.produce_obj(id=raw_spec['construction']['slug'])
         except KeyError:
-            raise ValidationException("Error with construction on %s (%s)" % (spec_slug, components))
+            raise FactoryException("Error building construction '%s'." % raw_spec.get('construction').get('slug'))
 
         image_obj_list = []
         for image in raw_spec['images']:

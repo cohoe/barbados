@@ -2,7 +2,7 @@ from barbados.factories.base import BaseFactory
 from barbados.objects.text import DisplayName
 from barbados.objects.inventory import Inventory
 from barbados.objects.inventoryitem import InventoryItem
-from barbados.exceptions import ValidationException
+from barbados.exceptions import FactoryException
 from barbados.services.logging import LogService
 from uuid import uuid4
 from barbados.models.inventory import InventoryModel
@@ -43,7 +43,7 @@ class InventoryFactory(BaseFactory):
         elif type(old_value) is str:
             new_value = DisplayName(old_value)
         else:
-            raise ValidationException("Bad display name given for inventory (%s)" % old_value)
+            raise FactoryException("Bad display name given for inventory (%s)" % old_value)
 
         # Log.info("New value for %s is %s" % (value_key, new_value))
         raw_input.update({value_key: new_value})
