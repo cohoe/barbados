@@ -7,6 +7,7 @@ from barbados.objects.text import Text
 from barbados.factories.citation import CitationFactory
 from barbados.factories.speccomponent import SpecComponentFactory
 from barbados.models.reciperesolutionsummary import RecipeResolutionSummaryModel
+from barbados.services.database import DatabaseService
 
 
 class RecipeResolutionFactory(BaseFactory):
@@ -123,3 +124,18 @@ class RecipeResolutionFactory(BaseFactory):
         return RecipeResolutionSummary(inventory_id=inventory.id, cocktail_slug=cocktail.slug, spec_slug=spec.slug,
                                        alpha=cocktail.alpha, citations=spec.citations + cocktail.citations,
                                        components=[], construction_slug=spec.construction.slug, garnish=spec.garnish)
+
+    @classmethod
+    def produce_all_objs_from_inventory(cls, inventory_id):
+        """
+        :return:
+        """
+        with DatabaseService.get_session() as session:
+            results = session.query(RecipeResolutionSummaryModel).filter(RecipeResolutionSummaryModel.inventory_id==inventory_id)
+
+            objects = []
+            for result in results:
+                obj = cls.model_to_obj(result)
+                objects.append(obj)
+
+        return objects

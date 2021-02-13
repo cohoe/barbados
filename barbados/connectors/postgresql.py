@@ -74,6 +74,8 @@ class PostgresqlConnector:
         except Exception:
             session.rollback()
             raise
+        # This is disabled since the only place this is called is in Factories where
+        # they are responsible for commit control.
         # finally:
         #     session.commit()
 
