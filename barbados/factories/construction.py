@@ -2,11 +2,12 @@ from barbados.factories.base import BaseFactory
 from barbados.models.construction import ConstructionModel
 from barbados.objects.construction import Construction
 from barbados.objects.text import DisplayName
+from barbados.validators.constructionmodel import ConstructionModelValidator
 
 
 class ConstructionFactory(BaseFactory):
     _model = ConstructionModel
-    _validator = None
+    _validator = ConstructionModelValidator
 
     required_keys = {
         'default_instructions': list()
