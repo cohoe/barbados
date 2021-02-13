@@ -2,7 +2,7 @@ from barbados.services.logging import LogService
 from barbados.indexes.recipe import RecipeIndex
 from barbados.indexes.ingredient import IngredientIndex
 from barbados.indexes.drinklist import DrinkListIndex
-from barbados.indexes.inventoryspecresolutionindex import InventorySpecResolutionIndex
+from barbados.indexes.reciperesolutionindex import RecipeResolutionIndex
 from barbados.indexes.inventory import InventoryIndex
 from barbados.connectors.elasticsearch import ElasticsearchConnector
 from elasticsearch.exceptions import NotFoundError
@@ -77,5 +77,5 @@ Indexes = IndexFactory()
 Indexes.register_index(RecipeIndex)
 Indexes.register_index(IngredientIndex)
 Indexes.register_index(DrinkListIndex)
-Indexes.register_index(InventorySpecResolutionIndex)
+Indexes.register_index(RecipeResolutionIndex)
 Indexes.register_index(InventoryIndex)

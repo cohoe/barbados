@@ -9,7 +9,7 @@ class ComponentIndex(InnerDoc):
     parent = Text(analyzer='whitespace', search_analyzer='whitespace')
 
 
-class InventorySpecResolutionIndex(Document, BarbadosIndex):
+class RecipeResolutionIndex(Document, BarbadosIndex):
     cocktail_slug = Text(analyzer='whitespace', search_analyzer='whitespace')
     spec_slug = Text(analyzer='whitespace', search_analyzer='whitespace')
     components = Object(ComponentIndex)
@@ -20,4 +20,4 @@ class InventorySpecResolutionIndex(Document, BarbadosIndex):
     alpha = Text(analyzer='whitespace', search_analyzer='whitespace')
 
     class Index(BaseIndex):
-        name = 'inventoryspecresolution'
+        name = 'reciperesolution'

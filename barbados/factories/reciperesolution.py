@@ -8,13 +8,13 @@ from barbados.factories.citation import CitationFactory
 from barbados.factories.speccomponent import SpecComponentFactory
 from barbados.models.reciperesolutionsummary import RecipeResolutionSummaryModel
 from barbados.services.database import DatabaseService
-from barbados.indexes.inventoryspecresolutionindex import InventorySpecResolutionIndex
+from barbados.indexes.reciperesolutionindex import RecipeResolutionIndex
 
 
 class RecipeResolutionFactory(BaseFactory):
     _model = RecipeResolutionSummaryModel
     _validator = None
-    _index = InventorySpecResolutionIndex
+    _index = RecipeResolutionIndex
 
     required_keys = {
         'alpha': str(),
