@@ -29,7 +29,7 @@ class RecipeResolutionSummary(BaseObject):
         self.generated_at = generated_at
 
     def __repr__(self):
-        return "Barbados::Objects::Resolution::RecipeResolutionSummary[%s]" % self.index_id
+        return "Barbados::Objects::Resolution::RecipeResolutionSummary[%s]" % self.id
 
     def add_component(self, resolution):
         """
@@ -70,7 +70,7 @@ class RecipeResolutionSummary(BaseObject):
         return len(self.components)
 
     @property
-    def index_id(self):
+    def id(self):
         """
         The document ID for the index. Has to be unique.
         :return:

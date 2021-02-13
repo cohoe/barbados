@@ -107,7 +107,7 @@ class RecipeResolutionFactory(BaseFactory):
         :param format: Format of the data to pass to the serializer.
         :return: Instance of the Index class.
         """
-        return cls._index(meta={'id': obj.index_id}, **ObjectSerializer.serialize(obj, format))
+        return cls._index(meta={'id': obj.id}, **ObjectSerializer.serialize(obj, format))
 
     @classmethod
     def index_to_obj(cls, indexable):
@@ -117,7 +117,7 @@ class RecipeResolutionFactory(BaseFactory):
     @classmethod
     def obj_to_model(cls, obj):
         raw_dict = ObjectSerializer.serialize(obj, 'dict')
-        raw_dict.update({'id': obj.index_id})
+        raw_dict.update({'id': obj.id})
         return cls._model(**raw_dict)
 
     @classmethod
