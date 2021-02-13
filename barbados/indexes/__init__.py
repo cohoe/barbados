@@ -72,8 +72,8 @@ class IndexFactory:
         return self._indexes
 
 
-index_factory = IndexFactory()
-index_factory.register_index(RecipeIndex)
-index_factory.register_index(IngredientIndex)
-index_factory.register_index(DrinkListIndex)
-index_factory.register_index(InventorySpecResolution)
+Indexes = IndexFactory()
+Indexes.register_index(RecipeIndex)
+Indexes.register_index(IngredientIndex)
+Indexes.register_index(DrinkListIndex)
+Indexes.register_index(InventorySpecResolution)

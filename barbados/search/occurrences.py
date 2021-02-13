@@ -47,8 +47,8 @@ class OccurrenceFactory:
         return occurrence_class
 
 
-occurrence_factory = OccurrenceFactory()
-occurrence_factory.register(MustOccurrence)
-occurrence_factory.register(FilterOccurrence)
-occurrence_factory.register(ShouldOccurrence)
-occurrence_factory.register(MustNotOccurrence)
+Occurrences = OccurrenceFactory()
+Occurrences.register(MustOccurrence)
+Occurrences.register(FilterOccurrence)
+Occurrences.register(ShouldOccurrence)
+Occurrences.register(MustNotOccurrence)

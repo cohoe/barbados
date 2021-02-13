@@ -34,9 +34,9 @@ class SerializerFactory:
         return serializer()
 
 
-serializer_factory = SerializerFactory()
-serializer_factory.register_format(JsonSerializer)
-serializer_factory.register_format(DictSerializer)
+Serializers = SerializerFactory()
+Serializers.register_format(JsonSerializer)
+Serializers.register_format(DictSerializer)
 
 
 class ObjectSerializer:
@@ -52,6 +52,6 @@ class ObjectSerializer:
         :param output_format: String key of the format you want to serialize to.
         :return: Output of the serialization of the object.
         """
-        serializer = serializer_factory.get_serializer(output_format)
+        serializer = Serializers.get_serializer(output_format)
         serializable.serialize(serializer)
         return serializer.serialize()

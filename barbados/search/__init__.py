@@ -1,7 +1,7 @@
 from barbados.services.logging import LogService
 from elasticsearch_dsl.query import Bool, Wildcard, MatchPhrase, Prefix, Match, Range, Exists
 from barbados.exceptions import SearchException
-from barbados.search.occurrences import occurrence_factory, MustOccurrence, MustNotOccurrence
+from barbados.search.occurrences import Occurrences, MustOccurrence, MustNotOccurrence
 
 
 class SearchResults:
@@ -91,7 +91,7 @@ class SearchBase:
 
         # Ensure that we were given a proper occurrence.
         try:
-            occurrence_factory.get_occurrence(occurrence.occur)
+            Occurrences.get_occurrence(occurrence.occur)
         except Exception as e:
             raise SearchException("Invalid occurrence: %s" % e)
 
