@@ -1,5 +1,5 @@
-# @TODO get this into the search service
-from barbados.exceptions import NotFoundError
+from barbados.exceptions import NotFoundError, SearchException
+from barbados.services.logging import LogService
 
 
 class BaseIndexer:
@@ -81,11 +81,20 @@ class BaseIndexer:
         cls.for_index.delete_all()
 
     @classmethod
-    def delete(cls, obj):
+    def delete(cls, obj, fatal=False):
         """
         Delete a specific object from its index.
+        Fatal changed to implicitly be false since if something isn't
+        in the index (kinda problematic?) whatevs thats the desired state.
         :param obj: barbados.objects.base.BarbadosObject child instance.
+        :param fatal: Should not being in the index be a critical problem.
         :return: None
         """
         index_obj = cls.factory.obj_to_index(obj, cls.index)
-        cls.index.delete(index_obj)
+
+        try:
+            cls.index.delete(index_obj)
+        except NotFoundError as e:
+            if fatal:
+                raise SearchException(e)
+            LogService.warn("Object %s was not found in index on DELETE. This probably isn't a problem?" % obj)
