@@ -1,11 +1,11 @@
 from barbados.search import SearchBase
 from elasticsearch_dsl.query import MatchPhrase, Wildcard, Prefix, Match, Range, Exists
-from barbados.indexes.inventoryspecresolution import InventorySpecResolution
+from barbados.indexes.inventoryspecresolutionindex import InventorySpecResolutionIndex
 from barbados.search.occurrences import ShouldOccurrence
 
 
 class InventorySpecResolutionSearch(SearchBase):
-    index_class = InventorySpecResolution
+    index_class = InventorySpecResolutionIndex
 
     def _build_query_parameters(self):
         self.add_query_parameter(url_parameter='inventory_id',

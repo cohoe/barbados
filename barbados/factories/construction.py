@@ -8,6 +8,7 @@ from barbados.validators.constructionmodel import ConstructionModelValidator
 class ConstructionFactory(BaseFactory):
     _model = ConstructionModel
     _validator = ConstructionModelValidator
+    _index = None
 
     required_keys = {
         'default_instructions': list()

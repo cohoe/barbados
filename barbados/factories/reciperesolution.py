@@ -8,11 +8,13 @@ from barbados.factories.citation import CitationFactory
 from barbados.factories.speccomponent import SpecComponentFactory
 from barbados.models.reciperesolutionsummary import RecipeResolutionSummaryModel
 from barbados.services.database import DatabaseService
+from barbados.indexes.inventoryspecresolutionindex import InventorySpecResolutionIndex
 
 
 class RecipeResolutionFactory(BaseFactory):
     _model = RecipeResolutionSummaryModel
     _validator = None
+    _index = InventorySpecResolutionIndex
 
     required_keys = {
         'alpha': str(),
@@ -96,17 +98,16 @@ class RecipeResolutionFactory(BaseFactory):
 
         return raw_input
 
-    @staticmethod
-    def obj_to_index(obj, index_class, format='dict'):
+    @classmethod
+    def obj_to_index(cls, obj, format='dict'):
         """
         Serialize an object into a standard form suitable
         for indexing.
         :param obj: Serializable object.
-        :param index_class: The ElasticSearch DSL class representing the intended index.
         :param format: Format of the data to pass to the serializer.
         :return: Instance of the Index class.
         """
-        return index_class(meta={'id': obj.index_id}, **ObjectSerializer.serialize(obj, format))
+        return cls._index(meta={'id': obj.index_id}, **ObjectSerializer.serialize(obj, format))
 
     @classmethod
     def index_to_obj(cls, indexable):

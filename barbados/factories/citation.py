@@ -7,6 +7,7 @@ from barbados.factories.base import BaseFactory
 class CitationFactory(BaseFactory):
     _model = None
     _validator = None
+    _index = None
 
     required_keys = {
         'notes': list(),

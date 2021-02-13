@@ -3,11 +3,13 @@ from barbados.factories.base import BaseFactory
 from barbados.models.ingredient import IngredientModel
 from barbados.query import QueryCondition
 from barbados.validators.ingredientmodel import IngredientModelValidator
+from barbados.indexes.ingredient import IngredientIndex
 
 
 class IngredientFactory(BaseFactory):
     _model = IngredientModel
     _validator = IngredientModelValidator
+    _index = IngredientIndex
 
     required_keys = {
         'slug': str(),

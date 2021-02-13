@@ -14,7 +14,7 @@ class BaseIndexer:
         :param obj: barbados.objects.base.BarbadosObject child.
         :return: None
         """
-        index = cls.factory.obj_to_index(obj, cls.for_index)
+        index = cls.factory.obj_to_index(obj)
         index.save()
 
     @classmethod
@@ -90,7 +90,7 @@ class BaseIndexer:
         :param fatal: Should not being in the index be a critical problem.
         :return: None
         """
-        index_obj = cls.factory.obj_to_index(obj, cls.index)
+        index_obj = cls.factory.obj_to_index(obj)
 
         try:
             cls.index.delete(index_obj)

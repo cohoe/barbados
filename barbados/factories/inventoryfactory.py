@@ -8,11 +8,13 @@ from uuid import uuid4
 from barbados.models.inventory import InventoryModel
 from barbados.caches.ingredienttree import IngredientTreeCache
 from barbados.validators.inventorymodel import InventoryModelValidator
+from barbados.indexes.inventory import InventoryIndex
 
 
 class InventoryFactory(BaseFactory):
     _model = InventoryModel
     _validator = InventoryModelValidator
+    _index = InventoryIndex
 
     required_keys = {
         'id': uuid4(),
@@ -73,3 +75,20 @@ class InventoryFactory(BaseFactory):
             i.expand(tree)
 
         return i
+
+    @classmethod
+    def obj_to_index(cls, obj):
+        """
+        This is custom because elasticsearch_dsl doesn't have flattened
+        support yet. See the InventoryIndex class for more details.
+        :param obj:
+        :return:
+        """
+        index = super().obj_to_index(obj)
+        delattr(index, 'items')
+        delattr(index, 'implicit_items')
+        return index
+
+    @classmethod
+    def index_to_obj(cls, indexable):
+        raise Exception("Not supported")

@@ -14,13 +14,13 @@ class RecipeIndexer(BaseIndexer):
 
     @staticmethod
     def index(cocktail_object):
-        indexables = CocktailFactory.obj_to_index(cocktail_object, RecipeIndex)
+        indexables = CocktailFactory.obj_to_index(cocktail_object)
         [indexable.save() for indexable in indexables]
 
     @staticmethod
     def delete(cocktail_object):
         try:
-            indexables = CocktailFactory.obj_to_index(cocktail_object, RecipeIndex)
+            indexables = CocktailFactory.obj_to_index(cocktail_object)
             for indexable in indexables:
                 try:
                     RecipeIndex.delete(indexable)

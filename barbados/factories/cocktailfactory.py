@@ -10,12 +10,15 @@ from barbados.objects.image import Image
 from barbados.models.cocktail import CocktailModel
 from barbados.validators.cocktailmodel import CocktailModelValidator
 from barbados.exceptions import FactoryException
+from barbados.indexes.recipe import RecipeIndex
 
 
 # @TODO this needs to standardize into modern constructs!
 class CocktailFactory(BaseFactory):
     _model = CocktailModel
     _validator = CocktailModelValidator
+    _index = RecipeIndex
+
 
     @staticmethod
     def raw_to_obj(raw_recipe, slug):
@@ -97,8 +100,8 @@ class CocktailFactory(BaseFactory):
 
         return CocktailFactory.raw_to_obj(slug=model.slug, raw_recipe=model.__dict__)
 
-    @staticmethod
-    def obj_to_index(obj, index_class, format='dict'):
+    @classmethod
+    def obj_to_index(cls, obj, format='dict'):
         base_recipe = ObjectSerializer.serialize(obj, format)
         alpha = base_recipe['slug'][0]
 
@@ -139,4 +142,4 @@ class CocktailFactory(BaseFactory):
                 # the Slug() is needed for the TDFv3 name->slug conversion.
                 component.update({'parents': tree.parents(Slug(component['slug']))})
 
-        return [index_class(meta={'id': key}, **value) for key, value in searchable_recipes.items()]
+        return [cls._index(meta={'id': key}, **value) for key, value in searchable_recipes.items()]
