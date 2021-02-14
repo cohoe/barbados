@@ -134,16 +134,14 @@ class BaseFactory:
 
         return objects
 
-    # @TODO refactor to insert
     @classmethod
-    def store_obj(cls, obj, overwrite=False):
+    def insert_obj(cls, obj, overwrite=False):
         """
-        Store an object in the database.
+        Insert an object in the database. Maybe overwrite it? Up to you kid.
         :param obj: The object to store.
         :param overwrite: Use Merge rather than Add.
         :return: Model corresponding to the object.
         """
-        # model = cls._model(**ObjectSerializer.serialize(obj, 'dict'))
         with DatabaseService.get_session() as session:
             model = cls.obj_to_model(obj)
 
@@ -153,7 +151,6 @@ class BaseFactory:
             else:
                 LogService.warn("No validator configured for %s" % cls._model)
 
-            # Save it to the database.
             # Merge vs Add
             # https://docs.sqlalchemy.org/en/13/orm/session_api.html#sqlalchemy.orm.session.Session.merge
             if overwrite:
