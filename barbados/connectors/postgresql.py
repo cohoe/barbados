@@ -42,10 +42,10 @@ class PostgresqlConnector:
         """
 
         def event_new_session(session, transaction, connection):
-            LogService.info("Opening new database session: %s" % session)
+            LogService.debug("Opening new database session: %s" % session)
 
         def event_end_session(session, transaction):
-            LogService.info("Closing database session: %s" % session)
+            LogService.debug("Closing database session: %s" % session)
 
         event.listen(self.Session, "after_begin", event_new_session)
         event.listen(self.Session, "after_transaction_end", event_end_session)
@@ -76,7 +76,8 @@ class PostgresqlConnector:
             raise
 
         finally:
-            LogService.info("Database with() context complete.")
+            LogService.debug("Database with() context complete.")
+            # pass
             # This is disabled since the only place this is called is in Factories where
             # they are responsible for commit control.
             # session.commit()
@@ -99,10 +100,10 @@ class PostgresqlConnector:
             from flask_sqlalchemy_session import current_session as session
             if not session:
                 raise RuntimeError
-            LogService.info("Using Flask session")
+            LogService.debug("Using Flask session")
         except RuntimeError as e:
             session = self.ScopedSession()
             commit = True
-            LogService.info("Using thread scoped session")
+            LogService.debug("Using thread scoped session")
 
         return session, commit
