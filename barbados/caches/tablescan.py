@@ -11,8 +11,8 @@ from barbados.models.drinklist import DrinkListModel
 from barbados.models.construction import ConstructionModel
 
 from barbados.factories.cocktailfactory import CocktailFactory
-from barbados.factories.inventoryfactory import InventoryFactory
-from barbados.factories.ingredientfactory import IngredientFactory
+from barbados.factories.inventory import InventoryFactory
+from barbados.factories.ingredient import IngredientFactory
 from barbados.factories.drinklistfactory import DrinkListFactory
 from barbados.factories.construction import ConstructionFactory
 

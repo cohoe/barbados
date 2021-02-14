@@ -6,7 +6,7 @@ from barbados.models.ingredient import IngredientModel
 from barbados.objects.ingredientkinds import IngredientKinds, CategoryKind, FamilyKind, IngredientKind, IndexKind
 from barbados.services.logging import LogService
 from barbados.services.database import DatabaseService
-from barbados.factories.ingredientfactory import IngredientFactory
+from barbados.factories.ingredient import IngredientFactory
 from barbados.serializers import ObjectSerializer
 
 

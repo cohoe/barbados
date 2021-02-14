@@ -93,7 +93,7 @@ class BaseIndexer:
         index_obj = cls.factory.obj_to_index(obj)
 
         try:
-            cls.index.delete(index_obj)
+            cls.for_index.delete(index_obj)
         except NotFoundError as e:
             if fatal:
                 raise SearchException(e)

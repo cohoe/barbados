@@ -1,5 +1,4 @@
 from barbados.objects.speccomponent import SpecComponent
-from barbados.objects.text import Text
 from barbados.factories.base import BaseFactory
 
 
@@ -16,17 +15,6 @@ class SpecComponentFactory(BaseFactory):
         raw_c = cls.sanitize_raw(raw_input=raw, required_keys=cls.required_keys)
 
         # Parse the fields
-        raw_c = cls._parse_notes(raw_c)
+        raw_c = cls._parse_text(raw_c, key='notes')
 
         return SpecComponent(**raw_c)
-
-    @staticmethod
-    def _parse_notes(raw_input):
-        key = 'notes'
-
-        objs = []
-        for note in raw_input['notes']:
-            objs.append(Text(**note))
-        raw_input.update({key: objs})
-
-        return raw_input
