@@ -5,6 +5,7 @@ from barbados.query import QueryCondition
 from barbados.validators.ingredientmodel import IngredientModelValidator
 from barbados.indexes.ingredient import IngredientIndex
 from barbados.objects.text import DisplayName
+from barbados.factories.parser import FactoryParser
 
 
 class IngredientFactory(BaseFactory):
@@ -25,14 +26,14 @@ class IngredientFactory(BaseFactory):
         'last_refresh': None,
     }
 
-    @staticmethod
-    def raw_to_obj(input_object):
-        raw_ingredient = IngredientFactory.sanitize_raw(raw_input=input_object, required_keys=IngredientFactory.required_keys)
+    @classmethod
+    def raw_to_obj(cls, input_object):
+        raw_ingredient = cls.sanitize_raw(raw_input=input_object, required_keys=cls.required_keys)
 
         # Beware the Python dict copying bullshit!
-        raw_ingredient = IngredientFactory._parse_conditions(raw_ingredient)
-        raw_ingredient = IngredientFactory._parse_aliases(raw_ingredient)
-        raw_ingredient = IngredientFactory._parse_display_name(raw_ingredient)
+        raw_ingredient = cls._parse_conditions(raw_ingredient)
+        raw_ingredient = cls._parse_aliases(raw_ingredient)
+        raw_ingredient = FactoryParser.parse_display_name(raw_ingredient)
 
         # Build the object
         i = Ingredient(**raw_ingredient)
@@ -61,14 +62,4 @@ class IngredientFactory(BaseFactory):
             objs.append(d)
         raw_input.update({key: objs})
 
-        return raw_input
-
-    @staticmethod
-    def _parse_display_name(raw_input):
-        key = 'display_name'
-        try:
-            d = DisplayName(raw_input[key])
-        except KeyError:
-            d = DisplayName(raw_input.get('slug'))
-        raw_input.update({key: d})
         return raw_input

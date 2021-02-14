@@ -8,6 +8,7 @@ from barbados.factories.speccomponent import SpecComponentFactory
 from barbados.models.reciperesolutionsummary import RecipeResolutionSummaryModel
 from barbados.services.database import DatabaseService
 from barbados.indexes.reciperesolutionindex import RecipeResolutionIndex
+from barbados.factories.parser import FactoryParser
 
 
 class RecipeResolutionFactory(BaseFactory):
@@ -22,7 +23,6 @@ class RecipeResolutionFactory(BaseFactory):
         'components': list(),
         'construction_slug': str(),
         'garnish': list(),
-        'inventory_id': uuid4(),
         'spec_slug': str(),
         'status_count': dict(),
     }
@@ -38,12 +38,22 @@ class RecipeResolutionFactory(BaseFactory):
         raw_srs = cls.sanitize_raw(raw_input=raw, required_keys=cls.required_keys, unwanted_keys=cls.unwanted_keys)
 
         # Parse the fields
-        raw_srs = cls._parse_id(raw_srs, key='inventory_id')
+        raw_srs = cls._parse_inventory_id(raw_srs)
         raw_srs = cls._parse_components(raw_srs)
         raw_srs = cls._parse_garnish(raw_srs)
         raw_srs = cls._parse_citations(raw_srs)
 
         return RecipeResolutionSummary(**raw_srs)
+
+    @staticmethod
+    def _parse_inventory_id(raw_input):
+        key = 'inventory_id'
+
+        if type(raw_input.get(key)) is not UUID:
+            raw_id = raw_input.get(key)
+            raw_input.update({key: UUID(raw_id)})
+
+        return raw_input
 
     @staticmethod
     def _parse_components(raw_input):

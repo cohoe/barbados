@@ -1,10 +1,7 @@
 import copy
-from uuid import UUID, uuid4
 from barbados.serializers import ObjectSerializer
 from barbados.services.logging import LogService
 from barbados.services.database import DatabaseService
-from barbados.exceptions import FactoryException
-from barbados.objects.text import DisplayName, Text
 
 
 class BaseFactory:
@@ -217,42 +214,3 @@ class BaseFactory:
                 session.commit()
 
             return model
-
-    """
-    The following functions are all attribute parsers used to properly
-    construct the various objects in sub-factories.
-    """
-    @staticmethod
-    def _parse_id(raw_input, key='id'):
-        raw_id = raw_input.get(key)
-        if type(raw_id) is UUID:
-            id = raw_id
-        elif type(raw_id) is str:
-            id = UUID(raw_id)
-        elif raw_id is None:
-            id = uuid4()
-        else:
-            raise FactoryException("Unable to construct ID")
-        raw_input.update({key: id})
-
-        return raw_input
-
-    @staticmethod
-    def _parse_display_name(raw_input, key='display_name', source_attr='slug'):
-        try:
-            d = DisplayName(raw_input[key])
-        except KeyError:
-            d = DisplayName(raw_input.get(source_attr))
-        raw_input.update({key: d})
-        return raw_input
-
-    # @TODO textfactory
-    @staticmethod
-    def _parse_text(raw_input, key):
-        objs = []
-        # @TODO text factory
-        for raw_text in raw_input.get(key):
-            objs.append(Text(**raw_text))
-        raw_input.update({key: objs})
-
-        return raw_input

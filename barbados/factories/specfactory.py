@@ -9,6 +9,7 @@ from barbados.factories.construction import ConstructionFactory
 from barbados.exceptions import FactoryException
 
 
+# @TODO refactor to the new world order
 class SpecFactory:
     def __init__(self):
         pass
