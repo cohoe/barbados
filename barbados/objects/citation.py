@@ -4,7 +4,7 @@ from barbados.serializers import ObjectSerializer
 
 
 class Citation(BaseObject):
-    def __init__(self, title=None, author=None, date=None, publisher=None, page=None, notes=None, href=None, location=None, issue=None):
+    def __init__(self, title=None, author=None, date=None, publisher=None, page=None, notes=None, href=None, location=None, issue=None, year=None):
         self.title = title
         self.author = author
         self.date = date
@@ -14,6 +14,7 @@ class Citation(BaseObject):
         self.href = href
         self.location = location
         self.issue = issue
+        self.year = year
 
     def to_mla_ish(self, html=False):
         if hasattr(self, 'author'):
@@ -49,9 +50,10 @@ class Citation(BaseObject):
         serializer.add_property('notes', [ObjectSerializer.serialize(note, serializer.format) for note in self.notes])
         serializer.add_property('title', self.title, even_if_empty=False)
         serializer.add_property('author', self.author, even_if_empty=False)
-        serializer.add_property('date', self.date, even_if_empty=False)
+        serializer.add_property('date', self.date.isoformat() if self.date is not None else None, even_if_empty=False)
         serializer.add_property('publisher', self.publisher, even_if_empty=False)
         serializer.add_property('page', self.page, even_if_empty=False)
         serializer.add_property('href', self.href, even_if_empty=False)
         serializer.add_property('location', self.location, even_if_empty=False)
         serializer.add_property('issue', self.issue, even_if_empty=False)
+        serializer.add_property('year', self.year, even_if_empty=False)

@@ -7,6 +7,7 @@ from barbados.factories.citation import CitationFactory
 from barbados.objects.image import Image
 from barbados.factories.construction import ConstructionFactory
 from barbados.exceptions import FactoryException
+from barbados.factories.text import TextFactory
 
 
 # @TODO refactor to the new world order
@@ -67,20 +68,8 @@ class SpecFactory:
         # print(ingredient_obj_list)
 
         c_obj_list = CitationFactory.raw_list_to_obj(raw_spec['citations'])
-        # print(c_obj_list)
-
-        n_obj_list = []
-        for note in raw_spec['notes']:
-            if type(note) is dict:
-                n_obj_list.append(Text(**note))
-            elif type(note) is Text:
-                n_obj_list.append(note)
-            else:
-                n_obj_list.append(Text(text=note))
-        # print(n_obj_list)
-
+        n_obj_list = TextFactory.raw_list_to_obj(raw_spec['notes'])
         straw = SpecFactory.infer_bool(raw_spec['straw'])
-        # print(straw)
 
         garnish_obj_list = []
         for raw_garnish in raw_spec['garnish']:
