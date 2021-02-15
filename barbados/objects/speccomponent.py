@@ -4,7 +4,7 @@ from barbados.serializers import ObjectSerializer
 
 class SpecComponent:
     """
-    Someday the direct name part might be able to go away.
+    SpecComponent is an Ingredient in a usage context (quantity, unit, notes, etc).
     """
     def __init__(self, slug, display_name=None, quantity=None, unit=None, notes=None):
         if not notes:
