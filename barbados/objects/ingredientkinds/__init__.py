@@ -111,13 +111,16 @@ class ProductKind(Kind):
 
 class CustomKind(Kind):
     """
-    Products or Ingredients that are modified or custom produced by a specific
-    venue or bartender. Includes infusions or house blends.
+    Products or Ingredients that are expected to be produced by you, the end user.
+    In a professional setting these include custom infusions and blends. But also
+    extends to syrups and such (more relevant for the home setting).
 
     Examples:
         * House Orange Bitters
         * Jalapeno-infused Tequila
         * Szechuan-peppercorn infused gin
+        * Simple Syrup
+        * Agave Syrup
     """
     value = 'custom'
     allowed_parents = [IngredientKind.value, ProductKind.value, FamilyKind.value, value]
