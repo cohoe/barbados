@@ -31,11 +31,10 @@ class FactoryParser:
 
     @staticmethod
     def parse_display_name(raw_input, key='display_name', source_attr='slug'):
-        try:
-            d = DisplayName(raw_input[key])
-        except KeyError:
-            d = DisplayName(raw_input.get(source_attr))
-        raw_input.update({key: d})
+        new_value = raw_input.get(key)
+        if not new_value:
+            new_value = DisplayName(raw_input.get(source_attr))
+        raw_input.update({key: new_value})
         return raw_input
 
     @staticmethod
