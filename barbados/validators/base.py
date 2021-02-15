@@ -15,3 +15,8 @@ class BaseValidator:
     @property
     def for_class(self):
         raise NotImplementedError
+
+    def _test_model_exists(self, model, slug):
+        m = self.session.query(model).get(slug)
+        if not m:
+            self.fail("%s %s does not exist." % (model, slug))

@@ -1,5 +1,7 @@
 from barbados.objects.text import Slug
 from barbados.models.ingredient import IngredientModel
+from barbados.models.construction import ConstructionModel
+from barbados.models.glassware import GlasswareModel
 from barbados.models.cocktail import CocktailModel
 from barbados.validators.base import BaseValidator
 
@@ -26,13 +28,14 @@ class CocktailModelValidator(BaseValidator):
 
     def _check_spec(self):
         for spec in self.model.specs:
+            # Components
             for component in spec.get('components'):
-                self._test_component_exists(component)
+                self._test_model_exists(IngredientModel, component.get('slug'))
+            # Garnish
             for garnish in spec.get('garnish'):
-                self._test_component_exists(garnish)
-
-    def _test_component_exists(self, component):
-        component_slug = component['slug']
-        i = self.session.query(IngredientModel).get(component_slug)
-        if not i:
-            self.fail("Ingredient %s does not exist." % component_slug)
+                self._test_model_exists(IngredientModel, garnish.get('slug'))
+            # Construction
+            self._test_model_exists(ConstructionModel, spec.get('construction').get('slug'))
+            # Glassware
+            for glassware in spec.get('glassware'):
+                self._test_model_exists(GlasswareModel, glassware.get('slug'))
