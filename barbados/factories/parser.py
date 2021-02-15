@@ -139,7 +139,10 @@ class FactoryParser:
         raw_value = raw_input.get(key)
         objs = []
         for item in raw_value:
-            o = factory.produce_obj(id=item.get(id_attr))
+            try:
+                o = factory.produce_obj(id=item.get(id_attr))
+            except FactoryException as err:
+                raise FactoryException("%s failed to produce! Error was: %s" % (factory.__name__, err))
             objs.append(o)
         raw_input.update({key: objs})
         return raw_input

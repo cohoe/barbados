@@ -2,6 +2,7 @@ import copy
 from barbados.serializers import ObjectSerializer
 from barbados.services.logging import LogService
 from barbados.services.database import DatabaseService
+from barbados.exceptions import FactoryException
 
 
 class BaseFactory:
@@ -53,7 +54,7 @@ class BaseFactory:
             model_dict = copy.deepcopy(model.__dict__)
             model_dict.pop('_sa_instance_state')
         except AttributeError:
-            raise KeyError("Object not found")
+            raise FactoryException("Failure converting model to object.")
 
         return cls.raw_to_obj(model_dict)
 
@@ -109,7 +110,7 @@ class BaseFactory:
         with DatabaseService.get_session() as current_session:
             result = current_session.query(cls._model).get(id)
             if not result:
-                raise KeyError('Not found')
+                raise FactoryException("Model for ID value '%s' not found." % id)
             obj = cls.model_to_obj(result)
 
         return obj

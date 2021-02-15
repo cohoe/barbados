@@ -1,6 +1,6 @@
-from barbados.objects.text import Slug
-from barbados.models.inventory import InventoryModel
 from barbados.validators.base import BaseValidator
+from barbados.models.ingredient import IngredientModel
+from barbados.models.inventory import InventoryModel
 
 
 class InventoryModelValidator(BaseValidator):
@@ -17,4 +17,4 @@ class InventoryModelValidator(BaseValidator):
 
     def _check_items(self):
         for item in self.model.items:
-            self._test_ingredient_exists(item)
+            self._test_model_exists(IngredientModel, item)
