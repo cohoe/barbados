@@ -26,8 +26,13 @@ class CocktailModelValidator(BaseValidator):
 
     def _check_spec(self):
         for spec in self.model.specs:
-            for component in spec['components']:
-                # It's been serialized at this point
-                i = self.session.query(IngredientModel).get(component['slug'])
-                if not i:
-                    self.fail("Ingredient %s does not exist." % component['slug'])
+            for component in spec.get('components'):
+                self._test_component_exists(component)
+            for garnish in spec.get('garnish'):
+                self._test_component_exists(garnish)
+
+    def _test_component_exists(self, component):
+        component_slug = component['slug']
+        i = self.session.query(IngredientModel).get(component_slug)
+        if not i:
+            self.fail("Ingredient %s does not exist." % component_slug)
