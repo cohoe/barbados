@@ -1,173 +1,44 @@
+from barbados.factories.base import BaseFactory
 from barbados.objects.spec import Spec
-from barbados.objects.origin import Origin
-from barbados.objects.glassware import Glassware
-from barbados.objects.speccomponent import SpecComponent
-from barbados.objects.text import Text, Slug, DisplayName
 from barbados.factories.citation import CitationFactory
-from barbados.objects.image import Image
 from barbados.factories.construction import ConstructionFactory
-from barbados.exceptions import FactoryException
 from barbados.factories.text import TextFactory
+from barbados.factories.speccomponent import SpecComponentFactory
+from barbados.factories.image import ImageFactory
+from barbados.factories.glassware import GlasswareFactory
+from barbados.factories.origin import OriginFactory
+from barbados.factories.parser import FactoryParser
 
 
-# @TODO refactor to the new world order
-class SpecFactory:
-    def __init__(self):
-        pass
+class SpecFactory(BaseFactory):
 
-    @staticmethod
-    def raw_to_obj(raw_spec):
-        # Tortuga Data Format v3 replaced all names with slugs, but it means that
-        # the slugs for specs are not accurate. Same problem for ingredients.
-        spec_slug = Slug(raw_spec['slug'])
-        try:
-            spec_display_name = raw_spec['display_name']
-        except KeyError:
-            spec_display_name = DisplayName(spec_slug)
+    required_keys = {
+        'origin': None,
+        'glassware': list(),
+        'components': list(),
+        'citations': list(),
+        'notes': list(),
+        'straw': None,
+        'garnish': list(),
+        'instructions': list(),
+        'construction': None,
+        'images': list(),
+    }
 
-        raw_spec = SpecFactory.sanitize_raw(raw_spec)
+    @classmethod
+    def raw_to_obj(cls, raw_spec):
+        raw_spec = cls.sanitize_raw(raw_input=raw_spec, required_keys=cls.required_keys)
+        raw_spec = FactoryParser.parse_slug(raw_spec)
+        raw_spec = FactoryParser.parse_display_name(raw_spec)
+        raw_spec = FactoryParser.parse_object(raw_spec, factory=OriginFactory, key='origin')
+        raw_spec = FactoryParser.parse_object_list(raw_spec, factory=GlasswareFactory, key='glassware')
+        raw_spec = FactoryParser.parse_object_list(raw_spec, factory=SpecComponentFactory, key='components')
+        raw_spec = FactoryParser.parse_object_list(raw_spec, factory=CitationFactory, key='citations')
+        raw_spec = FactoryParser.parse_object_list(raw_spec, factory=TextFactory, key='notes')
+        raw_spec = FactoryParser.parse_object_list(raw_spec, factory=TextFactory, key='instructions')
+        raw_spec = FactoryParser.parse_object_list(raw_spec, factory=SpecComponentFactory, key='garnish')
+        raw_spec = FactoryParser.parse_object_list(raw_spec, factory=ImageFactory, key='images')
+        raw_spec = FactoryParser.parse_object(raw_spec, factory=ConstructionFactory, key='construction')
+        raw_spec = FactoryParser.parse_boolean(raw_spec, key='straw')
 
-        if raw_spec['origin'] is not None:
-            origin_obj = Origin(**raw_spec['origin'])
-        else:
-            origin_obj = Origin()
-
-        glassware_obj_list = []
-        for glassware in raw_spec['glassware']:
-            if type(glassware) is dict:
-                glassware_obj_list.append(Glassware(**glassware))
-            else:
-                glassware_slug = Slug(glassware)
-                if len(glassware_slug) <= 2:
-                    raise KeyError("Probably bad glassware (slug way too short)")
-                glassware_display_name = DisplayName(glassware_slug)
-                glassware_obj_list.append(Glassware(slug=glassware_slug, display_name=glassware_display_name))
-
-        components = []
-        # ingredients == specingredient == component. Yay evolution
-        for raw_ingredient in raw_spec['components']:
-            try:
-                component_slug = Slug(raw_ingredient['name'])
-                component_display_name = DisplayName(component_slug)
-                del (raw_ingredient['name'])
-
-                notes = []
-                if 'notes' in raw_ingredient.keys():
-                    notes = [Text(**note) for note in raw_ingredient['notes']]
-                    del (raw_ingredient['notes'])
-                spec_ing_obj = SpecComponent(slug=component_slug, display_name=component_display_name, notes=notes, **raw_ingredient)
-            except KeyError:
-                notes = []
-                if 'notes' in raw_ingredient.keys():
-                    notes = [Text(**note) for note in raw_ingredient['notes']]
-                    raw_ingredient.update({'notes': notes})
-                raw_ingredient.update({'slug': Slug(raw_ingredient.get('slug'))})
-                spec_ing_obj = SpecComponent(**raw_ingredient)
-
-            components.append(spec_ing_obj)
-        # print(ingredient_obj_list)
-
-        c_obj_list = CitationFactory.raw_list_to_obj(raw_spec['citations'])
-        n_obj_list = TextFactory.raw_list_to_obj(raw_spec['notes'])
-        straw = SpecFactory.infer_bool(raw_spec['straw'])
-
-        garnish_obj_list = []
-        for raw_garnish in raw_spec['garnish']:
-            if 'notes' in raw_garnish.keys():
-                notes = []
-                for raw_note in raw_garnish.get('notes'):
-                    notes.append(Text(**raw_note))
-                raw_garnish['notes'] = notes
-
-            garnish_obj = SpecComponent(**raw_garnish)
-
-            garnish_obj_list.append(garnish_obj)
-        # print(garnish_obj_list)
-
-        instr_obj_list = []
-        for instruction in raw_spec['instructions']:
-            if type(instruction) is dict:
-                instr_obj_list.append(Text(**instruction))
-            elif type(instruction) is Text:
-                instr_obj_list.append(instruction)
-            else:
-                instr_obj_list.append(Text(text=instruction))
-        # print(instr_obj_list)
-
-        try:
-            construction_obj = ConstructionFactory.produce_obj(id=raw_spec['construction']['slug'])
-        except KeyError:
-            raise FactoryException("Error building construction '%s'." % raw_spec.get('construction').get('slug'))
-
-        image_obj_list = []
-        for image in raw_spec['images']:
-            image_obj_list.append(Image(**image))
-
-        s_obj = Spec(slug=spec_slug,
-                     display_name=spec_display_name,
-                     origin=origin_obj,
-                     glassware=glassware_obj_list,
-                     components=components,
-                     citations=c_obj_list,
-                     notes=n_obj_list,
-                     straw=straw,
-                     garnish=garnish_obj_list,
-                     instructions=instr_obj_list,
-                     construction=construction_obj,
-                     images=image_obj_list,
-                     )
-
-        return s_obj
-
-    @staticmethod
-    def sanitize_raw(raw_spec):
-        required_keys = {
-            'name': None,
-            'origin': None,
-            'glassware': list(),
-            'components': list(),
-            'citations': list(),
-            'notes': list(),
-            'straw': None,
-            'garnish': list(),
-            'instructions': list(),
-            'construction': None,
-            'images': list(),
-        }
-
-        for key in required_keys.keys():
-            if key not in raw_spec.keys():
-                raw_spec[key] = required_keys[key]
-
-        lists = ['components', 'citations', 'notes', 'garnish', 'instructions', 'glassware', 'images']
-        for key in lists:
-            if raw_spec[key] is None:
-                raw_spec[key] = required_keys[key]
-
-        return raw_spec
-
-    @staticmethod
-    def infer_bool(input_value):
-        """
-        Infer a boolean from the given value
-        :param input_value: String, Integer, Boolean, None
-        :return: Boolean
-        """
-        # Boolean
-        if isinstance(input_value, bool):
-            return input_value
-
-        # Integer
-        if isinstance(input_value, int):
-            return bool(input_value)
-
-        # String
-        if isinstance(input_value, str):
-            if 'Y' in input_value.upper():
-                return True
-            else:
-                return False
-
-        # None
-        if input_value is None:
-            return False
+        return Spec(**raw_spec)

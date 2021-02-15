@@ -17,6 +17,7 @@ class SpecComponentFactory(BaseFactory):
         raw_c = cls.sanitize_raw(raw_input=raw, required_keys=cls.required_keys)
 
         # Parse the fields
+        raw_c = FactoryParser.parse_slug(raw_c)
         raw_c = FactoryParser.parse_object_list(raw_c, factory=TextFactory, key='notes')
 
         return SpecComponent(**raw_c)

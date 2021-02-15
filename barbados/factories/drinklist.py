@@ -4,6 +4,7 @@ from barbados.models.drinklist import DrinkListModel
 from barbados.validators.drinklistmodel import DrinkListModelValidator
 from barbados.indexes.drinklist import DrinkListIndex
 from barbados.factories.parser import FactoryParser
+from barbados.factories.drinklistitem import DrinkListItemFactory
 
 
 class DrinkListFactory(BaseFactory):
@@ -27,7 +28,7 @@ class DrinkListFactory(BaseFactory):
         # Parse
         raw_list = FactoryParser.parse_id(raw_list)
         raw_list = FactoryParser.parse_display_name(raw_list, source_attr='id')
-        raw_list = FactoryParser.parse_drinklistitems(raw_list)
+        raw_list = FactoryParser.parse_object_list(raw_list, factory=DrinkListItemFactory, key='items')
 
         dl = DrinkList(**raw_list)
         return dl

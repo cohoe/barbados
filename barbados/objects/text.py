@@ -26,9 +26,7 @@ class DisplayName:
 
 class Text(BaseObject):
     def __init__(self, text, author=None, datetime=None):
-        if not datetime:
-            datetime = Timestamp()
-
+        # Disabled autogeneration of datetime values for now.
         self.text = text
         self.author = author
         self.datetime = datetime

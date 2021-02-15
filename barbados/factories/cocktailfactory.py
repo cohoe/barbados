@@ -11,6 +11,7 @@ from barbados.models.cocktail import CocktailModel
 from barbados.validators.cocktailmodel import CocktailModelValidator
 from barbados.exceptions import FactoryException
 from barbados.indexes.recipe import RecipeIndex
+from barbados.factories.text import TextFactory
 
 
 # @TODO this needs to standardize into modern constructs!
@@ -42,18 +43,7 @@ class CocktailFactory(BaseFactory):
 
         citation_obj_list = CitationFactory.raw_list_to_obj(raw_recipe['citations'])
 
-        n_obj_list = []
-        for note in raw_recipe['notes']:
-            if type(note) is dict:
-                n_obj_list.append(Text(**note))
-            elif type(note) is Text:
-                n_obj_list.append(note)
-            else:
-                n_obj_list.append(Text(text=note))
-
-        tag_obj_list = []
-        for tag in raw_recipe['tags']:
-            tag_obj_list.append(Text(text=tag))
+        n_obj_list = TextFactory.raw_list_to_obj(raw_recipe.get('notes'))
 
         image_obj_list = []
         for image in raw_recipe['images']:
@@ -64,7 +54,7 @@ class CocktailFactory(BaseFactory):
                          specs=s_obj_list,
                          citations=citation_obj_list,
                          notes=n_obj_list,
-                         tags=tag_obj_list,
+                         tags=[],
                          slug=slug,
                          images=image_obj_list)
 
