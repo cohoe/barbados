@@ -7,8 +7,6 @@ class SpecComponent:
     Someday the direct name part might be able to go away.
     """
     def __init__(self, slug, display_name=None, quantity=None, unit=None, notes=None):
-        if not display_name:
-            display_name = DisplayName(slug)
         if not notes:
             notes = []
         self.slug = slug

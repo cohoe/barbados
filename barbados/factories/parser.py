@@ -12,6 +12,9 @@ class FactoryParser:
     Any object that has its own factory should not be included here since it
     would cause a dependency loop. This library class is intended for more
     primative types.
+
+    parse_* functions are for creating an object from partial or transient data.
+    produce_* functions are for returning a complete object from the database.
     """
 
     @staticmethod
@@ -30,10 +33,10 @@ class FactoryParser:
         return raw_input
 
     @staticmethod
-    def parse_display_name(raw_input, key='display_name', source_attr='slug'):
+    def parse_display_name(raw_input, key='display_name', source_attr='slug', custom_fallback_value=None):
         new_value = raw_input.get(key)
         if not new_value:
-            new_value = DisplayName(raw_input.get(source_attr))
+            new_value = custom_fallback_value if custom_fallback_value else DisplayName(raw_input.get(source_attr))
         raw_input.update({key: new_value})
         return raw_input
 
@@ -122,4 +125,21 @@ class FactoryParser:
         if input_value is None:
             raw_input.update({key: False})
 
+        return raw_input
+
+    @staticmethod
+    def produce_object(raw_input, factory, key, id_attr='slug'):
+        raw_value = raw_input.get(key)
+        obj = factory.produce_obj(id=raw_value.get(id_attr))
+        raw_input.update({key: obj})
+        return raw_input
+
+    @staticmethod
+    def produce_object_list(raw_input, factory, key, id_attr='slug'):
+        raw_value = raw_input.get(key)
+        objs = []
+        for item in raw_value:
+            o = factory.produce_obj(id=item.get(id_attr))
+            objs.append(o)
+        raw_input.update({key: objs})
         return raw_input
