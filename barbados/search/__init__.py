@@ -284,14 +284,16 @@ class SearchBase:
         :return: Dict for Range() construction.
         """
         try:
+            if type(raw_value) is int:
+                # 'eq' is not a value ElasticSearch Range() operator. This
+                # secretly tells the constructor above to make it a Match()
+                # query instead.
+                return {'eq': raw_value}
             if raw_value.endswith('+'):
                 return {'gte': int(raw_value.strip('+'))}
             elif raw_value.endswith('-'):
                 return {'lte': int(raw_value.strip('-'))}
             else:
-                # 'eq' is not a value ElasticSearch Range() operator. This
-                # secretly tells the constructor above to make it a Match()
-                # query instead.
                 return {'eq': int(raw_value)}
         except ValueError:
             raise ValueError("Bad range value given (%s)" % raw_value)

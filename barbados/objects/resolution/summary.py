@@ -60,6 +60,18 @@ class RecipeResolutionSummary(BaseObject):
                 counts.update({status_key: 1})
         return counts
 
+    def get_components_by_status(self, status):
+        """
+        Return a list of all component slugs that matched a paricular status.
+        :param status: BaseResolutionStatus child class.
+        :return: List of slugs.
+        """
+        components = []
+        for r in self.components:
+            if r.status is status:
+                components.append(r.slug)
+        return components
+
     @property
     def component_count(self):
         """
