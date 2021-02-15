@@ -2,7 +2,7 @@ import requests
 import re
 from bs4 import BeautifulSoup
 from barbados.objects.text import DisplayName, Slug
-from barbados.factories.cocktailfactory import CocktailFactory
+from barbados.factories.cocktail import CocktailFactory
 from barbados.services.logging import LogService
 
 

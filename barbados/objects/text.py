@@ -48,7 +48,9 @@ class Slug:
 
     # Custom replacements
     replacements = [
-        ["'", '']
+        ["'", ''],
+        ["&", ''],
+        [".", ''],
     ]
 
     def __new__(cls, text):

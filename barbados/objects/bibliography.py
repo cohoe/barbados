@@ -1,6 +1,6 @@
 from barbados.services.database import DatabaseService
 from barbados.models.cocktail import CocktailModel
-from barbados.factories.cocktailfactory import CocktailFactory
+from barbados.factories.cocktail import CocktailFactory
 
 
 class Bibliography:
