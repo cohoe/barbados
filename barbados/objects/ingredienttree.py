@@ -331,6 +331,13 @@ class IngredientTree:
         """
         return json.dumps(self.tree.to_dict(with_data=True, sort=False, reverse=False), cls=TreeEncoder)
 
+    def __len__(self):
+        """
+        Return the length of the tree minus 1 (to count for the root node)
+        :return:
+        """
+        return len(self.tree)-1
+
 
 class TreeEncoder(json.JSONEncoder):
     """
