@@ -1,3 +1,6 @@
+import barbados.metrics.ingredient
+import barbados.metrics.inventory
+import barbados.metrics.cocktail
 from barbados.reports import BaseReport
 from barbados.objects.resolution.status import MissingResolutionStatus, DirectResolutionStatus
 from barbados.search.reciperesolution import RecipeResolutionSearch
@@ -10,10 +13,10 @@ class InventoryReport(BaseReport):
         self.inventory = inventory
 
     def run(self):
-        total = RecipeResolutionSearch().execute()
-        missing_0 = RecipeResolutionSearch(missing=0).execute()
-        missing_1 = RecipeResolutionSearch(missing=1).execute()
-        missing_2plus = RecipeResolutionSearch(missing='2+').execute()
+        total = RecipeResolutionSearch(inventory_id=str(self.inventory.id)).execute()
+        missing_0 = RecipeResolutionSearch(inventory_id=str(self.inventory.id), missing=0).execute()
+        missing_1 = RecipeResolutionSearch(inventory_id=str(self.inventory.id), missing=1).execute()
+        missing_2plus = RecipeResolutionSearch(inventory_id=str(self.inventory.id), missing='2+').execute()
 
         missing_any = missing_1 + missing_2plus
 
@@ -26,15 +29,16 @@ class InventoryReport(BaseReport):
         # @TODO should report list all drink names or slugs?
         report = {
             'inventory_id': str(self.inventory.id),
-            'supported_ingredients': len(tree),
-            'items_direct': len(self.inventory.items),
-            'items_indirect': len(self.inventory.implicit_items),
-            'count_total_recipes': len(total),
-            'count_missing_0': len(missing_0),
-            'count_missing_1': len(missing_1),
-            'count_missing_2+': len(missing_2plus),
-            'count_missing_any': len(missing_any),
-            'percent_recipe_available': round((len(missing_0) / len(total))*100, 2),
+            'supported_ingredients': barbados.metrics.ingredient.IngredientAllCount.collect(),
+            'items_direct': barbados.metrics.inventory.InventoryItemsDirectCount(self.inventory).collect(),
+            'items_indirect': barbados.metrics.inventory.InventoryItemsImplicitCount(self.inventory).collect(),
+            'count_total_drinks': barbados.metrics.cocktail.CocktailDrinkCount.collect(),
+            'count_total_recipes': barbados.metrics.cocktail.CocktailSpecCount.collect(),
+            'count_missing_0': barbados.metrics.inventory.InventoryResolutionMissingNoneCount(self.inventory).collect(),
+            'count_missing_1': barbados.metrics.inventory.InventoryResolutionMissingOneCount(self.inventory).collect(),
+            'count_missing_2+': barbados.metrics.inventory.InventoryResolutionMissingTwoPlusCount(self.inventory).collect(),
+            'count_missing_any': barbados.metrics.inventory.InventoryResolutionMissingAnyCount(self.inventory).collect(),
+            'percent_recipe_available': barbados.metrics.inventory.InventoryResolutionAvailableRecipePercent(self.inventory).collect(),
             'missing_component_tally': missing_counts,
             'direct_component_tally': direct_counts,
             'generated_at': Timestamp()
