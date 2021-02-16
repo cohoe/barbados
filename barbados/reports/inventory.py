@@ -2,6 +2,7 @@ from barbados.reports import BaseReport
 from barbados.objects.resolution.status import MissingResolutionStatus, DirectResolutionStatus
 from barbados.search.reciperesolution import RecipeResolutionSearch
 from barbados.caches.ingredienttree import IngredientTreeCache
+from barbados.objects.text import Timestamp
 
 
 class InventoryReport(BaseReport):
@@ -23,9 +24,6 @@ class InventoryReport(BaseReport):
         self.inventory.expand(tree)
 
         # @TODO should report list all drink names or slugs?
-        # @TODO add datetime generated
-        # @TODO use the word tally
-        # @TODO give percentage of what you can make
         report = {
             'inventory_id': str(self.inventory.id),
             'supported_ingredients': len(tree),
@@ -36,8 +34,10 @@ class InventoryReport(BaseReport):
             'count_missing_1': len(missing_1),
             'count_missing_2+': len(missing_2plus),
             'count_missing_any': len(missing_any),
+            'percent_recipe_available': round((len(missing_0) / len(total))*100, 2),
             'missing_component_tally': missing_counts,
             'direct_component_tally': direct_counts,
+            'generated_at': Timestamp()
         }
 
         return report
