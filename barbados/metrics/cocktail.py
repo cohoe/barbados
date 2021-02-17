@@ -1,4 +1,3 @@
-import json
 from barbados.metrics import BaseMetric
 from barbados.caches.tablescan import CocktailScanCache
 
@@ -8,7 +7,7 @@ class CocktailDrinkCount(BaseMetric):
 
     @classmethod
     def collect(cls):
-        results = json.loads(CocktailScanCache.retrieve())
+        results = CocktailScanCache.retrieve()
         return len(results)
 
 
@@ -18,7 +17,7 @@ class CocktailSpecCount(BaseMetric):
     @classmethod
     def collect(cls):
         count = 0
-        results = json.loads(CocktailScanCache.retrieve())
+        results = CocktailScanCache.retrieve()
         for item in results:
             count += len(item.get('specs'))
         return count

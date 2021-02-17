@@ -46,6 +46,15 @@ class TableScanCache(CacheBase):
 
         CacheService.set(cls.cache_key, json.dumps(cache_objects))
 
+    @classmethod
+    def retrieve(cls):
+        """
+        Retrieve and decode the scan.
+        :return: Complex object.
+        """
+        # https://www.geeksforgeeks.org/python-call-parent-class-method/
+        return json.loads(super().retrieve())
+
 
 class CocktailScanCache(TableScanCache):
     cache_key = 'cocktail_scan_cache'
