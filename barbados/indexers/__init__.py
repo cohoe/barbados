@@ -1,6 +1,6 @@
 from barbados.indexers.recipe import RecipeIndexer
 from barbados.indexers.ingredient import IngredientIndexer
-from barbados.indexers.drinklist import DrinkListIndexer
+from barbados.indexers.list import ListIndexer
 from barbados.indexers.reciperesolution import RecipeResolutionIndexer
 from barbados.indexers.inventory import InventoryIndexer
 
@@ -56,6 +56,6 @@ class IndexerFactory:
 Indexers = IndexerFactory()
 Indexers.register_class(RecipeIndexer)
 Indexers.register_class(IngredientIndexer)
-Indexers.register_class(DrinkListIndexer)
+Indexers.register_class(ListIndexer)
 Indexers.register_class(RecipeResolutionIndexer)
 Indexers.register_class(InventoryIndexer)

@@ -1,7 +1,7 @@
 from barbados.services.logging import LogService
 from barbados.indexes.recipe import RecipeIndex
 from barbados.indexes.ingredient import IngredientIndex
-from barbados.indexes.drinklist import DrinkListIndex
+from barbados.indexes.list import ListIndex
 from barbados.indexes.reciperesolutionindex import RecipeResolutionIndex
 from barbados.indexes.inventory import InventoryIndex
 from barbados.connectors.elasticsearch import ElasticsearchConnector
@@ -66,7 +66,7 @@ class IndexFactory:
     def get_indexes(self):
         """
         Return a dictionary containing all registered ElasticSearch indexes.
-        Keys are the name of the index (ex: recipe, ingredient, drinklist) with the
+        Keys are the name of the index (ex: recipe, ingredient, list) with the
         value being the class represening that index.
         :return: Dict
         """
@@ -76,6 +76,6 @@ class IndexFactory:
 Indexes = IndexFactory()
 Indexes.register_index(RecipeIndex)
 Indexes.register_index(IngredientIndex)
-Indexes.register_index(DrinkListIndex)
+Indexes.register_index(ListIndex)
 Indexes.register_index(RecipeResolutionIndex)
 Indexes.register_index(InventoryIndex)

@@ -1,16 +1,16 @@
 from barbados.factories.base import BaseFactory
-from barbados.objects.drinklist import DrinkList
-from barbados.models.drinklist import DrinkListModel
-from barbados.validators.drinklistmodel import DrinkListModelValidator
-from barbados.indexes.drinklist import DrinkListIndex
+from barbados.objects.list import List
+from barbados.models.list import ListModel
+from barbados.validators.listmodel import ListModelValidator
+from barbados.indexes.list import ListIndex
 from barbados.factories.parser import FactoryParser
-from barbados.factories.drinklistitem import DrinkListItemFactory
+from barbados.factories.listitem import ListItemFactory
 
 
-class DrinkListFactory(BaseFactory):
-    _model = DrinkListModel
-    _validator = DrinkListModelValidator
-    _index = DrinkListIndex
+class ListFactory(BaseFactory):
+    _model = ListModel
+    _validator = ListModelValidator
+    _index = ListIndex
 
     required_keys = {
         'items': list(),
@@ -28,7 +28,7 @@ class DrinkListFactory(BaseFactory):
         # Parse
         raw_list = FactoryParser.parse_id(raw_list)
         raw_list = FactoryParser.parse_display_name(raw_list, source_attr='id')
-        raw_list = FactoryParser.parse_object_list(raw_list, factory=DrinkListItemFactory, key='items')
+        raw_list = FactoryParser.parse_object_list(raw_list, factory=ListItemFactory, key='items')
 
-        dl = DrinkList(**raw_list)
+        dl = List(**raw_list)
         return dl

@@ -20,4 +20,4 @@ class RecipeResolutionSummaryModel(BarbadosModel):
     generated_at = Column(DateTime, nullable=False)
 
     def __repr__(self):
-        return "<Barbados::Models::DrinkListModel[%s]>" % self.id
+        return "<Barbados::Models::RecipeResolutionSummaryModel[%s]>" % self.id

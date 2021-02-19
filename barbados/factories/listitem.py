@@ -1,10 +1,10 @@
 from barbados.factories.base import BaseFactory
-from barbados.objects.drinklistitem import DrinkListItem
+from barbados.objects.listitem import ListItem
 
 
-class DrinkListItemFactory(BaseFactory):
+class ListItemFactory(BaseFactory):
 
     @classmethod
     def raw_to_obj(cls, raw):
         raw_obj = cls.sanitize_raw(raw_input=raw, required_keys=cls.required_keys)
-        return DrinkListItem(**raw_obj)
+        return ListItem(**raw_obj)

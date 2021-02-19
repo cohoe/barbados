@@ -1,11 +1,11 @@
 from barbados.objects.text import Slug
 from barbados.models.cocktail import CocktailModel
-from barbados.models.drinklist import DrinkListModel
+from barbados.models.list import ListModel
 from barbados.validators.base import BaseValidator
 
 
-class DrinkListModelValidator(BaseValidator):
-    for_class = DrinkListModel
+class ListModelValidator(BaseValidator):
+    for_class = ListModel
 
     def __init__(self, model, fatal=True):
         self.model = model

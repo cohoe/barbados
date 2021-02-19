@@ -7,14 +7,14 @@ from barbados.serializers import ObjectSerializer
 from barbados.models.cocktail import CocktailModel
 from barbados.models.inventory import InventoryModel
 from barbados.models.ingredient import IngredientModel
-from barbados.models.drinklist import DrinkListModel
+from barbados.models.list import ListModel
 from barbados.models.construction import ConstructionModel
 from barbados.models.glassware import GlasswareModel
 
 from barbados.factories.cocktail import CocktailFactory
 from barbados.factories.inventory import InventoryFactory
 from barbados.factories.ingredient import IngredientFactory
-from barbados.factories.drinklist import DrinkListFactory
+from barbados.factories.list import ListFactory
 from barbados.factories.construction import ConstructionFactory
 from barbados.factories.glassware import GlasswareFactory
 
@@ -68,10 +68,10 @@ class IngredientScanCache(TableScanCache):
     factory_class = IngredientFactory
 
 
-class DrinkListScanCache(TableScanCache):
-    cache_key = 'drinklist_scan_cache'
-    model_class = DrinkListModel
-    factory_class = DrinkListFactory
+class ListScanCache(TableScanCache):
+    cache_key = 'list_scan_cache'
+    model_class = ListModel
+    factory_class = ListFactory
 
 
 class InventoryScanCache(TableScanCache):
@@ -94,7 +94,7 @@ class GlasswareScanCache(TableScanCache):
 
 Caches.register_cache(CocktailScanCache)
 Caches.register_cache(IngredientScanCache)
-Caches.register_cache(DrinkListScanCache)
+Caches.register_cache(ListScanCache)
 Caches.register_cache(InventoryScanCache)
 Caches.register_cache(ConstructionScanCache)
 Caches.register_cache(GlasswareScanCache)
