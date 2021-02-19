@@ -27,7 +27,7 @@ class PostgresqlConnector:
         # https://stackoverflow.com/questions/48995979/how-to-replace-all-characters-in-a-string-with-one-character/48996018
         masked_connection_string = connection_string.replace(self.password, '*' * len(self.password))
         LogService.info("Postgres string: %s" % masked_connection_string)
-        LogService.warn('Starting PostgreSQL connection!')
+        LogService.warning('Starting PostgreSQL connection!')
 
         self.engine = sqlalchemy.create_engine(connection_string, echo=self.debug_sql)
         self.Session = sessionmaker(bind=self.engine)
