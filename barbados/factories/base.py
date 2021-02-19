@@ -110,7 +110,7 @@ class BaseFactory:
         with DatabaseService.get_session() as current_session:
             result = current_session.query(cls._model).get(id)
             if not result:
-                raise FactoryException("Model for ID value '%s' not found." % id)
+                raise KeyError("Model for ID value '%s' not found." % id)
             obj = cls.model_to_obj(result)
 
         return obj

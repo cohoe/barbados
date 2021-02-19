@@ -2,6 +2,7 @@ import datetime
 import dateutil.parser
 from barbados.exceptions import FactoryException
 from barbados.objects.text import DisplayName, Slug
+from barbados.objects.preparation import Preparations
 from uuid import UUID, uuid4
 
 
@@ -38,6 +39,12 @@ class FactoryParser:
         if not new_value:
             new_value = custom_fallback_value if custom_fallback_value else DisplayName(raw_input.get(source_attr))
         raw_input.update({key: new_value})
+        return raw_input
+
+    @staticmethod
+    def parse_preparation(raw_input, key='preparation'):
+        p = Preparations.get_preparation(raw_input.get(key))
+        raw_input.update({key: p})
         return raw_input
 
     @staticmethod

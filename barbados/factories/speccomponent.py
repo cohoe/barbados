@@ -20,6 +20,7 @@ class SpecComponentFactory(BaseFactory):
         # Parse the fields
         raw_c = FactoryParser.parse_slug(raw_c)
         raw_c = FactoryParser.parse_object_list(raw_c, factory=TextFactory, key='notes')
+        raw_c = FactoryParser.parse_preparation(raw_c)
 
         # Fill in any blanks from the source of truth.
         i = IngredientFactory.produce_obj(id=raw_c.get('slug'))
