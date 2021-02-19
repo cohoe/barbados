@@ -41,3 +41,6 @@ class CocktailSearch(SearchBase):
         self.add_query_parameter(url_parameter='citation_author',
                                  query_class=MatchPhrase,
                                  fields=['spec.citations.author'])
+        self.add_query_parameter(url_parameter='instructions',
+                                 query_class=MatchPhrase,
+                                 fields=['spec.instructions.text'])
