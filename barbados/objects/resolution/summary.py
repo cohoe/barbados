@@ -3,6 +3,7 @@ from barbados.serializers import ObjectSerializer
 from barbados.objects.resolution.status import ResolutionStatuses
 from barbados.objects.base import BaseObject
 from barbados.objects.text import Timestamp
+from collections import defaultdict
 
 
 class RecipeResolutionSummary(BaseObject):
@@ -51,13 +52,12 @@ class RecipeResolutionSummary(BaseObject):
         resolution. Example: {3x direct, 1x implicit, 1x missing}.
         :return: Dict
         """
-        counts = {key: 0 for key in ResolutionStatuses.get_resolution_statuses()}
+        # Sometimes Google knowing everything about you and the things you like can be useful.
+        # https://towardsdatascience.com/python-pro-tip-start-using-python-defaultdict-and-counter-in-place-of-dictionary-d1922513f747
+        counts = defaultdict(int)
         for r in self.components:
             status_key = r.status.status
-            try:
-                counts.update({status_key: counts[status_key]+1})
-            except KeyError:
-                counts.update({status_key: 1})
+            counts.update({status_key: counts[status_key]+1})
         return counts
 
     def get_components_by_status(self, status):

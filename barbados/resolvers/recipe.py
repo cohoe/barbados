@@ -58,7 +58,7 @@ class RecipeResolver(BaseResolver):
         try:
             rs = RecipeResolutionFactory.produce_obj(id=rs.id)
             LogService.info("Found resolution %s in the database" % rs.id)
-        except FactoryException:
+        except KeyError:
             LogService.warn("Document %s not found in database. Regenerating..." % rs.id)
             rs = RecipeResolver._populate_components(summary=rs, cocktail=cocktail, spec=spec, inventory=inventory, tree=tree)
 
