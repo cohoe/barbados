@@ -19,6 +19,27 @@ class DehydratedPreparation(BasePreparation):
     slug = 'dehydrated'
 
 
+class TwistedPreparation(BasePreparation):
+    slug = 'twisted'
+
+
+class GratedPreparation(BasePreparation):
+    slug = 'grated'
+
+
+class PickPreparation(BasePreparation):
+    slug = 'pick'
+
+
+class SidePreparation(BasePreparation):
+    slug = 'side'
+
+
+# @TODO grep through database
+class FlagPreparation(BasePreparation):
+    slug = 'flag'
+
+
 class NullPreparation(BasePreparation):
     slug = None
 
@@ -42,3 +63,8 @@ Preparations.register_class(DiscardedPreparation)
 Preparations.register_class(FlamedPreparation)
 Preparations.register_class(DehydratedPreparation)
 Preparations.register_class(NullPreparation)
+Preparations.register_class(TwistedPreparation)
+Preparations.register_class(GratedPreparation)
+Preparations.register_class(PickPreparation)
+Preparations.register_class(SidePreparation)
+Preparations.register_class(FlagPreparation)
