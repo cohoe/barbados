@@ -12,17 +12,31 @@ class List(BaseObject):
         self.items = items
         # @TODO notes?
 
+    @property
+    def items_dict(self):
+        return {i.cocktail_slug: i for i in self.items}
+
+    def get_item(self, slug):
+        return self.items_dict[slug]
+
     def add_item(self, item):
-        items_with_keys = {i.cocktail_slug: i for i in self.items}
-        if item.cocktail_slug in items_with_keys.keys():
+        if item.cocktail_slug in self.items_dict.keys():
             raise KeyError("%s is already an item of %s" % (item.cocktail_slug, self.id))
         self.items.append(item)
 
     def remove_item(self, slug):
-        items_with_keys = {i.cocktail_slug: i for i in self.items}
-        if slug not in items_with_keys.keys():
+        if slug not in self.items_dict.keys():
             raise KeyError("%s is not an item of %s" % (slug, self.id))
-        self.items.remove(items_with_keys[slug])
+        self.items.remove(self.items_dict[slug])
+
+    def replace_item(self, item):
+        if item.cocktail_slug not in self.items_dict.keys():
+            raise KeyError("%s is not an item of %s" % (item.cocktail_slug, self.id))
+        for index, list_item in enumerate(self.items):
+            if list_item.cocktail_slug == item.cocktail_slug:
+                self.items[index] = item
+                return item
+        raise Exception("Did not process %s for %s" % (item.cocktail_slug, self.id))
 
     def __repr__(self):
         return "Barbados::Objects::List[%s]" % self.id
