@@ -12,6 +12,18 @@ class List(BaseObject):
         self.items = items
         # @TODO notes?
 
+    def add_item(self, item):
+        items_with_keys = {i.cocktail_slug: i for i in self.items}
+        if item.cocktail_slug in items_with_keys.keys():
+            raise KeyError("%s is already an item of %s" % (item.cocktail_slug, self.id))
+        self.items.append(item)
+
+    def remove_item(self, slug):
+        items_with_keys = {i.cocktail_slug: i for i in self.items}
+        if slug not in items_with_keys.keys():
+            raise KeyError("%s is not an item of %s" % (slug, self.id))
+        self.items.remove(items_with_keys[slug])
+
     def __repr__(self):
         return "Barbados::Objects::List[%s]" % self.id
 
