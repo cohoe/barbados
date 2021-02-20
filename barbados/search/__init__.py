@@ -1,5 +1,5 @@
 from barbados.services.logging import LogService
-from elasticsearch_dsl.query import Bool, Wildcard, MatchPhrase, Prefix, Match, Range, Exists
+from elasticsearch_dsl.query import Bool, Wildcard, MatchPhrase, Prefix, Match, Range, Exists, MultiMatch
 from barbados.exceptions import SearchException
 from barbados.search.occurrences import Occurrences, MustOccurrence, MustNotOccurrence
 
@@ -107,12 +107,12 @@ class SearchBase:
             'value_parser': value_parser
         }
 
-    def get_query_condition(self, url_parameter, field, value):
+    def get_query_conditions(self, url_parameter, fields, value):
         """
-        Return an ElasticSearch DSL query object with the appropriate settings
+        Return a list of ElasticSearch DSL query objects with the appropriate settings
         for its kind and values from the given url_parameter.
         :param url_parameter: String of the URL parameter for this query.
-        :param field: String of the ElasticSearch document field to search.
+        :param fields: List[String] of the ElasticSearch document fields to search.
         :param value: Raw value to look for in this query.
         :returns: Some kind of Query child class.
         """
@@ -128,29 +128,44 @@ class SearchBase:
         # Attributes is the leftover **kwargs from the original function call.
         # query_class_parameters = {**{settings.get('query_key'): value}, **settings.get('attributes')}
 
-        if settings.get('query_class') is Wildcard:
-            search_value = "*%s*" % value
-            return Wildcard(**{field: {'value': search_value}})
-        elif settings.get('query_class') is MatchPhrase:
-            return MatchPhrase(**{field: value})
-        elif settings.get('query_class') is Prefix:
-            # If you're having problems with Prefix queries, see if the
-            # whitespace analyzer is set! See the RecipeIndex class for more.
-            return Prefix(**{field: {'value': value}})
-        elif settings.get('query_class') is Match:
-            return Match(**{field: {'query': value}})
-        elif settings.get('query_class') is Exists:
-            return Exists(**{'field': field})
-        elif settings.get('query_class') is Range:
-            # This is some hacks to simplify URL queries. This may be a bad idea.
-            # Range() queries do not support 'eq' (use Match() for that). To cheat
-            # this in my interface if something sets this a key of 'eq' then we
-            # under the hood convert this to a Match query.
-            if 'eq' in value.keys():
-                return Match(**{field: {'query': value.get('eq')}})
-            return Range(**{field: value})
-        else:
-            raise KeyError("Unsupported query class")
+        conditions = []
+
+        # QueryClasses that take all fields at once get constructed here.
+        # https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-multi-match-query.html
+        if settings.get('query_class') is MultiMatch:
+            conditions.append(MultiMatch(**{'query': value, 'fields': fields}))
+            return conditions
+
+        # For the rest, cycle through each field and build an object for each of them.
+        for field in fields:
+            if settings.get('query_class') is Wildcard:
+                search_value = "*%s*" % value
+                conditions.append(Wildcard(**{field: {'value': search_value}}))
+            elif settings.get('query_class') is MatchPhrase:
+                conditions.append(MatchPhrase(**{field: value}))
+            elif settings.get('query_class') is Prefix:
+                # If you're having problems with Prefix queries, see if the
+                # whitespace analyzer is set! See the RecipeIndex class for more.
+                conditions.append(Prefix(**{field: {'value': value}}))
+            elif settings.get('query_class') is Match:
+                conditions.append(Match(**{field: {'query': value}}))
+            elif settings.get('query_class') is Exists:
+                conditions.append(Exists(**{'field': field}))
+            elif settings.get('query_class') is Range:
+                # This is some hacks to simplify URL queries. This may be a bad idea.
+                # Range() queries do not support 'eq' (use Match() for that). To cheat
+                # this in my interface if something sets this a key of 'eq' then we
+                # under the hood convert this to a Match query.
+                if 'eq' in value.keys():
+                    conditions.append(Match(**{field: {'query': value.get('eq')}}))
+                else:
+                    conditions.append(Range(**{field: value}))
+            # Since MultiMatch takes all fields at once, it is constructed outside of this area.
+            else:
+                raise KeyError("Unsupported query class")
+
+        # Return the list
+        return conditions
 
     def _build_search_query(self):
         """
@@ -213,23 +228,20 @@ class SearchBase:
                     # (rum && sherry). This builds a sub-query of Bool() for the former || situation
                     # and adds it to the list of all conditions for this query for aggregation with
                     # other url_parameters.
-                    field_conditions = Bool(
-                        should=[self.get_query_condition(url_parameter=url_parameter, field=field, value=value) for field in fields])
+                    field_conditions = Bool(should=self.get_query_conditions(url_parameter=url_parameter, fields=fields, value=value))
                     url_parameter_conditions.append(field_conditions)
 
             # Single-valued url_parameters are much easier to look for.
             elif expected_value_type is str:
                 # This loops through every ElasticSearch document field that we were told to
                 # search in and add that as a condition to this url_parameter's conditions.
-                for field in fields:
-                    url_parameter_conditions.append(self.get_query_condition(url_parameter=url_parameter, field=field, value=raw_value))
+                url_parameter_conditions += self.get_query_conditions(url_parameter=url_parameter, fields=fields, value=raw_value)
             # Complex queries like implicit ranges take a direct dictionary of values to pass
             # to the underlying ElasticSearch query.
             elif expected_value_type is dict or expected_value_type is bool:
                 # This loops through every ElasticSearch document field that we were told to
                 # search in and add that as a condition to this url_parameter's conditions.
-                for field in fields:
-                    url_parameter_conditions.append(self.get_query_condition(url_parameter=url_parameter, field=field, value=raw_value))
+                url_parameter_conditions += self.get_query_conditions(url_parameter=url_parameter, fields=fields, value=raw_value)
             else:
                 raise SearchException("Unsupported url_parameter data type: %s" % expected_value_type)
 

@@ -44,3 +44,6 @@ class CocktailSearch(SearchBase):
         self.add_query_parameter(url_parameter='instructions',
                                  query_class=MatchPhrase,
                                  fields=['spec.instructions.text'])
+        self.add_query_parameter(url_parameter='all',
+                                 query_class=MultiMatch,
+                                 fields=['*'])
