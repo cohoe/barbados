@@ -185,16 +185,18 @@ class BaseFactory:
                 session.commit()
 
     @classmethod
-    def update_obj(cls, obj, commit=True):
+    def update_obj(cls, obj, id_attr='slug', commit=True):
         """
         Update an existing model based on its current object state.
         :param obj: The object to delete.
         :param commit: Whether to commit this transaction now or deal with it yourself. Useful for batches.
+        # @TODO deal with the id_attr
         :return: New model.
         """
         # @TODO this is unsafe based on if the slug/id changes. Maybe I gotta enforce that?
         with DatabaseService.get_session() as session:
-            model = session.query(cls._model).get(obj.slug)
+            id_value = getattr(obj, id_attr)
+            model = session.query(cls._model).get(id_value)
 
             # This feels unsafe, but should be OK.
             # https://stackoverflow.com/questions/9667138/how-to-update-sqlalchemy-row-entry
