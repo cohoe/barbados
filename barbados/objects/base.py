@@ -8,7 +8,3 @@ class BaseObject:
     """
     def serialize(self, serializer):
         raise NotImplementedError
-
-    # @TODO tie this in with the validators to add a .validate() function
-    # to the object? That way we don't need to bother importing validators
-    # all over the place.

@@ -10,7 +10,6 @@ class BaseIndexer:
     def index(cls, obj):
         """
         Store the object in the index.
-        @TODO rebrand to .put()?
         :param obj: barbados.objects.base.BarbadosObject child.
         :return: None
         """

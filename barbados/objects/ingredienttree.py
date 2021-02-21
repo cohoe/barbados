@@ -86,7 +86,6 @@ class IngredientTree:
 
     def parent(self, node_id):
         """
-        @TODO this should return a string like the rest of my functions.
         :param node_id:
         :return:
         """

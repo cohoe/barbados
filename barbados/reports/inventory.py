@@ -28,7 +28,6 @@ class InventoryReport(BaseReport):
         tree = IngredientTreeCache.retrieve()
         self.inventory.expand(tree)
 
-        # @TODO should report list all drink names or slugs?
         report = {
             'inventory_id': str(self.inventory.id),
             'generated_at': Timestamp()

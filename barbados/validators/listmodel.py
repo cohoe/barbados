@@ -1,7 +1,8 @@
-from barbados.objects.text import Slug
 from barbados.models.cocktail import CocktailModel
 from barbados.models.list import ListModel
 from barbados.validators.base import BaseValidator
+from barbados.exceptions import ValidationException
+from uuid import UUID
 
 
 class ListModelValidator(BaseValidator):
@@ -14,16 +15,14 @@ class ListModelValidator(BaseValidator):
 
     def validate(self, session):
         self.session = session
-        # self._check_slug()
-        # @TODO check_id
+        self._check_id()
         self._check_items()
 
-    # def _check_slug(self):
-    #     slug = self.model.slug
-    #     calculated_slug = Slug(self.model.display_name)
-    #
-    #     if slug != calculated_slug:
-    #         self.fail("Slug (%s) is inconsistent with display_name (%s)." % (self.model.slug, self.model.display_name))
+    def _check_id(self):
+        try:
+            uuid = UUID(self.model.id)
+        except ValueError as e:
+            raise ValidationException(e)
 
     def _check_items(self):
         for item in self.model.items:
@@ -32,7 +31,6 @@ class ListModelValidator(BaseValidator):
             if not c_db:
                 self.fail("Cocktail slug %s does not exist." % cocktail_slug)
 
-            # @TODO spec slug validation
             spec_slug = item.get('spec_slug')
             if spec_slug:
                 c_spec_slugs = [spec.get('slug') for spec in c_db.specs]

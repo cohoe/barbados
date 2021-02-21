@@ -7,7 +7,6 @@ from elasticsearch.exceptions import NotFoundError
 class ValidationException(Exception):
     """
     Used for validators.
-    # @TODO clean up usage of this.
     Probably 400?
     """
     pass
@@ -16,7 +15,6 @@ class ValidationException(Exception):
 class FactoryException(Exception):
     """
     Used for factories when they can't do something.
-    @TODO proper usage
     Probably 500?
     """
     pass
@@ -25,7 +23,6 @@ class FactoryException(Exception):
 class SearchException(Exception):
     """
     Used for search.
-    @TODO use this.
     Probably 400?
     """
     pass
