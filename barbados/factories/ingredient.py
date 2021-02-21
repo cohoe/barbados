@@ -6,6 +6,8 @@ from barbados.validators.ingredientmodel import IngredientModelValidator
 from barbados.indexes.ingredient import IngredientIndex
 from barbados.objects.text import DisplayName
 from barbados.factories.parser import FactoryParser
+from barbados.factories.component import ComponentFactory
+from barbados.factories.text import TextFactory
 
 
 class IngredientFactory(BaseFactory):
@@ -24,6 +26,8 @@ class IngredientFactory(BaseFactory):
         'elements_include': list(),
         'elements_exclude': list(),
         'last_refresh': None,
+        'components': list(),
+        'instructions': list()
     }
 
     @classmethod
@@ -34,6 +38,8 @@ class IngredientFactory(BaseFactory):
         raw_ingredient = cls._parse_conditions(raw_ingredient)
         raw_ingredient = cls._parse_aliases(raw_ingredient)
         raw_ingredient = FactoryParser.parse_display_name(raw_ingredient)
+        raw_ingredient = FactoryParser.parse_object_list(raw_ingredient, TextFactory, 'instructions')
+        raw_ingredient = FactoryParser.parse_object_list(raw_ingredient, ComponentFactory, 'components')
 
         # Build the object
         i = Ingredient(**raw_ingredient)

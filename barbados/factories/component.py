@@ -2,7 +2,7 @@ from barbados.objects.component import Component
 from barbados.factories.base import BaseFactory
 from barbados.factories.parser import FactoryParser
 from barbados.factories.text import TextFactory
-from barbados.factories.ingredient import IngredientFactory
+# from barbados.factories.ingredient import IngredientFactory
 
 
 class ComponentFactory(BaseFactory):
@@ -23,7 +23,8 @@ class ComponentFactory(BaseFactory):
         raw_c = FactoryParser.parse_preparation(raw_c)
 
         # Fill in any blanks from the source of truth.
-        i = IngredientFactory.produce_obj(id=raw_c.get('slug'))
-        raw_c = FactoryParser.parse_display_name(raw_c, custom_fallback_value=i.display_name)
+        # @TODO unfrak this
+        # i = IngredientFactory.produce_obj(id=raw_c.get('slug'))
+        # raw_c = FactoryParser.parse_display_name(raw_c, custom_fallback_value=i.display_name)
 
         return Component(**raw_c)

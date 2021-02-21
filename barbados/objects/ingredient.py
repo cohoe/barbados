@@ -8,7 +8,8 @@ from barbados.objects.text import Timestamp
 
 class Ingredient(BaseObject):
     def __init__(self, slug, display_name, kind, parent=None, aliases=None, elements=None,
-                 conditions=None, elements_include=None, elements_exclude=None, last_refresh=None):
+                 conditions=None, elements_include=None, elements_exclude=None, last_refresh=None,
+                 instructions=None, components=None):
         """
         Ingredient
         :param slug: Slug ID of this ingredient.
@@ -21,6 +22,8 @@ class Ingredient(BaseObject):
         :param elements_include: List of Ingredient slugs that should be manually included in this index.
         :param elements_exclude: List of Ingredient slugs that should be excluded from this index.
         :param last_refresh: Timestamp of the last refresh of the elements in this index.
+        :param instructions: List of Text objects for instructions to make this ingredient.
+        :param components: List of Component objects.
         """
         if aliases is None:
             aliases = []
@@ -37,6 +40,12 @@ class Ingredient(BaseObject):
         if elements_include is None:
             elements_include = []
 
+        if instructions is None:
+            instructions = []
+
+        if components is None:
+            components = []
+
         self.slug = slug
         self.display_name = display_name
         self.kind = IngredientKinds(kind)
@@ -47,6 +56,8 @@ class Ingredient(BaseObject):
         self.elements_include = elements_include
         self.elements_exclude = elements_exclude
         self.last_refresh = last_refresh
+        self.instructions = instructions
+        self.components = components
 
     def serialize(self, serializer):
         serializer.add_property('slug', self.slug)
@@ -59,6 +70,8 @@ class Ingredient(BaseObject):
         serializer.add_property('elements_include', self.elements_include)
         serializer.add_property('elements_exclude', self.elements_exclude)
         serializer.add_property('last_refresh', str(self.last_refresh) if self.last_refresh is not None else None)
+        serializer.add_property('instructions', [ObjectSerializer.serialize(obj, serializer.format) for obj in self.instructions])
+        serializer.add_property('components', [ObjectSerializer.serialize(obj, serializer.format) for obj in self.components])
 
     def refresh(self):
         """

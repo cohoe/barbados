@@ -19,6 +19,8 @@ class IngredientModel(BarbadosModel):
     last_refresh = Column(DateTime, nullable=True)
     elements_include = Column(ARRAY(String), nullable=True)
     elements_exclude = Column(ARRAY(String), nullable=True)
+    instructions = Column(JSON, nullable=True)
+    components = Column(JSON, nullable=True)
 
     @staticmethod
     def get_usable_ingredients(session):

@@ -1,7 +1,7 @@
 from barbados.objects.text import Slug
 from barbados.models.ingredient import IngredientModel
 from barbados.validators.base import BaseValidator
-from barbados.objects.ingredientkinds import IngredientKinds
+from barbados.objects.ingredientkinds import IngredientKinds, CustomKind
 from barbados.exceptions import ValidationException
 
 
@@ -22,6 +22,8 @@ class IngredientModelValidator(BaseValidator):
         self._check_elements()
         self._check_slug()
         self._check_conditions()
+        self._check_instructions()
+        self._check_components()
         # @TODO check_aliases display_name not in aliases
 
     def _check_kind(self):
@@ -88,3 +90,17 @@ class IngredientModelValidator(BaseValidator):
     def _check_slug(self):
         if self.model.slug != Slug(self.model.display_name):
             raise ValidationException("Slug (%s) is inconsistent with display_name." % self.model.slug)
+
+    def _check_components(self):
+        if not self.model.components:
+            return
+        # Only custom can have components
+        if self.model.kind != CustomKind.value:
+            raise ValidationException("Kind %s of %s cannot have components." % (self.model.kind, self.model.slug))
+
+    def _check_instructions(self):
+        if not self.model.instructions:
+            return
+        # Only custom can have instructions
+        if self.model.kind != CustomKind.value:
+            raise ValidationException("Kind %s of %s cannot have instructions." % (self.model.kind, self.model.slug))
