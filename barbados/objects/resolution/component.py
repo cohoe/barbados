@@ -1,9 +1,9 @@
 from barbados.objects.resolution.status import ResolutionStatuses
 
 
-class SpecComponentResolution:
+class ComponentResolution:
     """
-    A SpecComponentResolution represents a comparison of an ingredient (SpecComponent) to what you have in your Inventory. Generally this
+    A ComponentResolution represents a comparison of an ingredient (Component) to what you have in your Inventory. Generally this
     can mean you have it (Direct), you can substitute for it (Implicit), or it's Missing entirely. This calculation is performed using
     the IngredientTree.
     """
@@ -19,7 +19,7 @@ class SpecComponentResolution:
         self.parents = parents
 
     def __repr__(self):
-        return "Barbados::Objects::SpecComponentResolution[%s]" % self.slug
+        return "Barbados::Objects::ComponentResolution[%s]" % self.slug
 
     def serialize(self, serializer):
         serializer.add_property('slug', self.slug)

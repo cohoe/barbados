@@ -1,7 +1,7 @@
 from barbados.resolvers.base import BaseResolver
 from barbados.services.logging import LogService
 from barbados.objects.resolution.status import DirectResolutionStatus, ImplicitResolutionStatus, MissingResolutionStatus
-from barbados.objects.resolution.speccomponent import SpecComponentResolution
+from barbados.objects.resolution.component import ComponentResolution
 from barbados.caches.ingredienttree import IngredientTreeCache
 from barbados.factories.reciperesolution import RecipeResolutionFactory
 from barbados.exceptions import FactoryException
@@ -87,8 +87,8 @@ class RecipeResolver(BaseResolver):
 
                 # Construct the SpecResolution object.
             LogService.info("Resolution for %s::%s::%s is %s" % (cocktail.slug, spec.slug, component.slug, resolution_status.status))
-            r = SpecComponentResolution(slug=component.slug, status=resolution_status, substitutes=substitutes,
-                                        parents=tree.parents(component.slug))
+            r = ComponentResolution(slug=component.slug, status=resolution_status, substitutes=substitutes,
+                                    parents=tree.parents(component.slug))
 
             # Add the resolution to the summary
             summary.add_component(r)

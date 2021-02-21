@@ -1,4 +1,4 @@
-from barbados.objects.resolution.speccomponent import SpecComponentResolution
+from barbados.objects.resolution.component import ComponentResolution
 from barbados.serializers import ObjectSerializer
 from barbados.objects.resolution.status import ResolutionStatuses
 from barbados.objects.base import BaseObject
@@ -39,8 +39,8 @@ class RecipeResolutionSummary(BaseObject):
         :return: None
         """
         # Test the incoming
-        if not isinstance(resolution, SpecComponentResolution):
-            raise ValueError("Bad resolution type. %s" % SpecComponentResolution)
+        if not isinstance(resolution, ComponentResolution):
+            raise ValueError("Bad resolution type. %s" % ComponentResolution)
 
         # Add the resolution to the list of components for this spec.
         self.components.append(resolution)

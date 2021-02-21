@@ -1,9 +1,10 @@
 from barbados.serializers import ObjectSerializer
+from barbados.objects.base import BaseObject
 
 
-class SpecComponent:
+class Component(BaseObject):
     """
-    SpecComponent is an Ingredient in a usage context (quantity, unit, notes, etc).
+    Component is an Ingredient in a usage context (quantity, unit, notes, etc).
     """
     def __init__(self, slug, display_name=None, quantity=None, unit=None, notes=None, optional=None, preparation=None):
         if not notes:
@@ -17,7 +18,7 @@ class SpecComponent:
         self.preparation = preparation
 
     def __repr__(self):
-        return "Barbados::Objects::SpecComponent[%s]" % self.slug
+        return "Barbados::Objects::Component[%s]" % self.slug
 
     def serialize(self, serializer):
         serializer.add_property('slug', self.slug)
