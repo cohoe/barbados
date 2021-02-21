@@ -1,7 +1,8 @@
 from barbados.objects.resolution.status import ResolutionStatuses
+from barbados.objects.base import BaseObject
 
 
-class ComponentResolution:
+class ComponentResolution(BaseObject):
     """
     A ComponentResolution represents a comparison of an ingredient (Component) to what you have in your Inventory. Generally this
     can mean you have it (Direct), you can substitute for it (Implicit), or it's Missing entirely. This calculation is performed using

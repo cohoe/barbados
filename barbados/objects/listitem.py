@@ -6,7 +6,6 @@ class ListItem(BaseObject):
     A ListItem is a glorified hint/pointer to a specific item
     in a List. Right now this is only coded for either a "cocktail"
     or a specific Spec of a particular Cocktail.
-    @TODO add a Kind field and make this generic?
     @TODO deal with notes
     """
 

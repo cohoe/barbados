@@ -1,4 +1,4 @@
-class IngredientKinds(object):
+class IngredientKinds:
     """
     https://realpython.com/factory-method-python/
     """
