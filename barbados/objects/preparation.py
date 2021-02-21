@@ -35,7 +35,6 @@ class SidePreparation(BasePreparation):
     slug = 'side'
 
 
-# @TODO grep through database
 class FlagPreparation(BasePreparation):
     slug = 'flag'
 

@@ -24,7 +24,7 @@ class IngredientModelValidator(BaseValidator):
         self._check_conditions()
         self._check_instructions()
         self._check_components()
-        # @TODO check_aliases display_name not in aliases
+        self._check_aliases()
 
     def _check_kind(self):
         try:
@@ -104,3 +104,10 @@ class IngredientModelValidator(BaseValidator):
         # Only custom can have instructions
         if self.model.kind != CustomKind.value:
             raise ValidationException("Kind %s of %s cannot have instructions." % (self.model.kind, self.model.slug))
+
+    def _check_aliases(self):
+        if not self.model.aliases:
+            return
+        # Ensure display_name isnt in the aliases
+        if self.model.display_name in self.model.aliases:
+            raise ValidationException("Display Name %s cannot be an alias." % self.model.display_name)

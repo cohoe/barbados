@@ -190,7 +190,6 @@ class BaseFactory:
         Update an existing model based on its current object state.
         :param obj: The object to delete.
         :param commit: Whether to commit this transaction now or deal with it yourself. Useful for batches.
-        # @TODO deal with the id_attr
         :return: New model.
         """
         # @TODO this is unsafe based on if the slug/id changes. Maybe I gotta enforce that?

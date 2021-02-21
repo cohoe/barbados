@@ -1,6 +1,5 @@
 import os
 import logging
-# @TODO wrap this into the search service
 from elasticsearch.exceptions import NotFoundError
 
 

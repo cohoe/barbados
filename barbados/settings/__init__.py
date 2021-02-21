@@ -6,7 +6,6 @@ class Setting:
     """
     Standard class for accessing a setting provided either by the registry,
     environment variable, and defaults.
-    @TODO support a config file?
     """
     def __init__(self, path, env, default, type_=None):
         self.path = path

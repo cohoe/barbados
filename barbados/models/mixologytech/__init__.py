@@ -62,7 +62,7 @@ class IngredientDependencyModel(MixologyTechModel):
     __tablename__ = 'ZINGREDIENTDEPENDENCY'
 
     id = Column(Integer, name='Z_PK', primary_key=True, doc='Table primary key ID.')
-    position = Column(Integer, name='ZPOSITION', doc='???????') # @TODO this might be the small ingredient text below each recipe?
+    position = Column(Integer, name='ZPOSITION', doc='???????') # this might be the small ingredient text below each recipe?
     recipe = Column(Integer, name='ZRECIPE', doc='Primary Key of Recipe.')
 
     # status = Column(Integer, name='ZSTATUS')

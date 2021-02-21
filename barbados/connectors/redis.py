@@ -9,7 +9,6 @@ class RedisConnector:
     """
     Connector to the Redis cache service. The CacheService creates an instance of this connector
     and uses it to communicate with the backend.
-    @TODO implement global connection pooling somewhere
     """
     def __init__(self):
         self.host = Setting(path='/cache/redis/host', env='AMARI_REDIS_HOST', default='127.0.0.1', type_=str).get_value()
