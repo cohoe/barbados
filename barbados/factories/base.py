@@ -2,7 +2,7 @@ import copy
 from barbados.serializers import ObjectSerializer
 from barbados.services.logging import LogService
 from barbados.services.database import DatabaseService
-from barbados.exceptions import FactoryException
+from barbados.exceptions import FactoryException, FactoryUpdateException
 
 
 class BaseFactory:
@@ -185,17 +185,17 @@ class BaseFactory:
                 session.commit()
 
     @classmethod
-    def update_obj(cls, obj, id_attr='slug', commit=True):
+    def update_obj(cls, obj, id_value, id_attr='slug', commit=True):
         """
         Update an existing model based on its current object state.
         :param obj: The object to delete.
+        :param id_value: The ID of the object we should be updating.
+        :param id_attr: Identity attribute.
         :param commit: Whether to commit this transaction now or deal with it yourself. Useful for batches.
         :return: New model.
         """
-        # @TODO this is unsafe based on if the slug/id changes. Maybe I gotta enforce that?
         with DatabaseService.get_session() as session:
-            id_value = getattr(obj, id_attr)
-            model = session.query(cls._model).get(id_value)
+            model = cls._get_model_safe(session, obj, id_attr, id_value)
 
             # This feels unsafe, but should be OK.
             # https://stackoverflow.com/questions/9667138/how-to-update-sqlalchemy-row-entry
@@ -210,3 +210,27 @@ class BaseFactory:
                 session.commit()
 
             return model
+
+    @classmethod
+    def _get_model_safe(cls, session, obj, id_attr, id_value):
+        """
+        Safely retrieve an existing model for this object. This has some checks
+        to prevent someone from trying to cross-modify a different object.
+        :param session: Database session context object.
+        :param obj: BarbadosObject that we're trying to save to the database.
+        :param id_attr: Identity attribute.
+        :param id_value: Expected identity value.
+        :return: BarbadosModel child representing the current state of the object.
+        """
+        obj_id_value = getattr(obj, id_attr)
+
+        # Straight up, if the ID values don't match throw it back.
+        if obj_id_value != id_value:
+            raise FactoryUpdateException("Cannot change ID values (%s -> %s)" % (id_value, obj_id_value))
+
+        # Try getting the existing model. If it doesn't exist then something has gone wrong.
+        model = session.query(cls._model).get(obj_id_value)
+        if not model:
+            raise FactoryUpdateException("Model for %s not found." % obj_id_value)
+
+        return model

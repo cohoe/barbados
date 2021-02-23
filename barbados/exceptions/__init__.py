@@ -19,6 +19,14 @@ class FactoryException(Exception):
     pass
 
 
+class FactoryUpdateException(Exception):
+    """
+    The factory tried to update something but it couldn't. Probably because
+    you're trying to be naughty and change the ID or something like that.
+    """
+    pass
+
+
 class SearchException(Exception):
     """
     Used for search.
