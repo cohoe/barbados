@@ -7,7 +7,7 @@ class Setting:
     Standard class for accessing a setting provided either by the registry,
     environment variable, and defaults.
     """
-    def __init__(self, path, env, default, type_=None):
+    def __init__(self, path, default, env=None, type_=None):
         self.path = path
         self.env = env
         self.default = default
@@ -26,7 +26,7 @@ class Setting:
                 raise KeyError
             value = RegistryService.get(self.path)
         except KeyError:
-            value = os.getenv(key=self.env, default=self.default)
+            value = os.getenv(key=self.env, default=self.default) if self.env else self.default
 
         if self.type_ and not isinstance(value, self.type_) and value is not None:
             value = self.type_(value)
