@@ -13,13 +13,18 @@ class RegistryService:
     connector = ZookeeperConnector()
 
     @staticmethod
-    def get(path):
+    def get(path, default_none=False):
         """
         Fetch the value from the configuration store for the given key.
         :param path: Normalized path in the hierarchy to the key.
+        :param default_none: Boolean of whether to return None instead of a KeyError if it doesn't exist.
         :return: str or Exception
         """
-        return RegistryService.connector.get(path)
+        try:
+            return RegistryService.connector.get(path)
+        except KeyError as e:
+            if not default_none:
+                raise e
 
     @staticmethod
     def set(path, value):

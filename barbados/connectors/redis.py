@@ -13,8 +13,10 @@ class RedisConnector:
     def __init__(self):
         self.host = Setting(path='/cache/redis/host', env='AMARI_REDIS_HOST', default='127.0.0.1', type_=str).get_value()
         self.port = Setting(path='/cache/redis/port', env='AMARI_REDIS_PORT', default=6379, type_=int).get_value()
-        self.username = Setting(path='/cache/redis/username', env='AMARI_REDIS_USERNAME', default=None, type_=str).get_value()
-        self.password = Setting(path='/cache/redis/password', env='AMARI_REDIS_PASSWORD', default=None, type_=str).get_value()
+        # self.username = Setting(path='/cache/redis/username', env='AMARI_REDIS_USERNAME', default=None, type_=str).get_value()
+        # self.password = Setting(path='/cache/redis/password', env='AMARI_REDIS_PASSWORD', default=None, type_=str).get_value()
+        self.username = None
+        self.password = None
         self.ssl = Setting(path='/cache/redis/ssl', env='AMARI_REDIS_SSL', default=False, type_=bool).get_value()
         self.request_timeout = Setting(path='/cache/redis/request_timeout', env='AMARI_REDIS_REQUEST_TIMEOUT', default=18000, type_=int).get_value()
         self.flask_database_id = Setting(path='/cache/redis/flask_database_id', env='AMARI_REDIS_FLASK_DATABASE_ID', default=2, type_=int).get_value()

@@ -1,5 +1,7 @@
 import os
 from barbados.services.registry import RegistryService
+from barbados.exceptions import SettingsException
+from barbados.services.logging import LogService
 
 
 class Setting:
@@ -7,7 +9,8 @@ class Setting:
     Standard class for accessing a setting provided either by the registry,
     environment variable, and defaults.
     """
-    def __init__(self, path, default, env=None, type_=None):
+
+    def __init__(self, path, type_, default=None, env=''):
         self.path = path
         self.env = env
         self.default = default
@@ -21,17 +24,22 @@ class Setting:
         :param skip_registry: Boolean to skip looking at the registry.
         :return: Value of the setting.
         """
+        registry_value = RegistryService.get(self.path, default_none=True)
+        env_value = os.getenv(key=self.env, default=None)
+        default_value = self.default
+
+        potential_values = (registry_value, env_value, default_value)
+        if skip_registry:
+            potential_values = (env_value, default_value)
+
+        # https://stackoverflow.com/questions/18533620/getting-the-first-non-none-value-from-list
         try:
-            if skip_registry:
-                raise KeyError
-            value = RegistryService.get(self.path)
-        except KeyError:
-            value = os.getenv(key=self.env, default=self.default) if self.env else self.default
+            setting_value = next(value for value in potential_values if value is not None)
+        except StopIteration:
+            raise SettingsException("No valid setting found for %s" % self.path)
 
-        if self.type_ and not isinstance(value, self.type_) and value is not None:
-            value = self.type_(value)
-
-        return value
+        LogService.info("Setting %s => %s" % (self.path, setting_value))
+        return setting_value
 
     def __repr__(self):
-        return "Barbados::Settings::Setting[%s]" % self.path
+        return "Barbados::Settings::Setting[%s=%s]" % (self.path, self.get_value())

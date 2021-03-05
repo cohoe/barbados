@@ -35,6 +35,14 @@ class SearchException(Exception):
     pass
 
 
+class SettingsException(Exception):
+    """
+    Bad configuration.
+    Probably 500.
+    """
+    pass
+
+
 class FatalException(Exception):
     def __init__(self, exception):
         logging.error("A fatal error has occurred: %s" % exception)
