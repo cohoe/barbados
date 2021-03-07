@@ -1,4 +1,5 @@
 from barbados.connectors.redis import RedisConnector
+from barbados.settings.cache import redis_settings
 
 
 class CacheService:
@@ -9,7 +10,7 @@ class CacheService:
     * Memcached
     """
 
-    connector = RedisConnector()
+    connector = RedisConnector(**redis_settings)
 
     @staticmethod
     def get(key):

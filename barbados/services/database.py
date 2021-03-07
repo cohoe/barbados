@@ -1,4 +1,5 @@
 from barbados.connectors.postgresql import PostgresqlConnector
+from barbados.settings.database import postgresql_settings
 
 
 class DatabaseService:
@@ -13,7 +14,7 @@ class DatabaseService:
     this class really creates.
     """
 
-    connector = PostgresqlConnector()
+    connector = PostgresqlConnector(**postgresql_settings)
 
     @staticmethod
     def get_session():

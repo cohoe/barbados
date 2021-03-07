@@ -43,3 +43,25 @@ class Setting:
 
     def __repr__(self):
         return "Barbados::Settings::Setting[%s=%s]" % (self.path, self.get_value())
+
+
+class Settings(dict):
+    """
+    Dictionary-esque holder for all settings and their values for a particular
+    collection of settings. Useful for organizing all PostgreSQL or Redis or
+    whatever settings into a single dict that can be fed into a constructor.
+    """
+
+    def __init__(self, **kwargs):
+        """
+        This expects a series of keyword arguments of key: Setting objects.
+        But it has to also deal with more native data types like None or Dicts.
+        :param kwargs: Expanded series of key=Setting pairs.
+        """
+        settings_dict = {}
+        for k, v in kwargs.items():
+            if isinstance(v, Setting):
+                settings_dict.update({k: v.get_value()})
+            else:
+                settings_dict.update({k: v})
+        super().__init__(settings_dict)
