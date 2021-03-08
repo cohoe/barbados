@@ -30,6 +30,8 @@ setup(
         'bs4',
         'sqlalchemy_json_querybuilder',
         'slugify',
-        'python-dateutil'
+        'python-dateutil',
+        'flask-security-too',
+        'flask_sqlalchemy_session'
     ]
 )
