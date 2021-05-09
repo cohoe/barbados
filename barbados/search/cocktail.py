@@ -8,9 +8,12 @@ class CocktailSearch(SearchBase):
     index_class = RecipeIndex
 
     def _build_query_parameters(self):
+        # Is there a performance penalty for wildcard queries? This makes "components=meletti"
+        # return for anything with "amaro-meletti". Not sure if this is a good enough solution
+        # or if search should only work with actual ingredient names/slugs.
         self.add_query_parameter(url_parameter='components',
                                  url_parameter_type=list,
-                                 query_class=MatchPhrase,
+                                 query_class=Wildcard,
                                  fields=['spec.components.slug', 'spec.components.parents'])
         self.add_query_parameter(url_parameter='name',
                                  query_class=Wildcard,

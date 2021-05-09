@@ -19,7 +19,7 @@ class GarnishIndex(InnerDoc):
 
 class ComponentIndex(InnerDoc):
     slug = Text(analyzer='whitespace', search_analyzer='whitespace')
-    display_name = Text()
+    display_name = Text(analyzer='whitespace', search_analyzer='whitespace')
     quantity = Integer()
     unit = Text()
     parents = Text(multi=True)
