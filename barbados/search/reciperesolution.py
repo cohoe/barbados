@@ -1,5 +1,5 @@
 from barbados.search import SearchBase
-from elasticsearch_dsl.query import MatchPhrase, Wildcard, Prefix, Match, Range, Exists
+from elasticsearch_dsl.query import MatchPhrase, Wildcard, Prefix, Match, Range, Exists, MultiMatch
 from barbados.indexes.reciperesolutionindex import RecipeResolutionIndex
 from barbados.search.occurrences import ShouldOccurrence
 
@@ -50,3 +50,6 @@ class RecipeResolutionSearch(SearchBase):
         self.add_query_parameter(url_parameter='citation_author',
                                  query_class=MatchPhrase,
                                  fields=['citations.author'])
+        self.add_query_parameter(url_parameter='all',
+                                 query_class=MultiMatch,
+                                 fields=['*'])
