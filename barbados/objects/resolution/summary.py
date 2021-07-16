@@ -3,7 +3,6 @@ from barbados.serializers import ObjectSerializer
 from barbados.objects.resolution.status import ResolutionStatuses
 from barbados.objects.base import BaseObject
 from barbados.objects.text import Timestamp
-from collections import defaultdict
 
 
 class RecipeResolutionSummary(BaseObject):
@@ -54,7 +53,11 @@ class RecipeResolutionSummary(BaseObject):
         """
         # Sometimes Google knowing everything about you and the things you like can be useful.
         # https://towardsdatascience.com/python-pro-tip-start-using-python-defaultdict-and-counter-in-place-of-dictionary-d1922513f747
-        counts = defaultdict(int)
+        # This had a bug for a while where searching for status of 0 if none were of that type
+        # would yield no results. Retired defaultdict in favor of fromkeys().
+        # https://www.geeksforgeeks.org/python-initialize-a-dictionary-with-only-keys-from-a-list/
+        # https://www.tutorialspoint.com/python/dictionary_fromkeys.htm
+        counts = dict.fromkeys(ResolutionStatuses.get_resolution_statuses(), 0)
         for r in self.components:
             status_key = r.status.status
             counts.update({status_key: counts[status_key]+1})

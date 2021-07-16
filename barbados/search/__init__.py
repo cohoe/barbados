@@ -138,6 +138,7 @@ class SearchBase:
 
         # For the rest, cycle through each field and build an object for each of them.
         for field in fields:
+            # @TODO this needs to be its own function. Too hard to debug.
             if settings.get('query_class') is Wildcard:
                 search_value = "*%s*" % value
                 conditions.append(Wildcard(**{field: {'value': search_value}}))
@@ -295,6 +296,12 @@ class SearchBase:
         :param raw_value: String of an integer and optional plus/minus.
         :return: Dict for Range() construction.
         """
+        # URLs treat '+' as a blank space. This caused problems debugging so
+        # I'm going to add an explicit check for it to prevent someone getting
+        # confused later on.
+        # https://stackoverflow.com/questions/5450190/how-to-encode-the-plus-symbol-in-a-url
+        if ' ' in raw_value:
+            raise ValueError("A space was detected in the range query. This likely means you did not encode a + (%2b).")
         try:
             if type(raw_value) is int:
                 # 'eq' is not a value ElasticSearch Range() operator. This
