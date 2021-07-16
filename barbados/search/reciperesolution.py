@@ -37,7 +37,9 @@ class RecipeResolutionSearch(SearchBase):
                                  query_class=Match,
                                  fields=['construction_slug'])
         self.add_query_parameter(url_parameter='component_count',
-                                 query_class=Match,
+                                 query_class=Range,
+                                 url_parameter_type=dict,
+                                 value_parser=self._parse_range_value,
                                  fields=['component_count'])
         self.add_query_parameter(url_parameter='garnish',
                                  url_parameter_type=bool,
