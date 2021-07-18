@@ -21,7 +21,8 @@ class PostgresqlConnector:
         self.database = database
         self.debug_sql = debug_sql
 
-        connection_string = "postgres://%s:%s@%s:%i/%s" % (self.username, self.password, self.host, self.port, self.database)
+        # https://stackoverflow.com/questions/62688256/sqlalchemy-exc-nosuchmoduleerror-cant-load-plugin-sqlalchemy-dialectspostgre
+        connection_string = "postgresql://%s:%s@%s:%i/%s" % (self.username, self.password, self.host, self.port, self.database)
 
         # https://stackoverflow.com/questions/48995979/how-to-replace-all-characters-in-a-string-with-one-character/48996018
         masked_connection_string = connection_string.replace(self.password, '*' * len(self.password))
